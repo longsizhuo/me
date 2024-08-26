@@ -16,7 +16,7 @@ const Experience = () => {
             <div>
                 <h3 style={headingStyle}>Gem Flower Healthcare Information Technology Ltd.</h3>
                 <p style={paragraphStyle}><strong>Role:</strong> Research & Development Intern, Product Development Department</p>
-                <p style={paragraphStyle}><strong>Duration:</strong> Sep 2017 - May 2021</p>
+                <p style={paragraphStyle}><strong>Duration:</strong> Jan 2021 - Apr 2021</p>
                 <p style={paragraphStyle}>
                     Assisted tutor in hospital system maintenance and code testing, performing duties similar to a mobile task force by addressing issues across various departments.
                 </p>

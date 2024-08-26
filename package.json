@@ -10,7 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@mui/material": "^5.16.6",
+    "@mui/styled-engine": "^5.16.6",
+    "@octokit/graphql": "^8.1.1",
+    "axios": "^1.7.3",
+    "graphql": "^16.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
