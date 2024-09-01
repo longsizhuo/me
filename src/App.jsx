@@ -5,6 +5,10 @@ import Education from './components/Education';
 import Experience from './components/Experience';
 import Achievements from './components/Achievements';
 import GitHubCard from './components/GitHubCard';
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import SpotFinder from "./Projects/spot-finder.jsx";
+import HelloAlgo from "./Projects/hello-algo.jsx";
+import VisualizationTool from "./Projects/visualization-tool.jsx";
 
 function App() {
     const appStyle = {
@@ -13,18 +17,27 @@ function App() {
     };
 
     return (
-        <div className="App" style={appStyle}>
-            {/*<header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>*/}
-            {/*    <h1>Sizhuo Long's Website</h1>*/}
-            {/*    <MyAvatar />*/}
-            {/*</header>*/}
-            <Profile />
-            <GitHubCard />
-            <Projects />
-            <Education />
-            <Experience />
-            <Achievements />
-        </div>
+        <Router>
+            <div className="App" style={appStyle}>
+                <Routes>
+                    <Route path={"/"} element={
+                        <>
+                            <Profile />
+                            <GitHubCard />
+                            <Projects />
+                            <Education />
+                            <Experience />
+                            <Achievements />
+                        </>
+                    } />
+                    <Route path="spot-finder" element={<SpotFinder />} />
+                    <Route path="hello-algo" element={<HelloAlgo />} />
+                    <Route path="visualization-tool" element={<VisualizationTool />} />
+
+                </Routes>
+
+            </div>
+        </Router>
     );
 }
 
