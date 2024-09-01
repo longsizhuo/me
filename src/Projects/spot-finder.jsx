@@ -1,15 +1,15 @@
-import React, {useEffect} from 'react';
-import {Container, Typography, Card, CardContent, Box, ImageList, ImageListItem} from '@mui/material';
+import React from 'react';
+import { Container, Typography, Card, CardContent, Box } from '@mui/material';
 import SpotFinderImages from '../../utils/getImages.jsx';
 
 const SpotFinder = () => {
     return (
-        <Container maxWidth="md" style={{ marginTop: '20px' }}>
-            <Card>
+        <Container style={{ marginTop: '20px', maxWidth: '100%' }}>
+            <Card style={{ marginBottom: '20px' }}>
                 <CardContent>
                     <Box mb={2}>
                         <Typography variant="h4" component="h1" gutterBottom>
-                            <a href={"https://longsizhuo.com"} target={"_blank"} rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'blue' }}>
+                            <a href="https://longsizhuo.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'blue' }}>
                                 Spot Finder
                             </a>
                         </Typography>
@@ -40,14 +40,14 @@ const SpotFinder = () => {
                         </ul>
                     </Box>
                 </CardContent>
-            </Card>
 
-            <Card>
+
+            <Card style={{ marginBottom: '20px' }}>
                 <CardContent>
                     <Typography variant="h5" component="h3" gutterBottom>
-                            Live Preview of SpotFinder
+                        Live Preview of SpotFinder
                     </Typography>
-                    <Box sx={{ height: '400px', overflow: 'hidden', border: '1px solid #ccc' }}>
+                    <Box sx={{ height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', border: '1px solid #ccc' }}>
                         <iframe
                             src="https://longsizhuo.com"
                             title="longsizhuo.com"
@@ -56,15 +56,17 @@ const SpotFinder = () => {
                     </Box>
                 </CardContent>
             </Card>
+
             <Card>
-                <Typography variant="h5" component="h3" gutterBottom>
-                    Pictures of USYD Coding Fest 2024
-                </Typography>
-                <SpotFinderImages />
+                <CardContent>
+                    <Typography variant="h5" component="h3" gutterBottom>
+                        Pictures of USYD Coding Fest 2024
+                    </Typography>
+                    <SpotFinderImages />
+                </CardContent>
+            </Card>
             </Card>
         </Container>
-
-
     );
 }
 
