@@ -49,27 +49,27 @@ const GitHubCard = () => {
             }
         };
 
-        fetchPinnedRepos();
+        fetchPinnedRepos().then(r =>
+            console.log(r)
+        );
     }, []);
 
     return (
-        <Box sx={{ padding: '20px' }}>
-            <Typography variant="h4" gutterBottom>
-                First 3 Contributed GitHub Repos
-            </Typography>
+        <Box>
+            <h2 style={{color: '#333'}}>First 3 Contributed</h2>
             <Grid container spacing={2}>
-                {pinnedRepos.map((repo) => (
+            {pinnedRepos.map((repo) => (
                     <Grid item xs={12} sm={6} md={4} key={repo.id}>
-                        <Card>
+                        <Card sx={{ maxWidth: "auto", minHeight: 250 }}> {/* 调整卡片大小 */}
                             <CardMedia>
                                 <Avatar
                                     alt={repo.owner.login}
                                     src={repo.owner.avatarUrl}
-                                    sx={{ width: 56, height: 56, margin: 'auto', marginTop: '10px' }}
+                                    sx={{ width: 48, height: 48, margin: 'auto', marginTop: '10px' }}
                                 />
                             </CardMedia>
                             <CardContent>
-                                <Typography variant="h6" component="div">
+                                <Typography variant="subtitle1" component="div">
                                     {repo.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
