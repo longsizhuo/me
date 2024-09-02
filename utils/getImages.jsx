@@ -18,20 +18,30 @@ export default function SpotFinderImages() {
     const [checkedStates, setCheckedStates] = useState(new Array(8).fill(false));
 
     useEffect(() => {
-        // 用于依次显示每张图片的动画
-        visibleImages.forEach((_, index) => {
-            setTimeout(() => {
-                setCheckedStates((prevStates) => {
-                    const newStates = [...prevStates];
-                    newStates[index] = true; // 依次显示图片
-                    return newStates;
-                });
-            }, index * 500); // 依次延迟500ms
-        });
+        const showImagesSequentially = () => {
+            visibleImages.forEach((_, index) => {
+                setTimeout(() => {
+                    setCheckedStates((prevStates) => {
+                        const newStates = [...prevStates];
+                        newStates[index] = true;
+                        return newStates;
+                    });
+                }, index * 500);
+            });
+        };
 
-        // 每5秒切换一次图片
+        showImagesSequentially();
+
         const interval = setInterval(() => {
-            setCheckedStates(new Array(10).fill(false)); // 先隐藏所有图片
+            visibleImages.forEach((_, index) => {
+                setTimeout(() => {
+                    setCheckedStates((prevStates) => {
+                        const newStates = [...prevStates];
+                        newStates[index] = false; // 隐藏每个图片
+                        return newStates;
+                    });
+                }, index * 300); // 延迟300ms逐步隐藏
+            });
 
             setTimeout(() => {
                 setVisibleImages((prevImages) => {
@@ -42,18 +52,9 @@ export default function SpotFinderImages() {
                     ];
                     return newImages;
                 });
-
-                new Array(10).fill(null).forEach((_, index) => {
-                    setTimeout(() => {
-                        setCheckedStates((prevStates) => {
-                            const newStates = [...prevStates];
-                            newStates[index] = true; // 再依次显示新的图片
-                            return newStates;
-                        });
-                    }, index * 500); // 同样依次延迟500ms
-                });
-            }, 500); // 在隐藏图片后延迟500ms再开始显示
-        }, 5000); // 每5秒轮换一次
+                showImagesSequentially();
+            }, 300 * visibleImages.length); // 在隐藏图片后延迟再开始显示
+        }, 5000);
 
         return () => {
             clearInterval(interval);
@@ -70,7 +71,7 @@ export default function SpotFinderImages() {
             {visibleImages.map((item, index) => (
                 <Grow
                     in={checkedStates[index]}
-                    timeout={1000} // 动画持续时间
+                    timeout={1000}
                     key={index}
                 >
                     <ImageListItem cols={1} rows={1}>
