@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImageList, ImageListItem, Box, Grow } from '@mui/material';
+import { ImageList, ImageListItem, Grow } from '@mui/material';
 
 // 动态导入图片
 const images = import.meta.glob('../public/USYDCodingFest/*.{jpg,png,gif}', { eager: true });
@@ -46,7 +46,8 @@ export default function SpotFinderImages() {
             setTimeout(() => {
                 setVisibleImages((prevImages) => {
                     const nextStartIndex = allItemData.indexOf(prevImages[prevImages.length - 1]) + 1;
-                    const newImages = [
+                    let newImages;
+                    newImages = [
                         ...prevImages.slice(1),
                         allItemData[nextStartIndex % allItemData.length]
                     ];
