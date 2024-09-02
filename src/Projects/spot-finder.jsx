@@ -1,10 +1,20 @@
 import React from 'react';
-import { Container, Typography, Card, CardContent, Box } from '@mui/material';
+import {Container, Typography, Card, CardContent, Box, IconButton} from '@mui/material';
 import SpotFinderImages from '../../utils/getImages.jsx';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {useNavigate} from "react-router-dom";
 
 const SpotFinder = () => {
+    const navigate = useNavigate();
+
+    const handleReturn = () => {
+        navigate(-1); // This navigates back to the previous page
+    };
     return (
         <Container style={{ marginTop: '20px', maxWidth: '100%' }}>
+            <IconButton color="primary" aria-label="add to shopping cart" onClick={handleReturn}>
+                <ArrowBackIcon />
+            </IconButton>
             <Card style={{ marginBottom: '20px' }}>
                 <CardContent>
                     <Box mb={2}>

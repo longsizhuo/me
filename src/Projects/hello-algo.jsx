@@ -1,10 +1,19 @@
-import {Box, Card, CardContent, Container, Typography} from "@mui/material";
-import SpotFinderImages from "../../utils/getImages.jsx";
+import {Box, Card, CardContent, Container, Typography, Button, IconButton} from "@mui/material";
 import React from "react";
+import {useNavigate} from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const HelloAlgo = () => {
+    const navigate = useNavigate();
+
+    const handleReturn = () => {
+        navigate(-1); // This navigates back to the previous page
+    };
     return (
         <Container style={{ marginTop: '20px', maxWidth: '100%' }}>
+            <IconButton color="primary" aria-label="add to shopping cart" onClick={handleReturn}>
+                <ArrowBackIcon />
+            </IconButton>
             <Card style={{ marginBottom: '20px' }}>
                 <CardContent>
                     <Box mb={2}>
@@ -51,7 +60,7 @@ const HelloAlgo = () => {
                             </li>
                             <li>
                                 <Typography variant="body2">
-                                    Won the Outstanding Project Idea Award Champion in the USYD Coding Fest 2024.
+                                    Sold over 50,000 copies of the physical book and received 99% positive reviews.
                                 </Typography>
                             </li>
                         </ul>

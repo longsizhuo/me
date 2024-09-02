@@ -13,13 +13,13 @@ const projects = [
     },
     {
         name: "Hello-algo",
-        logo: "public/vite.svg", // 只有一个 logo，不支持深色模式
+        logo: "https://www.hello-algo.com/assets/images/logo.svg", // 只有一个 logo，不支持深色模式
         description: "Simplifying data structures and algorithms with animations.",
         link: "hello-algo"
     },
     {
         name: "Dimensionality Reduction Clustering Visualization Tool",
-        logo: "public/vite.svg", // 只有一个 logo，不支持深色模式
+        logo: "public/1234.webp", // 只有一个 logo，不支持深色模式
         description: "A web-based tool for visualizing single-cell RNA-seq data.",
         link: "visualization-tool"
     }
@@ -43,29 +43,32 @@ const Projects = () => {
     }, []);
 
     return (
-        <section style={{ marginBottom: '40px' }}>
+        <section style={{ marginTop: '40px', marginBottom: null }}>
             <h2 style={{ color: '#333' }}>Projects</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {projects.map((project, index) => (
                     <Link to={project.link} key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                        <img
-                            src={
-                                typeof project.logo === 'string'
-                                    ? project.logo // 如果只有一个 logo，直接使用它
-                                    : theme === 'dark'
-                                        ? project.logo.dark // 如果有多种主题 logo，选择对应的
-                                        : project.logo.light
-                            }
-                            alt={`${project.name} logo`}
-                            style={{
-                                width: project.name === "Spot Finder" ? '200px' : '50px', // Spot Finder 的 logo 更大
-                                marginRight: '20px' }}
-                        />
-                        <div>
+                        <div style={{ minWidth: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '20px' }}>
+                            <img
+                                src={
+                                    typeof project.logo === 'string'
+                                        ? project.logo // 如果只有一个 logo，直接使用它
+                                        : theme === 'dark'
+                                            ? project.logo.dark // 如果有多种主题 logo，选择对应的
+                                            : project.logo.light
+                                }
+                                alt={`${project.name} logo`}
+                                style={{
+                                    maxWidth: project.name === "Hello-algo"? '100px': '200px', // 限制最大宽度为容器宽度
+                                    height: 'auto', // 高度自动调整以保持比例
+                                }}
+                            />
+                        </div>
+                        <div className={"Name"}>
                             <div style={{ color: 'blue', fontSize: '18px', textDecoration: 'none' }}>
                                 {project.name}
                             </div>
-                            <p style={{ color: '#555' }}>{project.description}</p>
+                            <p style={{ color: '#555', margin: 0 }}>{project.description}</p>
                         </div>
                     </Link>
                 ))}

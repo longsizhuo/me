@@ -12,7 +12,8 @@
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "@mui/material": "^5.16.6",
+    "@mui/icons-material": "^6.0.1",
+    "@mui/material": "^6.0.1",
     "@mui/styled-engine": "^5.16.6",
     "@octokit/graphql": "^8.1.1",
     "axios": "^1.7.3",
