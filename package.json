@@ -10,18 +10,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.0.1",
     "@mui/material": "^6.0.1",
     "@mui/styled-engine": "^5.16.6",
     "@octokit/graphql": "^8.1.1",
+    "@react-three/drei": "^9.112.0",
+    "@react-three/fiber": "^8.17.7",
     "axios": "^1.7.3",
+    "fra": "^0.0.4",
+    "framer-motion": "^11.5.4",
     "graphql": "^16.9.0",
+    "maath": "^0.10.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
-    "require": "^2.4.20"
+    "react-tilt": "^1.0.2",
+    "react-vertical-timeline-component": "^3.6.0",
+    "require": "^2.4.20",
+    "three": "^0.168.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

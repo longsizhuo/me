@@ -1,6 +1,6 @@
 import React from 'react';
 import {Container, Typography, Card, CardContent, Box, IconButton} from '@mui/material';
-import SpotFinderImages from '../../utils/getImages.jsx';
+import SpotFinderImages from '../utils/getImages.jsx';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {useNavigate} from "react-router-dom";
 
