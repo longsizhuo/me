@@ -15,14 +15,14 @@ import {
     git,
     figma,
     docker,
-    meta,
+    bsh,
     starbucks,
     tesla,
     shopify,
     carrent,
     jobit,
     tripguide,
-    threejs,
+    threejs, unsw, spotFinder,
 } from "../assets";
 
 export const navLinks = [
@@ -40,7 +40,7 @@ export const navLinks = [
     },
 ];
 
-const services = [
+let services = [
     {
         title: "Web Developer",
         icon: web,
@@ -116,58 +116,59 @@ const technologies = [
 
 const experiences = [
     {
-        title: "React.js Developer",
-        company_name: "Starbucks",
-        icon: starbucks,
-        iconBg: "#383E56",
-        date: "March 2020 - April 2021",
+        title: "Casual Academic",
+        company_name: "University of New South Wales",
+        icon: unsw,
+        iconBg: "#FFF",
+        date: "Sep 2024 - Present",
         points: [
-            "Developing and maintaining web applications using React.js and other related technologies.",
-            "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-            "Implementing responsive design and ensuring cross-browser compatibility.",
-            "Participating in code reviews and providing constructive feedback to other developers.",
+            "Teaching and guiding students in the Principles of Programming and Computer Science Project courses.",
+            "Assisting students with programming concepts, debugging, and project management techniques.",
+            "Providing clear and constructive feedback on assignments and projects to ensure academic growth.",
+            "Collaborating with fellow academics to improve course delivery and student engagement."
         ],
     },
     {
-        title: "React Native Developer",
-        company_name: "Tesla",
-        icon: tesla,
+        title: "Scrum Master & Backend Developer",
+        company_name: "Spot Finder",
+        icon: spotFinder,
+        iconBg: "#000",
+        date: "Jan 2024 - Present",
+        points: [
+            "Led the development of a parking space time-sharing rental system using Golang and MySQL.",
+            "Managed the deployment of the backend using Docker, Cloudflare, Redis, and Nginx.",
+            "Supervised team tasks, ensuring milestone achievement and project quality.",
+            "Implemented WebSocket for real-time communication and offline messaging."
+        ],
+    },
+    // {
+    //     title: "Core Contributor",
+    //     company_name: "Hello-algo",
+    //     icon: shopify,
+    //     iconBg: "#383E56",
+    //     date: "Dec 2022 - Present",
+    //     points: [
+    //         "Contributed to summarizing and simplifying data structures and algorithms for learners.",
+    //         "Managed interactive Q&A segments to engage the community and advance educational value.",
+    //         "Translated content into English, making it accessible to a global audience.",
+    //         "Helped the project reach 89.3K stars on GitHub and contributed to the sale of 50,000+ books."
+    //     ],
+    // },
+    {
+        title: "Research & Development Intern",
+        company_name: "Gem Flower Healthcare Information Technology Ltd.",
+        icon: bsh,
         iconBg: "#E6DEDD",
-        date: "Jan 2021 - Feb 2022",
+        date: "Jan 2021 - Apr 2021",
         points: [
-            "Developing and maintaining web applications using React.js and other related technologies.",
-            "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-            "Implementing responsive design and ensuring cross-browser compatibility.",
-            "Participating in code reviews and providing constructive feedback to other developers.",
-        ],
-    },
-    {
-        title: "Web Developer",
-        company_name: "Shopify",
-        icon: shopify,
-        iconBg: "#383E56",
-        date: "Jan 2022 - Jan 2023",
-        points: [
-            "Developing and maintaining web applications using React.js and other related technologies.",
-            "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-            "Implementing responsive design and ensuring cross-browser compatibility.",
-            "Participating in code reviews and providing constructive feedback to other developers.",
-        ],
-    },
-    {
-        title: "Full stack Developer",
-        company_name: "Meta",
-        icon: meta,
-        iconBg: "#E6DEDD",
-        date: "Jan 2023 - Present",
-        points: [
-            "Developing and maintaining web applications using React.js and other related technologies.",
-            "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-            "Implementing responsive design and ensuring cross-browser compatibility.",
-            "Participating in code reviews and providing constructive feedback to other developers.",
+            "Assisted in the maintenance of hospital systems and code testing to ensure functionality.",
+            "Developed test plans and scripts to validate new system features.",
+            "Collaborated with cross-functional teams to gather and analyze user requirements for system improvements.",
+            "Provided technical support to strengthen sales and marketing efforts."
         ],
     },
 ];
+
 
 const testimonials = [
     {

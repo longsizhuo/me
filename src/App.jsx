@@ -11,11 +11,17 @@ import HelloAlgo from "./Projects/hello-algo.jsx";
 import VisualizationTool from "./Projects/visualization-tool.jsx";
 import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, StarsCanvas } from "./components";
 function AppContent() {
-    const appStyle = {
-        fontFamily: 'Arial, sans-serif',
-        margin: '20px'
-    };
+    const [theme, setTheme] = React.useState('dark');
+    useEffect(() => {
+        document.documentElement.className = theme;
+    }, [theme]);
+
     const location = useLocation();
+
+    // 切换白天和黑夜模式
+    const toggleTheme = () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
 
     useEffect(() => {
         if (window.gtag) {
