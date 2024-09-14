@@ -199,68 +199,69 @@ const testimonials = [
 
 const projects = [
     {
-        name: "Car Rent",
+        name: "Spot Finder",
         description:
-            "Web-based platform that allows users to search, book, and manage car rentals from various providers, providing a convenient and efficient solution for transportation needs.",
+            "A parking space time-sharing rental system, addressing urban parking challenges and increasing income for parking space owners.",
         tags: [
             {
-                name: "react",
+                name: "golang",
                 color: "blue-text-gradient",
             },
             {
-                name: "mongodb",
+                name: "docker",
                 color: "green-text-gradient",
             },
             {
-                name: "tailwind",
+                name: "mysql",
                 color: "pink-text-gradient",
             },
         ],
-        image: carrent,
-        source_code_link: "https://github.com/",
+        image: "src/assets/SpotFinder/logo.svg", // 使用之前的 logo 路径
+        source_code_link: "https://github.com/longsizhuo/spot-finder",
     },
     {
-        name: "Job IT",
+        name: "Hello-algo",
         description:
-            "Web application that enables users to search for job openings, view estimated salary ranges for positions, and locate available jobs based on their current location.",
+            "Simplifying data structures and algorithms through visual animations and interactive learning materials.",
         tags: [
             {
-                name: "react",
+                name: "python",
                 color: "blue-text-gradient",
             },
             {
-                name: "restapi",
+                name: "visualization",
                 color: "green-text-gradient",
             },
             {
-                name: "scss",
+                name: "open-source",
                 color: "pink-text-gradient",
             },
         ],
-        image: jobit,
-        source_code_link: "https://github.com/",
+        image: "https://www.hello-algo.com/assets/images/logo.svg", // 使用之前的 logo 路径
+        source_code_link: "https://github.com/krahets/hello-algo",
     },
     {
-        name: "Trip Guide",
+        name: "Dimensionality Reduction Clustering Visualization Tool",
         description:
-            "A comprehensive travel booking platform that allows users to book flights, hotels, and rental cars, and offers curated recommendations for popular destinations.",
+            "A web-based tool designed to simplify the analysis of single-cell RNA-seq data through intuitive visualization techniques.",
         tags: [
             {
-                name: "nextjs",
+                name: "r",
                 color: "blue-text-gradient",
             },
             {
-                name: "supabase",
+                name: "data-visualization",
                 color: "green-text-gradient",
             },
             {
-                name: "css",
+                name: "bioinformatics",
                 color: "pink-text-gradient",
             },
         ],
-        image: tripguide,
-        source_code_link: "https://github.com/",
+        image: "public/1234.webp", // 使用之前的 logo 路径
+        source_code_link: "https://github.com/longsizhuo/visualization-tool",
     },
 ];
+
 
 export { services, technologies, experiences, testimonials, projects };

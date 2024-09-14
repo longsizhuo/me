@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Tilt } from "react-tilt";
 import { motion } from "framer-motion";
 
@@ -16,8 +16,16 @@ const ProjectCard = ({
   image,
   source_code_link,
 }) => {
+    const [isExpanded, setIsExpanded] = useState(false); // State to track if the card is expanded
+
+    // Function to handle card click and toggle expansion
+    const handleCardClick = () => {
+        setIsExpanded((prevState) => !prevState);
+    };
   return (
-    <motion.div variants={fadeIn("up", "spring", index * 0.5, 0.75)}>
+    <motion.div
+        onClick={handleCardClick}
+        variants={fadeIn("up", "spring", index * 0.5, 0.75)}>
       <Tilt
         options={{
           max: 45,
