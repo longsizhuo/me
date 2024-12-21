@@ -217,7 +217,7 @@ const projects = [
             },
         ],
         image: "src/assets/SpotFinder/logo.svg", // 使用之前的 logo 路径
-        source_code_link: "https://github.com/longsizhuo/spot-finder",
+        source_code_link: "https://longsizhuo.com",
     },
     {
         name: "Hello-algo",
@@ -259,7 +259,7 @@ const projects = [
             },
         ],
         image: "public/1234.webp", // 使用之前的 logo 路径
-        source_code_link: "https://github.com/longsizhuo/visualization-tool",
+        source_code_link: "https://longsizhuo.shinyapps.io/long/",
     },
 ];
 
