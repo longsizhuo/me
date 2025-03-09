@@ -25,7 +25,7 @@ const ProjectCard = ({
   return (
     <motion.div
         onClick={handleCardClick}
-        variants={fadeIn("up", "spring", index * 0.5, 0.75)}>
+        variants={fadeIn("up", "", index * 0.5, 0.75)}>
       <Tilt
         options={{
           max: 45,

@@ -1,8 +1,32 @@
-# React + Vite
+# Resume
+This is a simple resume website built with Vite.js.
+Trying rebuild it to Next.js.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Running it locally
+```shell
+npm install
+npm run dev
+```
 
-Currently, two official plugins are available:
+# Building it
+```shell
+npm run build
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Running the built version
+```shell
+npm run serve
+```
+
+# Linting
+```shell
+npm run lint
+```
+
+# Deploying it to a server
+```shell
+npm run build
+cd ./dist
+sudo rsync -av --delete . /var/www/my-frontend/
+sudo nginx -s reload
+```

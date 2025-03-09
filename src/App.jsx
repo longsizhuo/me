@@ -38,6 +38,7 @@ function AppContent() {
                     <Hero />
                 </div>
                 <About />
+                {/*<GitHubCard />*/}
                 <Experience />
                 {/*<Tech />*/}
                 <Works />

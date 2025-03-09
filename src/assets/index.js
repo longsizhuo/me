@@ -32,6 +32,9 @@ import carrent from "./carrent.png";
 import jobit from "./jobit.png";
 import tripguide from "./tripguide.png";
 
+import logo_dark from "./SpotFinder/logo3.svg"
+import logo_normal from "./SpotFinder/logo4.svg"
+import drcvt from "./1234.webp"
 export {
   logo,
   backend,
@@ -62,6 +65,9 @@ export {
   jobit,
   tripguide,
   bsh,
-    unsw,
-    spotFinder,
+  unsw,
+  spotFinder,
+  logo_dark,
+  logo_normal,
+  drcvt
 };

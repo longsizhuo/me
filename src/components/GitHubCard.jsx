@@ -8,7 +8,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 
-const GITHUB_TOKEN = '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'; // 请将此替换为你的GitHub Token
+const GITHUB_TOKEN = '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'; // 请将此替换为你的GitHub Token
 
 const GitHubCard = () => {
     const [pinnedRepos, setPinnedRepos] = useState([]);

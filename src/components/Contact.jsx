@@ -32,8 +32,8 @@ const Contact = () => {
     setLoading(true);
 
     // 创建 POST /contact 和 GET /health 的请求
-    const postContact = axios.post("http://localhost:8181/contact", form);
-    const getHealth = axios.get("http://localhost:8181/health");
+    const postContact = axios.post(" https://me.longsizhuo.com/resume-api/contact", form);
+    const getHealth = axios.get(" https://me.longsizhuo.com/resume-api/health");
 
     // 同时发送两个请求
     axios

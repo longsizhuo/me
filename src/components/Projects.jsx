@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // 用于导航到项目详情页面
-
+import {logo_dark, logo_normal, drcvt} from "../assets/index.js";
 const projects = [
     {
         name: "Spot Finder",
-        logo: {
-            light: "public/SpotFinder/logo3.svg",
-            dark: "public/SpotFinder/logo4.svg"
-        },
+        logo:
+            {
+                light: logo_normal,
+                dark: logo_dark
+            },
         description: "A parking space time-sharing rental system.",
         link: "spot-finder"
     },
@@ -19,7 +20,7 @@ const projects = [
     },
     {
         name: "Dimensionality Reduction Clustering Visualization Tool",
-        logo: "public/1234.webp", // 只有一个 logo，不支持深色模式
+        logo: drcvt, // 只有一个 logo，不支持深色模式
         description: "A web-based tool for visualizing single-cell RNA-seq data.",
         link: "visualization-tool"
     }
@@ -51,11 +52,7 @@ const Projects = () => {
                         <div style={{ minWidth: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginRight: '20px' }}>
                             <img
                                 src={
-                                    typeof project.logo === 'string'
-                                        ? project.logo // 如果只有一个 logo，直接使用它
-                                        : theme === 'dark'
-                                            ? project.logo.dark // 如果有多种主题 logo，选择对应的
-                                            : project.logo.light
+                                typeof project.logo === 'string' ? project.logo : theme === 'dark' ? project.logo.dark : project.logo.light
                                 }
                                 alt={`${project.name} logo`}
                                 style={{
