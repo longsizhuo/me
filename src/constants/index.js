@@ -116,6 +116,19 @@ const technologies = [
 
 const experiences = [
     {
+        title: "Frontend Engineer",
+        company_name: "Kwai",
+        icon: "src/assets/kwai-vector-logo-seeklogo/kwai.png",
+        iconBg: "#FFF",
+        date: "May 2025 - Present",
+        points: [
+            "Focused on the implementation and optimization of animation infrastructure for internal web projects.",
+            "Developed and maintained reusable animation modules using SVG, CSS Keyframes, and Lottie, ensuring consistency and efficiency across teams.",
+            "Collaborated with designers and engineers to deliver smooth, subtle, and resource-friendly animation effects.",
+            "Paid special attention to animation performance, accessibility, and maintainability, supporting a wide range of browsers and devices."
+        ],
+    },
+    {
         title: "Casual Academic",
         company_name: "University of New South Wales",
         icon: unsw,
@@ -141,19 +154,6 @@ const experiences = [
             "Implemented WebSocket for real-time communication and offline messaging."
         ],
     },
-    // {
-    //     title: "Core Contributor",
-    //     company_name: "Hello-algo",
-    //     icon: shopify,
-    //     iconBg: "#383E56",
-    //     date: "Dec 2022 - Present",
-    //     points: [
-    //         "Contributed to summarizing and simplifying data structures and algorithms for learners.",
-    //         "Managed interactive Q&A segments to engage the community and advance educational value.",
-    //         "Translated content into English, making it accessible to a global audience.",
-    //         "Helped the project reach 89.3K stars on GitHub and contributed to the sale of 50,000+ books."
-    //     ],
-    // },
     {
         title: "Research & Development Intern",
         company_name: "Gem Flower Healthcare Information Technology Ltd.",
@@ -167,6 +167,7 @@ const experiences = [
             "Provided technical support to strengthen sales and marketing efforts."
         ],
     },
+
 ];
 
 

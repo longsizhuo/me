@@ -40,9 +40,10 @@ function AppContent() {
                 <About />
                 {/*<GitHubCard />*/}
                 <Experience />
-                {/*<Tech />*/}
+                <Education />
+                {/* <Tech /> */}
                 <Works />
-                {/*<Feedbacks />*/}
+                <Feedbacks />
                 <div className={"relative z-0"}>
                     <Contact />
                     <StarsCanvas />

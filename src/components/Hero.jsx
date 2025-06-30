@@ -3,9 +3,19 @@ import Card from "@mui/material/Card";
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
 import Typography from "@mui/material/Typography";
-import React from "react";
+import React, {useState} from "react";
 import profilePicture from "../assets/IMG_2862.png";
+import {spring} from "motion/react";
 const Hero = () => {
+    const [giggle, setGiggle] = useState(false);
+
+    const giggleAnimation = {
+        transform: giggle
+            ? `translateX(${Math.random() * 400 - 200}px) translateY(${Math.random() * 200 - 100}px) rotate(${Math.random() * 360}deg) scale(2)`
+            : 'translateX(0) translateY(0) rotate(0deg) scale(1)',
+        transition: 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+    };
+
     return (
         <section className={`relative w-full h-screen mx-auto`}>
             <div
@@ -20,7 +30,30 @@ const Hero = () => {
 
                     <div>
                         <h1 className={`${styles.heroHeadText} text-white`}>
-                            Hi, I'm <span className='text-[#915EFF]'>Sizhuo Long</span>
+                            Hi, I'm <motion.span
+                                className='text-[#915EFF]'
+                                style={{ display: 'inline-block', cursor: 'pointer' }}
+                                animate={giggle ? {
+                                    x: Math.random() * 400 - 200,
+                                    y: Math.random() * 200 - 100,
+                                    rotate: Math.random() * 360,
+                                    scale: 2
+                                } : {
+                                    x: 0,
+                                    y: 0,
+                                    rotate: 0,
+                                    scale: 1
+                                }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 300,
+                                    damping: 20
+                                }}
+                                onClick={() => setGiggle(true)}
+                                onAnimationComplete={() => setGiggle(false)}
+                                >
+                                Siz Long
+                                </motion.span>
                         </h1>
                         <p className={`${styles.heroSubText} mt-2 text-white-100`}>
                             Open-source enthusiast skilled in Python, Golang, and Javascript.{" "}
