@@ -9,7 +9,7 @@ import GitHubCard from './components/GitHubCard';
 import SpotFinder from "./Projects/spot-finder.jsx";
 import HelloAlgo from "./Projects/hello-algo.jsx";
 import VisualizationTool from "./Projects/visualization-tool.jsx";
-import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, StarsCanvas } from "./components";
+import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, StarsCanvas, GlobalLottieBackground } from "./components";
 function AppContent() {
     const [theme, setTheme] = React.useState('dark');
     useEffect(() => {
@@ -33,6 +33,7 @@ function AppContent() {
 
     return (
             <div className="relative z-0 bg-primary">
+                <GlobalLottieBackground />
                 <div className={"bg-hero-pattern bg-cover bg-no-repeat bg-center"}>
                     <Navbar />
                     <Hero />
