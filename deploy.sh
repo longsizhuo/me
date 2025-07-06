@@ -16,7 +16,7 @@ echo "📦 安装依赖..."
 pnpm install
 
 echo "🏗️ 构建项目..."
-pnpm build
+NODE_OPTIONS="--max-old-space-size=2048" pnpm build
 
 echo "🧹 清理旧的部署目录: $DEPLOY_DIR"
 sudo rm -rf "$DEPLOY_DIR"
