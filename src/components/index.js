@@ -10,6 +10,7 @@ import Contact from "./Contact";
 import ContactAdvanced from "./ContactAdvanced";
 import CanvasLoader from "./Loader";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
+import Album from "./Album.tsx";
 
 
 export {
@@ -27,5 +28,6 @@ export {
   BallCanvas, 
   ComputersCanvas, 
   StarsCanvas,
-  GlobalLottieBackground
+  GlobalLottieBackground,
+  Album
 };

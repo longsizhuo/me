@@ -5,7 +5,7 @@ import { BallCanvas } from "./canvas";
 import { SectionWrapper } from "../hoc";
 import { technologies } from "../constants";
 import { styles } from "../styles";
-import { textVariant } from "../utils/motion";
+import { textVariant } from "../utils/motion.ts";
 
 const Tech = () => {
   return (

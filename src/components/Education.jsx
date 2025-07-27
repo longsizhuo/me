@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
-import { fadeIn, textVariant } from "../utils/motion";
+import { fadeIn, textVariant } from "../utils/motion.ts";
 
 const EducationCard = ({
   degree,

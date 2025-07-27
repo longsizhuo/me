@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {BrowserRouter as Router, useLocation} from "react-router-dom";
 import Education from './components/Education';
-import { About, ContactAdvanced, Experience, Hero, Navbar, Works, StarsCanvas, GlobalLottieBackground } from "./components";
+import { About, Album, ContactAdvanced, Experience, Hero, Navbar, Works, StarsCanvas, GlobalLottieBackground } from "./components";
 function AppContent() {
     const location = useLocation();
 
@@ -21,6 +21,7 @@ function AppContent() {
                     <Hero />
                 </div>
                 <About />
+                <Album />
                 {/*<GitHubCard />*/}
                 <Experience />
                 <Education />
