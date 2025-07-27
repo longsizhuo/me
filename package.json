@@ -20,6 +20,7 @@
     "@octokit/graphql": "^8.1.1",
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.7",
+    "antd": "^5.26.6",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "fra": "^0.0.4",
