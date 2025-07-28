@@ -10,9 +10,10 @@ import Contact from "./Contact";
 import ContactAdvanced from "./ContactAdvanced";
 import CanvasLoader from "./Loader";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
-
+import Album from "./Album";
 
 export {
+  Album,
   Hero,
   Navbar,
   About,
