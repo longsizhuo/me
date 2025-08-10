@@ -2,7 +2,7 @@
  * Album 组件 - 照片相册展示
  * 功能：递归遍历 assets/album/Kwai 文件夹下的所有照片并以瀑布流形式展示
  */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image } from 'antd';
 import { SectionWrapper } from '../hoc';
 import { motion } from 'framer-motion';
@@ -91,4 +91,5 @@ const Album = () => {
   );
 };
 
-export default SectionWrapper(Album, 'album');
+const AlbumWithWrapper = SectionWrapper(Album, 'album');
+export default AlbumWithWrapper;

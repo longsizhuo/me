@@ -11,6 +11,7 @@ import ContactAdvanced from "./ContactAdvanced";
 import CanvasLoader from "./Loader";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
 import Album from "./Album";
+import VideoToAscii from "./VideoToAscii";
 
 export {
   Album,
@@ -28,5 +29,6 @@ export {
   BallCanvas, 
   ComputersCanvas, 
   StarsCanvas,
-  GlobalLottieBackground
+  GlobalLottieBackground,
+  VideoToAscii
 };
