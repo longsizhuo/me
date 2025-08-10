@@ -7,20 +7,17 @@ import { API_ENDPOINTS, DEV_CONFIG } from '../config/api';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-// 1) 在“实际样式”下测量字符格宽高比（charAspect = charHeight / charWidth）
 function useMeasuredCharAspect() {
-  const [aspect, setAspect] = useState(2); // 经验初值
+  const [aspect, setAspect] = useState(2);
   useEffect(() => {
     const el = document.createElement('pre');
-    // ——务必与显示区域相同的样式——
     el.style.position = 'absolute';
     el.style.visibility = 'hidden';
     el.style.fontFamily = `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace`;
-    el.style.fontSize = '12px';     // 跟你的 text-xs 接近
-    el.style.lineHeight = '1';      // 和显示区域一致
-    el.style.letterSpacing = '0';   // 防止字距影响
+    el.style.fontSize = '12px';
+    el.style.lineHeight = '1';
+    el.style.letterSpacing = '0';
     el.style.whiteSpace = 'pre';
-    // 用大网格测量更稳定
     const COLS = 120, ROWS = 60;
     el.textContent = Array.from({ length: ROWS }).map(() => 'M'.repeat(COLS)).join('\n');
     document.body.appendChild(el);
@@ -46,7 +43,11 @@ const VideoToAscii = () => {
   const [useBackendResult, setUseBackendResult] = useState(false);
   const [characters, setCharacters] = useState(DEFAULT_CHARS);
   const [frameRate, setFrameRate] = useState(10);
-  const [resolution, setResolution] = useState(50); // 仍然把它当“行数 rows”
+  const [resolution, setResolution] = useState(50); // 行数 rows
+
+  // 🔒 新增：是否启用后端 & 口令
+  const [enableBackend, setEnableBackend] = useState(false);
+  const [backendToken, setBackendToken] = useState(localStorage.getItem('ascii_token') || '');
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -55,9 +56,8 @@ const VideoToAscii = () => {
   const objectUrlRef = useRef(null);
   const isPlayingRef = useRef(false);
 
-  const charAspect = useMeasuredCharAspect(); // ★ 关键：真实字符格宽高比
+  const charAspect = useMeasuredCharAspect();
 
-  // ——把非 ASCII 的全角/宽字符过滤，保证等宽和灰阶可用——
   const sanitizeAscii = (s) => {
     const set = new Set();
     for (const ch of s) {
@@ -67,17 +67,15 @@ const VideoToAscii = () => {
     return Array.from(set).join('');
   };
 
-  // 把 RGBA 像素转换为 ASCII 行（仅前端预览用）
   const imageToAscii = useCallback((imageData, width, height, chars) => {
     const ascii = [];
-    // 逐像素映射（预览就不做 area 平均了）
     for (let y = 0; y < height; y++) {
       let line = '';
       const rowOff = y * width * 4;
       for (let x = 0; x < width; x++) {
         const idx = rowOff + x * 4;
         const r = imageData[idx], g = imageData[idx + 1], b = imageData[idx + 2];
-        const brightness = r * 0.299 + g * 0.587 + b * 0.114; // 0..255
+        const brightness = r * 0.299 + g * 0.587 + b * 0.114;
         const ci = Math.max(0, Math.min(chars.length - 1, Math.floor((brightness / 255) * (chars.length - 1))));
         line += chars[ci];
       }
@@ -86,7 +84,6 @@ const VideoToAscii = () => {
     return ascii;
   }, []);
 
-  // 2) 前端预览：基于“行数rows”和 charAspect + 原视频比例 计算 cols
   const processVideoFrames = useCallback(async (video) => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -95,7 +92,6 @@ const VideoToAscii = () => {
     const rows = clamp(resolution, 20, 120);
     const vw = video.videoWidth || 16;
     const vh = video.videoHeight || 9;
-    // ★ 核心换算：cols = rows * (W/H) * charAspect
     const cols = clamp(Math.round(rows * (vw / vh) * charAspect), 20, 480);
 
     canvas.width = cols;
@@ -117,11 +113,18 @@ const VideoToAscii = () => {
     });
   }, [resolution, frameRate, characters, imageToAscii, charAspect]);
 
-  // 3) 发送到后端：传 rows/cols（和上面一致），由后端 scale+pad 到该网格
+  // ▶️ 后端调用：只有启用且有 token 才发送；否则直接返回
   const sendVideoToBackend = async (file) => {
+    if (!enableBackend) return;
+
+    const token = backendToken.trim();
+    if (!token) {
+      alert('未填写口令，已仅用前端预览'); 
+      return;
+    }
+
     setIsProcessingBackend(true);
 
-    // 计算 rows/cols（与预览一致）
     const rows = clamp(resolution, 20, 120);
     const vw = videoRef.current?.videoWidth || 16;
     const vh = videoRef.current?.videoHeight || 9;
@@ -133,14 +136,17 @@ const VideoToAscii = () => {
     formData.append('frameRate', String(clamp(frameRate, 5, 24)));
     formData.append('rows', String(rows));
     formData.append('cols', String(cols));
-    // 白底片建议反相：也可以做自动判定，这里给开关保留接口（默认 true）
     formData.append('invert', 'true');
     formData.append('gamma', '0.9');
 
     try {
       const resp = await axios.post(API_ENDPOINTS.VIDEO_TO_ASCII, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-Ascii-Token': token, // 🔒 口令放 Header
+        },
         timeout: DEV_CONFIG.TIMEOUT,
+        withCredentials: false,
       });
       if (resp.data?.success) {
         setBackendAsciiFrames(resp.data.frames || []);
@@ -150,7 +156,7 @@ const VideoToAscii = () => {
       }
     } catch (e) {
       console.error(e);
-      alert('后端处理失败，将使用前端预览结果');
+      alert('后端处理失败或口令错误，已仅用前端预览');
     } finally {
       setIsProcessingBackend(false);
     }
@@ -181,7 +187,8 @@ const VideoToAscii = () => {
         console.error(err);
       } finally {
         setIsProcessing(false);
-        sendVideoToBackend(file);
+        // 只有开启开关且 token 存在时才走后端
+        await sendVideoToBackend(file);
       }
     };
     video.removeEventListener('loadedmetadata', onMeta);
@@ -189,7 +196,6 @@ const VideoToAscii = () => {
     video.src = url;
   };
 
-  // 播放/停止
   const play = useCallback(() => {
     const frames = useBackendResult ? backendAsciiFrames : asciiFrames;
     if (!frames.length) return;
@@ -221,6 +227,11 @@ const VideoToAscii = () => {
 
   const frames = useBackendResult ? backendAsciiFrames : asciiFrames;
 
+  // 保存 token
+  useEffect(() => {
+    localStorage.setItem('ascii_token', backendToken || '');
+  }, [backendToken]);
+
   return (
     <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-16">
       <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8">
@@ -233,30 +244,69 @@ const VideoToAscii = () => {
         <div className="lg:w-1/3 space-y-6">
           <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="bg-tertiary p-6 rounded-2xl">
             <h3 className="text-xl font-bold mb-4 text-white">设置</h3>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">选择视频文件</label>
-              <input ref={fileInputRef} type="file" accept="video/*" onChange={handleFileUpload}
-                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
+
+            {/* 是否启用后端 */}
+            <div className="mb-4 flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-300">使用后端（带口令）</label>
+              <input
+                type="checkbox"
+                checked={enableBackend}
+                onChange={(e) => setEnableBackend(e.target.checked)}
+              />
             </div>
 
+            {/* 口令输入 */}
+            {enableBackend && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">后端口令</label>
+                <input
+                  type="password"
+                  value={backendToken}
+                  onChange={(e) => setBackendToken(e.target.value)}
+                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+                  placeholder="输入口令后才会调用后端"
+                />
+              </div>
+            )}
+
+            {/* 文件上传 */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">选择视频文件</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                onChange={handleFileUpload}
+                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+              />
+            </div>
+
+            {/* 字符集 */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">ASCII字符集</label>
-              <input type="text" value={characters} onChange={(e) => setCharacters(e.target.value)}
+              <input
+                type="text"
+                value={characters}
+                onChange={(e) => setCharacters(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
-                placeholder={DEFAULT_CHARS} />
+                placeholder={DEFAULT_CHARS}
+              />
               <p className="text-xs text-gray-400 mt-1">会自动过滤非 ASCII 字符</p>
             </div>
 
+            {/* 行数 */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">分辨率(行数): {resolution}</label>
               <input type="range" min="20" max="120" value={resolution} onChange={(e) => setResolution(parseInt(e.target.value))} className="w-full" />
             </div>
 
+            {/* 帧率 */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-300 mb-2">帧率: {frameRate} FPS</label>
               <input type="range" min="5" max="24" value={frameRate} onChange={(e) => setFrameRate(parseInt(e.target.value))} className="w-full" />
             </div>
 
+            {/* 切换显示结果 */}
             {asciiFrames.length > 0 && backendAsciiFrames.length > 0 && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-300 mb-2">选择显示结果</label>
@@ -267,12 +317,35 @@ const VideoToAscii = () => {
               </div>
             )}
 
+            {/* 控制按钮 */}
             <div className="flex gap-2">
-              <button onClick={isPlaying ? stop : play} disabled={(frames.length === 0) || isProcessing || isProcessingBackend}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
+              <button
+                onClick={isPlaying ? () => { setIsPlaying(false); isPlayingRef.current = false; if (animationRef.current) clearTimeout(animationRef.current); } : (() => {
+                  const frames = useBackendResult ? backendAsciiFrames : asciiFrames;
+                  if (!frames.length) return;
+                  setIsPlaying(true);
+                  isPlayingRef.current = true;
+                  let i = currentFrame;
+                  const tick = () => {
+                    if (!isPlayingRef.current) return;
+                    setCurrentFrame(i);
+                    i = (i + 1) % frames.length;
+                    animationRef.current = setTimeout(tick, 1000 / clamp(frameRate, 5, 24));
+                  };
+                  tick();
+                })}
+                disabled={(frames.length === 0) || isProcessing || isProcessingBackend}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              >
                 {isPlaying ? '暂停' : '播放'}
               </button>
-              <button onClick={reset} disabled={frames.length === 0} className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50">重置</button>
+              <button
+                onClick={() => { setIsPlaying(false); isPlayingRef.current = false; if (animationRef.current) clearTimeout(animationRef.current); setCurrentFrame(0); }}
+                disabled={frames.length === 0}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+              >
+                重置
+              </button>
             </div>
 
             {isProcessing && (
@@ -281,7 +354,7 @@ const VideoToAscii = () => {
                 <p className="text-sm text-gray-300 mt-2">正在生成预览...</p>
               </div>
             )}
-            {isProcessingBackend && (
+            {isProcessingBackend && enableBackend && (
               <div className="mt-4 text-center">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
                 <p className="text-sm text-gray-300 mt-2">后端正在处理...</p>
@@ -290,7 +363,7 @@ const VideoToAscii = () => {
           </motion.div>
         </div>
 
-        {/* 显示区域：单个 <pre>，避免每行一个 <div> 的行盒差异 */}
+        {/* 显示区域 */}
         <div className="lg:w-2/3">
           <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-black p-4 rounded-2xl min-h-[400px] flex items-center justify-center">
@@ -298,12 +371,7 @@ const VideoToAscii = () => {
               <div className="text-center">
                 <pre
                   className="font-mono text-xs text-green-400"
-                  style={{
-                    lineHeight: 1,                 // 与测量保持一致
-                    letterSpacing: 0,
-                    margin: 0,
-                    whiteSpace: 'pre',
-                  }}
+                  style={{ lineHeight: 1, letterSpacing: 0, margin: 0, whiteSpace: 'pre' }}
                 >
                   {frames[currentFrame]?.join('\n')}
                 </pre>
