@@ -8,6 +8,7 @@ import { EarthCanvas } from "./canvas";
 import { SectionWrapper } from "../hoc";
 import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
+import { API_ENDPOINTS } from "../config/api";
 
 const ContactAdvanced = () => {
   const formRef = useRef();
@@ -100,8 +101,8 @@ const ContactAdvanced = () => {
       // 并行处理所有请求
       const [emailResponse, dbResponse, healthResponse] = await Promise.allSettled([
         emailjs.send(serviceId, templateId, templateParams, publicKey),
-        axios.post("/api/contact", form),
-        axios.get("/api/health")
+        axios.post(API_ENDPOINTS.CONTACT, form),
+        axios.get(API_ENDPOINTS.HEALTH)
       ]);
 
       // 分析结果

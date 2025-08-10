@@ -8,6 +8,7 @@ import { EarthCanvas } from "./canvas";
 import { SectionWrapper } from "../hoc";
 import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
+import { API_ENDPOINTS } from "../config/api";
 
 const Contact = () => {
   const formRef = useRef();
@@ -46,8 +47,8 @@ const Contact = () => {
 
     // 同时处理 EmailJS 发送邮件和数据库保存
     const sendEmail = emailjs.send(serviceId, templateId, templateParams, publicKey);
-    const saveToDatabase = axios.post("https://me.longsizhuo.com/resume-api/contact", form);
-    const healthCheck = axios.get("https://me.longsizhuo.com/resume-api/health");
+    const saveToDatabase = axios.post(API_ENDPOINTS.CONTACT, form);
+    const healthCheck = axios.get(API_ENDPOINTS.HEALTH);
 
     // 使用 Promise.all 同时处理所有请求
     Promise.all([sendEmail, saveToDatabase, healthCheck])
@@ -163,4 +164,5 @@ const Contact = () => {
   );
 };
 
-export default SectionWrapper(Contact, "contact");
+const ContactWithWrapper = SectionWrapper(Contact, "contact");
+export default ContactWithWrapper;

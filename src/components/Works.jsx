@@ -105,4 +105,5 @@ const Works = () => {
   );
 };
 
-export default SectionWrapper(Works, "");
+const WorksWithWrapper = SectionWrapper(Works, "");
+export default WorksWithWrapper;

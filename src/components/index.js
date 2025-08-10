@@ -10,10 +10,11 @@ import Contact from "./Contact";
 import ContactAdvanced from "./ContactAdvanced";
 import CanvasLoader from "./Loader";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
-import Album from "./Album.tsx";
-
+import Album from "./Album";
+import VideoToAscii from "./VideoToAscii";
 
 export {
+  Album,
   Hero,
   Navbar,
   About,
@@ -29,5 +30,5 @@ export {
   ComputersCanvas, 
   StarsCanvas,
   GlobalLottieBackground,
-  Album
+  VideoToAscii
 };
