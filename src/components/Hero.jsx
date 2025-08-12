@@ -55,10 +55,10 @@ const Hero = () => {
                                 Siz Long
                                 </motion.span>
                         </h1>
-                        <p className={`${styles.heroSubText} mt-2 text-white-100`}>
+                        <div className={`${styles.heroSubText} mt-2 text-white-100`}>
                             Open-source enthusiast skilled in Python, Golang, and Javascript.{" "}
                             <br className='sm:block hidden' />
-                            <Typography variant="body1">
+                            <Typography variant="body1" component="div">
                                 <strong>Email:</strong>{" "}
                                 <a href="mailto:longsizhuo@gmail.com">longsizhuo@gmail.com</a>
                                 <br />
@@ -69,9 +69,9 @@ const Hero = () => {
                                 <a href="https://longsizhuo.github.io">longsizhuo.github.io</a>{" "}
                                 <br />
                                 <strong>LinkedIn:</strong>{" "}
-                                <a href="https://linkedin.com/in/longsizhuo">linkedin.com/in/longsizhuo</a>
+                                <a href="https://linkedin.com/in/longsizhuo">longsizhuo.github.io</a>
                             </Typography>
-                        </p>
+                        </div>
                     </div>
                 </div>
 

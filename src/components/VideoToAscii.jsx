@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { styles } from '../styles';
 import { SectionWrapper } from '../hoc';
+import { useCharMetrics } from '../hook/useCharMetrics';
 import { API_ENDPOINTS, DEV_CONFIG } from '../config/api';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -83,6 +84,33 @@ const VideoToAscii = () => {
     }
     return ascii;
   }, []);
+
+
+const viewportRef = useRef(null);
+const [fontSize, setFontSize] = useState(12);
+const { wPerFs, hPerFs } = useCharMetrics();
+
+useEffect(() => {
+  if (!viewportRef.current) return;
+  const ro = new ResizeObserver(() => {
+    const el = viewportRef.current;
+    const vw = el.clientWidth;
+    const vh = el.clientHeight;
+    const rows = clamp(resolution, 20, 120);
+    const vwVideo = videoRef.current?.videoWidth || 16;
+    const vhVideo = videoRef.current?.videoHeight || 9;
+    const cols = clamp(Math.round(rows * (vwVideo / vhVideo) * (hPerFs / wPerFs)), 20, 480);
+
+    // 让 ASCII 正好“铺满但不溢出”
+    const fsByW = vw / (cols * wPerFs);
+    const fsByH = vh / (rows * hPerFs);
+    const fs = Math.max(6, Math.floor(Math.min(fsByW, fsByH))); // 最小 6px
+    setFontSize(fs);
+  });
+  ro.observe(viewportRef.current);
+  return () => ro.disconnect();
+}, [resolution, wPerFs, hPerFs]);
+
 
   const processVideoFrames = useCallback(async (video) => {
     const canvas = canvasRef.current;
@@ -241,7 +269,7 @@ const VideoToAscii = () => {
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* 控制面板 */}
-        <div className="lg:w-1/3 space-y-6">
+        <div className="lg:w-1/3 space-y-6 sticky top-4 self-star">
           <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="bg-tertiary p-6 rounded-2xl">
             <h3 className="text-xl font-bold mb-4 text-white">设置</h3>
 
@@ -365,29 +393,47 @@ const VideoToAscii = () => {
 
         {/* 显示区域 */}
         <div className="lg:w-2/3">
-          <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-black p-4 rounded-2xl min-h-[400px] flex items-center justify-center">
-            {frames.length > 0 ? (
-              <div className="text-center">
-                <pre
-                  className="font-mono text-xs text-green-400"
-                  style={{ lineHeight: 1, letterSpacing: 0, margin: 0, whiteSpace: 'pre' }}
-                >
-                  {frames[currentFrame]?.join('\n')}
-                </pre>
-                <div className="mt-4 text-sm text-gray-400">
-                  帧 {currentFrame + 1} / {frames.length}
-                  {useBackendResult && <span className="text-green-400 ml-2">(后端处理)</span>}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-black p-4 rounded-2xl"
+            style={{ height: 540 }}  // 你可以改成想要的固定高度
+          >
+            <div
+              ref={viewportRef}
+              className="w-full h-full overflow-auto grid place-items-center"
+            >
+              {frames.length > 0 ? (
+                <div className="text-center">
+                  <pre
+                    className="font-mono text-green-400"
+                    style={{
+                      lineHeight: 1,
+                      letterSpacing: 0,
+                      margin: 0,
+                      whiteSpace: 'pre',
+                      fontSize, // ✅ 关键：使用自适应字号
+                    }}
+                  >
+                    {frames[currentFrame]?.join('\n')}
+                  </pre>
+                  <div className="mt-4 text-sm text-gray-400">
+                    帧 {currentFrame + 1} / {frames.length}
+                    {useBackendResult && <span className="text-green-400 ml-2">(后端处理)</span>}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center text-gray-500">
-                <p className="text-lg mb-2">上传视频开始转换</p>
-                <p className="text-sm">支持 MP4, WebM, AVI 等格式</p>
-              </div>
-            )}
+              ) : (
+                <div className="text-center text-gray-500">
+                  <p className="text-lg mb-2">上传视频开始转换</p>
+                  <p className="text-sm">支持 MP4, WebM, AVI 等格式</p>
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
+
+
       </div>
 
       {/* 隐藏的video/canvas */}
