@@ -57,7 +57,8 @@ const VideoToAscii = () => {
   const objectUrlRef = useRef(null);
   const isPlayingRef = useRef(false);
 
-  const charAspect = useMeasuredCharAspect();
+  const { wPerFs, hPerFs } = useCharMetrics();
+  const charRatio = (hPerFs && wPerFs) ? (hPerFs / wPerFs) : 2; 
 
   const sanitizeAscii = (s) => {
     const set = new Set();
@@ -88,7 +89,6 @@ const VideoToAscii = () => {
 
 const viewportRef = useRef(null);
 const [fontSize, setFontSize] = useState(12);
-const { wPerFs, hPerFs } = useCharMetrics();
 
 useEffect(() => {
   if (!viewportRef.current) return;
@@ -139,7 +139,7 @@ useEffect(() => {
       video.currentTime = 0;
       video.addEventListener('seeked', doFrame, { once: true });
     });
-  }, [resolution, frameRate, characters, imageToAscii, charAspect]);
+  }, [resolution, frameRate, characters, imageToAscii, charRatio]);
 
   // ▶️ 后端调用：只有启用且有 token 才发送；否则直接返回
   const sendVideoToBackend = async (file) => {
@@ -156,7 +156,7 @@ useEffect(() => {
     const rows = clamp(resolution, 20, 120);
     const vw = videoRef.current?.videoWidth || 16;
     const vh = videoRef.current?.videoHeight || 9;
-    const cols = clamp(Math.round(rows * (vw / vh) * charAspect), 20, 480);
+    const cols = clamp(Math.round(rows * (vw / vh) * charRatio), 20, 480);
 
     const formData = new FormData();
     formData.append('video', file);
