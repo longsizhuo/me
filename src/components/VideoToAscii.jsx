@@ -50,6 +50,46 @@ const VideoToAscii = () => {
   const [frameRate, setFrameRate] = useState(10);
   const [resolution, setResolution] = useState(50); // 行数 rows
 
+  // ********************** 平滑参数 **********************
+  // —— 可调参数（默认值就是推荐值）——
+  const [gamma, setGamma] = useState(1.2); // 亮度曲线：越大中间灰越不敏感
+  const [emaAlpha, setEmaAlpha] = useState(1); // 时间平滑：越小越稳
+  const [hysteresis, setHysteresis] = useState(0.03); // 滞回：越大越不易抖
+  const [edgeAware, setEdgeAware] = useState(true); // 是否启用边缘字符
+  const [edgeThreshold, setEdgeThreshold] = useState(0.18); // 边缘阈值：越低边越多
+  const [edgeStyle, setEdgeStyle] = useState("paren"); // 'paren' | 'bracket' | 'mixed'
+
+  // —— 从本地恢复参数（可选）——
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ascii_tune");
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (typeof s.gamma === "number") setGamma(s.gamma);
+      if (typeof s.emaAlpha === "number") setEmaAlpha(s.emaAlpha);
+      if (typeof s.hysteresis === "number") setHysteresis(s.hysteresis);
+      if (typeof s.edgeAware === "boolean") setEdgeAware(s.edgeAware);
+      if (typeof s.edgeThreshold === "number")
+        setEdgeThreshold(s.edgeThreshold);
+      if (typeof s.edgeStyle === "string") setEdgeStyle(s.edgeStyle);
+    } catch {}
+  }, []);
+
+  // —— 参数变更时保存（可选）——
+  useEffect(() => {
+    const s = {
+      gamma,
+      emaAlpha,
+      hysteresis,
+      edgeAware,
+      edgeThreshold,
+      edgeStyle,
+    };
+    localStorage.setItem("ascii_tune", JSON.stringify(s));
+  }, [gamma, emaAlpha, hysteresis, edgeAware, edgeThreshold, edgeStyle]);
+
+  // ********************** 后端调用 **********************
+
   // 🔒 新增：是否启用后端 & 口令
   const [enableBackend, setEnableBackend] = useState(false);
   const [backendToken, setBackendToken] = useState(
@@ -77,24 +117,33 @@ const VideoToAscii = () => {
 
   const imageToAscii = useCallback((imageData, width, height, chars) => {
     const ascii = [];
+    const WHITE_CLAMP = 0.97; // 高亮钳制阈值（0~1），可改 0.95~0.99 之间
+
     for (let y = 0; y < height; y++) {
       let line = "";
       const rowOff = y * width * 4;
+
       for (let x = 0; x < width; x++) {
         const idx = rowOff + x * 4;
         const r = imageData[idx],
           g = imageData[idx + 1],
           b = imageData[idx + 2];
-        const brightness = r * 0.299 + g * 0.587 + b * 0.114;
+
+        // 1) 计算亮度（0~255）→ 归一化到 0~1
+        const y01 = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+        // 2) 高亮端钳制（clamp）
+        const yClamped = y01 > WHITE_CLAMP ? 1.0 : y01;
+
+        // 3) 映射到字符索引
         const ci = Math.max(
           0,
-          Math.min(
-            chars.length - 1,
-            Math.floor((brightness / 255) * (chars.length - 1))
-          )
+          Math.min(chars.length - 1, Math.floor(yClamped * (chars.length - 1)))
         );
+
         line += chars[ci];
       }
+
       ascii.push(line);
     }
     return ascii;
@@ -131,21 +180,71 @@ const VideoToAscii = () => {
   const processVideoFrames = useCallback(
     async (video) => {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       const frames = [];
 
       const rows = clamp(resolution, 20, 120);
       const vw = video.videoWidth || 16;
       const vh = video.videoHeight || 9;
-      const cols = clamp(Math.round(rows * (vw / vh) * charRatio), 20, 480);
+      const cols = clamp(
+        Math.round(rows * (vw / vh) * (hPerFs / wPerFs)),
+        20,
+        480
+      );
 
       canvas.width = cols;
       canvas.height = rows;
+      ctx.imageSmoothingEnabled = false;
+
+      const N = cols * rows;
+      let prevY = new Float32Array(N);
+      let prevIdx = new Uint16Array(N);
+
+      const srgb2lin = (v8) => {
+        const v = v8 / 255;
+        return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      };
+      const toLuma = (r, g, b) => {
+        const R = srgb2lin(r),
+          G = srgb2lin(g),
+          B = srgb2lin(b);
+        let Y = 0.2126 * R + 0.7152 * G + 0.0722 * B; // 线性亮度
+        Y = Math.pow(Y, 1 / gamma); // gamma 调整
+        return Math.max(0, Math.min(1, Y));
+      };
+
+      const EDGE = {
+        parenL: ["(", "{", "["],
+        parenR: [")", "}", "]"],
+        vert: ["|", "I", "!"],
+        horiz: ["-", "_", "="],
+        diagF: ["/"],
+        diagB: ["\\"],
+      };
+      const pick = (arr, w) =>
+        arr[
+          Math.min(
+            arr.length - 1,
+            Math.floor(Math.max(0, Math.min(0.999, w)) * arr.length)
+          )
+        ];
+
+      const chars = sanitizeAscii(characters) || DEFAULT_CHARS;
+      const M = chars.length;
+      const invM1 = 1 / (M - 1);
+      const alpha = emaAlpha;
+      const dead = hysteresis;
+
+      const bayer4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(
+        (x) => (x + 0.5) / 16
+      );
 
       return new Promise((resolve) => {
         const step = 1 / clamp(frameRate, 5, 24);
+
         const doFrame = () => {
           if (video.currentTime >= video.duration) return resolve(frames);
+
           ctx.drawImage(video, 0, 0, cols, rows);
           const imageData = ctx.getImageData(0, 0, cols, rows);
           const ascii = imageToAscii(
@@ -158,11 +257,25 @@ const VideoToAscii = () => {
           video.currentTime += step;
           video.addEventListener("seeked", doFrame, { once: true });
         };
+
         video.currentTime = 0;
+        video.addEventListener("loadeddata", () => {}, { once: true });
         video.addEventListener("seeked", doFrame, { once: true });
       });
     },
-    [resolution, frameRate, characters, imageToAscii, charRatio]
+    [
+      resolution,
+      frameRate,
+      characters,
+      hPerFs,
+      wPerFs,
+      gamma,
+      emaAlpha,
+      hysteresis,
+      edgeAware,
+      edgeThreshold,
+      edgeStyle,
+    ]
   );
 
   // ▶️ 后端调用：只有启用且有 token 才发送；否则直接返回
@@ -412,6 +525,111 @@ const VideoToAscii = () => {
               />
             </div>
 
+            {/* 画质 / 稳定性 */}
+            <div className="mt-6 border-t border-gray-700 pt-4 space-y-4">
+              <h4 className="text-white font-semibold text-sm">画质与稳定性</h4>
+
+              <label className="block text-xs text-gray-300">
+                Gamma（亮度曲线）：<b className="ml-1">{gamma.toFixed(2)}</b>
+                <input
+                  type="range"
+                  min="0.8"
+                  max="2.0"
+                  step="0.05"
+                  value={gamma}
+                  onChange={(e) => setGamma(parseFloat(e.target.value))}
+                  className="w-full mt-1"
+                />
+                <span className="text-[11px] text-gray-400">
+                  更大=中间灰更不敏感，更稳；太大对比会弱
+                </span>
+              </label>
+
+              <label className="block text-xs text-gray-300">
+                平滑（EMA）：<b className="ml-1">{emaAlpha.toFixed(2)}</b>
+                <input
+                  type="range"
+                  min="0.00"
+                  max="1.00"
+                  step="0.01"
+                  value={emaAlpha}
+                  onChange={(e) => setEmaAlpha(parseFloat(e.target.value))}
+                  className="w-full mt-1"
+                />
+                <span className="text-[11px] text-gray-400">
+                  越小越稳，但响应更慢（建议 0.20~0.30）
+                </span>
+              </label>
+
+              <label className="block text-xs text-gray-300">
+                滞回（抗抖）：<b className="ml-1">{hysteresis.toFixed(3)}</b>
+                <input
+                  type="range"
+                  min="0.000"
+                  max="0.100"
+                  step="0.005"
+                  value={hysteresis}
+                  onChange={(e) => setHysteresis(parseFloat(e.target.value))}
+                  className="w-full mt-1"
+                />
+                <span className="text-[11px] text-gray-400">
+                  越大越不易在边界来回跳（建议 0.02~0.05）
+                </span>
+              </label>
+
+              {/* <div className="flex items-center justify-between text-xs text-gray-300">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={edgeAware}
+                    onChange={(e) => setEdgeAware(e.target.checked)}
+                  />
+                  边缘字符增强
+                </label>
+                <select
+                  value={edgeStyle}
+                  onChange={(e) => setEdgeStyle(e.target.value)}
+                  className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-gray-200"
+                >
+                  <option value="paren">圆括号 ()</option>
+                  <option value="bracket">方括号 []</option>
+                  <option value="mixed">自动混合</option>
+                </select>
+              </div> */}
+
+              <label className="block text-xs text-gray-300">
+                边缘阈值：<b className="ml-1">{edgeThreshold.toFixed(2)}</b>
+                <input
+                  type="range"
+                  min="0.00"
+                  max="1.00"
+                  step="0.01"
+                  value={edgeThreshold}
+                  onChange={(e) => setEdgeThreshold(parseFloat(e.target.value))}
+                  className="w-full mt-1"
+                />
+                <span className="text-[11px] text-gray-400">
+                  越低捕捉到的边越多，但噪点也会多
+                </span>
+              </label>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setGamma(1.2);
+                    setEmaAlpha(0.25);
+                    setHysteresis(0.03);
+                    setEdgeAware(true);
+                    setEdgeThreshold(0.18);
+                    setEdgeStyle("paren");
+                  }}
+                  className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-xs"
+                >
+                  恢复默认
+                </button>
+              </div>
+            </div>
+
             {/* 切换显示结果 */}
             {asciiFrames.length > 0 && backendAsciiFrames.length > 0 && (
               <div className="mb-4">
@@ -509,7 +727,7 @@ const VideoToAscii = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="bg-black p-4 rounded-2xl"
-            style={{ height: 540 }} // 你可以改成想要的固定高度
+            style={{ height: 540 }}
           >
             <div
               ref={viewportRef}
