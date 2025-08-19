@@ -427,7 +427,7 @@ const VideoToAscii = () => {
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* 控制面板 */}
-        <div className="lg:w-1/3 space-y-6 sticky top-4 self-start">
+        <div className="lg:w-1/3 space-y-6 top-4 self-start">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
