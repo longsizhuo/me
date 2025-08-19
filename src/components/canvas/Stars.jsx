@@ -6,10 +6,11 @@ import { Suspense, useRef, useState } from "react";
 const Stars = (props) => {
   const ref = useRef();
   const [sphere] = useState(() => {
-    const positions = random.inSphere(new Float32Array(5000), { radius: 1.2 });
-    // 验证并清理 NaN 值
+    // 需要为每个顶点提供三个坐标，因此数组长度应为 3 的倍数
+    const positions = random.inSphere(new Float32Array(15000), { radius: 1.2 });
+    // 验证并清理所有非有限值
     for (let i = 0; i < positions.length; i++) {
-      if (isNaN(positions[i])) {
+      if (!Number.isFinite(positions[i])) {
         positions[i] = 0;
       }
     }
