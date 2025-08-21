@@ -24,6 +24,9 @@ import {
     tripguide,
     threejs, unsw, spotFinder,
 } from "../assets";
+import spotFinderLogo from "../assets/SpotFinder/logo.svg";
+import drcvt from "../assets/1234.webp";
+import kwai from "../assets/kwai-vector-logo-seeklogo/kwai.png";
 
 export const navLinks = [
     {
@@ -118,7 +121,7 @@ const experiences = [
     {
         title: "Frontend Engineer",
         company_name: "Kwai",
-        icon: "src/assets/kwai-vector-logo-seeklogo/kwai.png",
+        icon: kwai,
         iconBg: "#FFF",
         date: "May 2025 - Present",
         points: [
@@ -217,7 +220,7 @@ const projects = [
                 color: "pink-text-gradient",
             },
         ],
-        image: "src/assets/SpotFinder/logo.svg", // 使用之前的 logo 路径
+        image: spotFinderLogo, // 使用导入的图片
         source_code_link: "https://longsizhuo.com",
     },
     {
@@ -259,7 +262,7 @@ const projects = [
                 color: "pink-text-gradient",
             },
         ],
-        image: "public/1234.webp", // 使用之前的 logo 路径
+        image: drcvt, // 使用导入的图片
         source_code_link: "https://longsizhuo.shinyapps.io/long/",
     },
 ];
