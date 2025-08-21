@@ -43,7 +43,6 @@ ffmpeg_supports_heic() {
 convert_heic_to_png() {
   [ -d "$ASSET_ROOT" ] || { log "跳过 HEIC 转换：$ASSET_ROOT 不存在"; return 0; }
 
-  # 搜索 .HEIC/.heic
   mapfile -t heic_files < <(find "$ASSET_ROOT" -type f \( -iname '*.heic' -o -iname '*.HEIC' \) | sort)
   if [ ${#heic_files[@]} -eq 0 ]; then
     log "未发现 HEIC 文件，跳过转换"
@@ -52,23 +51,46 @@ convert_heic_to_png() {
 
   log "发现 ${#heic_files[@]} 个 HEIC 文件，开始转换为 PNG（就地同名生成）..."
 
-  local tool=""
-  if need ffmpeg && ffmpeg_supports_heic; then
-    tool="ffmpeg"
-  elif need sips; then
-    tool="sips"
-  elif need magick; then
-    tool="magick"
+  # 选择工具：按“实际试跑”探测可用性
+  choose_tool() {
+    local test_file="$1"
+    # 优先 ffmpeg
+    if command -v ffmpeg >/dev/null 2>&1; then
+      local out="${test_file%.*}.png"
+      if ffmpeg -y -hide_banner -loglevel error -i "$test_file" -frames:v 1 -map_metadata 0 -an -pix_fmt rgb24 "$out" 2>/dev/null; then
+        rm -f "$out"
+        echo "ffmpeg"; return 0
+      fi
+    fi
+    # 其次 ImageMagick
+    if command -v magick >/dev/null 2>&1; then
+      local out="${test_file%.*}.png"
+      if magick "$test_file" "$out" 2>/dev/null; then
+        rm -f "$out"
+        echo "magick"; return 0
+      fi
+    fi
+    # 再次 heif-convert（libheif-examples 提供）
+    if command -v heif-convert >/dev/null 2>&1; then
+      local out="${test_file%.*}.png"
+      if heif-convert "$test_file" "$out" >/dev/null 2>&1; then
+        rm -f "$out"
+        echo "heif-convert"; return 0
+      fi
+    fi
+    return 1
+  }
+
+  tool=""
+  if tool=$(choose_tool "${heic_files[0]}"); then
+    log "使用转换工具：$tool"
   else
-    die "未找到可用的转换工具（需要 ffmpeg[带 heif] 或 sips 或 ImageMagick 的 magick）"
+    die "未找到可用的转换工具（请安装：ImageMagick 或 libheif-examples，或带 libheif 的 ffmpeg）"
   fi
-  log "使用转换工具：$tool"
 
   local converted=0 skipped=0 failed=0
   for f in "${heic_files[@]}"; do
     out="${f%.*}.png"
-
-    # 跳过：若 png 已存在且较新
     if [ -f "$out" ] && [ "$out" -nt "$f" ]; then
       ((skipped++)) || true
       continue
@@ -76,9 +98,6 @@ convert_heic_to_png() {
 
     case "$tool" in
       ffmpeg)
-        # -frames:v 1：若是 HEIC 序列，仅取首帧（常规照片是单帧）
-        # -map_metadata 0：尽可能保留元数据；-an：无音轨
-        # 对图像用 rgb24 可避免 yuv 导致的潜在伽马差异
         if ffmpeg -y -hide_banner -loglevel error \
           -i "$f" -frames:v 1 -map_metadata 0 -an -pix_fmt rgb24 "$out"; then
           ((converted++)) || true
@@ -87,17 +106,7 @@ convert_heic_to_png() {
           warn "ffmpeg 转换失败：$f"
         fi
         ;;
-      sips)
-        # macOS 原生命令，颜色管理友好
-        if sips -s format png "$f" --out "$out" >/dev/null; then
-          ((converted++)) || true
-        else
-          ((failed++)) || true
-          warn "sips 转换失败：$f"
-        fi
-        ;;
       magick)
-        # ImageMagick，自动识别 heic → png
         if magick "$f" "$out"; then
           ((converted++)) || true
         else
@@ -105,14 +114,21 @@ convert_heic_to_png() {
           warn "magick 转换失败：$f"
         fi
         ;;
+      heif-convert)
+        if heif-convert "$f" "$out" >/dev/null; then
+          ((converted++)) || true
+        else
+          ((failed++)) || true
+          warn "heif-convert 转换失败：$f"
+        fi
+        ;;
     esac
   done
 
   log "HEIC 转换完成：成功 $converted，跳过 $skipped，失败 $failed"
-  if [ "$failed" -gt 0 ]; then
-    warn "部分文件转换失败，请检查依赖或损坏的 HEIC 文件"
-  fi
+  [ "$failed" -eq 0 ] || warn "部分文件转换失败：请确认依赖或源文件是否损坏"
 }
+
 
 # ========= 开始 =========
 log "切换到项目目录: $PROJECT_DIR"
