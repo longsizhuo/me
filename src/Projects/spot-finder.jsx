@@ -1,11 +1,13 @@
-import React from 'react';
-import {Container, Typography, Card, CardContent, Box, IconButton} from '@mui/material';
-import SpotFinderImages from '../utils/getImages.jsx';
+import React, { useState, Suspense } from 'react';
+import { Container, Typography, Card, CardContent, Box, IconButton, Button, Dialog, DialogContent } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+const LazySpotFinderImages = React.lazy(() => import('../utils/getImages.jsx'));
 
 const SpotFinder = () => {
     const navigate = useNavigate();
+    const [openGallery, setOpenGallery] = useState(false);
 
     const handleReturn = () => {
         navigate(-1); // This navigates back to the previous page
@@ -72,12 +74,21 @@ const SpotFinder = () => {
                     <Typography variant="h5" component="h3" gutterBottom>
                         Pictures of USYD Coding Fest 2024
                     </Typography>
-                    <SpotFinderImages />
+                    <Button variant="outlined" onClick={() => setOpenGallery(true)}>
+                        View Photos
+                    </Button>
                 </CardContent>
             </Card>
-            </Card>
+
+            <Dialog open={openGallery} onClose={() => setOpenGallery(false)} maxWidth="lg" fullWidth>
+                <DialogContent>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <LazySpotFinderImages />
+                    </Suspense>
+                </DialogContent>
+            </Dialog>
         </Container>
     );
-}
+};
 
 export default SpotFinder;
