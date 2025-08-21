@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // 用于导航到项目详情页面
 import {logo_dark, logo_normal, drcvt} from "../assets/index.js";
+
 const projects = [
     {
         name: "Spot Finder",
