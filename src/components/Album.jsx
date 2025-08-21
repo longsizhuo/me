@@ -1,95 +1,125 @@
 /**
  * Album 组件 - 照片相册展示
- * 功能：递归遍历 assets/album/Kwai 文件夹下的所有照片并以瀑布流形式展示
+ * 功能：递归遍历 assets/album 文件夹下的所有照片，按子文件夹分组并以瀑布流形式展示
  */
-import { useEffect, useState } from 'react';
-import { Image } from 'antd';
-import { SectionWrapper } from '../hoc';
-import { motion } from 'framer-motion';
-import { styles } from '../styles';
-import { textVariant, fadeIn } from '../utils/motion';
+import { Image } from "antd";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { SectionWrapper } from "../hoc";
+import { styles } from "../styles";
+import { fadeIn, textVariant } from "../utils/motion";
 
 const getGroupedImages = () => {
-  const imageModules = import.meta.glob('/src/assets/album/Kwai/*.{jpg,jpeg,png,webp,gif}', {
-    eager: true,
-    import: 'default',
-  });
+  // 递归加载所有图片（包括子目录）
+  const imageModules = import.meta.glob(
+    "/src/assets/album/**/*.{jpg,jpeg,png,webp,gif,heic,HEIC}",
+    {
+      eager: true,
+      import: "default",
+    }
+  );
 
-  const images = [];
+  const grouped = {};
 
   for (const path in imageModules) {
     const src = imageModules[path];
-    images.push(src);
+
+    // 提取子目录名（例如 Kwai, 2025-Kwai, 2025-UNSW）
+    const match = path.match(/album\/([^\/]+)\//);
+    const folder = match?.[1] ?? "Uncategorized";
+
+    if (!grouped[folder]) grouped[folder] = [];
+    grouped[folder].push(src);
   }
 
-  return images;
+  return grouped;
 };
 
 const Album = () => {
-  const [images, setImages] = useState([]);
+  const [albumMap, setAlbumMap] = useState({});
   const gap = 16;
+  const columnWidth = 250;
 
   useEffect(() => {
-    const imageList = getGroupedImages();
-    setImages(imageList);
+    const grouped = getGroupedImages();
+    setAlbumMap(grouped);
   }, []);
 
   return (
     <div className="relative w-full">
       <motion.div variants={textVariant()}>
         <p className={`${styles.sectionSubText} text-white`}>Gallery</p>
-        <h2 className={`${styles.sectionHeadText} text-white`}>Kwai 相册</h2>
+        <h2 className={`${styles.sectionHeadText} text-white`}>Photo Album</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-white text-[17px] max-w-3xl leading-[30px]"
       >
-        Here are some of the fun memories captured at Kwai! All photos are automatically collected from the Kwai album folder.
+        Here are my photo collections organized by folders. All photos are
+        automatically collected from the assets/album directory.
       </motion.p>
 
       <div
         id="album-scroll"
         className="p-4 mt-10 bg-transparent shadow-inner overflow-y-scroll border-2 border-white rounded-2xl"
         style={{
-          maxHeight: '520px',
-          width: '100%',
+          maxHeight: "520px",
+          width: "100%",
         }}
       >
-        <div
-          style={{
-            columnCount: Math.floor(window.innerWidth / 250),
-            columnGap: gap,
-          }}
-        >
-          {images.map((src, index) => (
-            <div
-              key={index}
-              style={{
-                breakInside: 'avoid',
-                marginBottom: `${gap}px`,
-                borderRadius: '12px',
-                overflow: 'hidden',
-              }}
-            >
-              <Image
-                src={src}
-                alt={`kwai-student-${index}`}
+        <Image.PreviewGroup>
+          {Object.entries(albumMap).map(([folderName, imageList]) => (
+            <div key={folderName} style={{ marginBottom: 40 }}>
+              <h2
                 style={{
-                  width: '100%',
-                  height: 'auto',
-                  borderRadius: 12,
-                  objectFit: 'cover',
+                  fontSize: "20px",
+                  fontWeight: 600,
+                  margin: "16px 0",
+                  color: "#fff",
+                  borderBottom: "2px solid #fff",
+                  paddingBottom: "8px",
                 }}
-                placeholder
-              />
+              >
+                {folderName}
+              </h2>
+              <div
+                style={{
+                  columnCount: Math.floor(window.innerWidth / columnWidth),
+                  columnGap: gap,
+                }}
+              >
+                {imageList.map((src, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      breakInside: "avoid",
+                      marginBottom: `${gap}px`,
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${folderName}-${idx}`}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: 12,
+                        objectFit: "cover",
+                      }}
+                      placeholder
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
-        </div>
+        </Image.PreviewGroup>
       </div>
     </div>
   );
 };
 
-const AlbumWithWrapper = SectionWrapper(Album, 'album');
+const AlbumWithWrapper = SectionWrapper(Album, "album");
 export default AlbumWithWrapper;
