@@ -4,38 +4,86 @@
  */
 import { Image } from "antd";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion";
 
 const getGroupedImages = () => {
-  // 递归加载所有图片（包括子目录）
+  // 递归加载所有图片（包括子目录），返回加载函数而不是立即加载
   const imageModules = import.meta.glob(
     "/src/assets/album/**/*.{jpg,jpeg,png,webp,gif,heic,HEIC}",
-    {
-      eager: true,
-      import: "default",
-    }
+    { eager: false }
   );
 
+  /** @type {Record<string, Array<() => Promise<{ default: string }>>>} */
   const grouped = {};
 
   for (const path in imageModules) {
-    const src = imageModules[path];
+    const loader = imageModules[path];
 
     // 提取子目录名（例如 Kwai, 2025-Kwai, 2025-UNSW）
     const match = path.match(/album\/([^\/]+)\//);
     const folder = match?.[1] ?? "Uncategorized";
 
     if (!grouped[folder]) grouped[folder] = [];
-    grouped[folder].push(src);
+    grouped[folder].push(loader);
   }
 
   return grouped;
 };
 
+const LazyImage = ({ loader, alt, gap }) => {
+  const ref = useRef(null);
+  const [src, setSrc] = useState("");
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          loader().then((mod) => setSrc(mod.default));
+          observer.disconnect();
+        }
+      });
+    });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [loader]);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        breakInside: "avoid",
+        marginBottom: `${gap}px`,
+        borderRadius: "12px",
+        overflow: "hidden",
+      }}
+    >
+      {src && (
+        <Image
+          src={src}
+          alt={alt}
+          loading="lazy"
+          style={{
+            width: "100%",
+            height: "auto",
+            borderRadius: 12,
+            objectFit: "cover",
+          }}
+          placeholder
+        />
+      )}
+    </div>
+  );
+};
+
 const Album = () => {
+  /** @type {[Record<string, Array<() => Promise<{ default: string }>>>, Function]} */
   const [albumMap, setAlbumMap] = useState({});
   const gap = 16;
   const columnWidth = 250;
@@ -89,28 +137,13 @@ const Album = () => {
                   columnGap: gap,
                 }}
               >
-                {imageList.map((src, idx) => (
-                  <div
+                {imageList.map((loader, idx) => (
+                  <LazyImage
                     key={idx}
-                    style={{
-                      breakInside: "avoid",
-                      marginBottom: `${gap}px`,
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Image
-                      src={src}
-                      alt={`${folderName}-${idx}`}
-                      style={{
-                        width: "100%",
-                        height: "auto",
-                        borderRadius: 12,
-                        objectFit: "cover",
-                      }}
-                      placeholder
-                    />
-                  </div>
+                    loader={loader}
+                    alt={`${folderName}-${idx}`}
+                    gap={gap}
+                  />
                 ))}
               </div>
             </div>
