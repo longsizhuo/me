@@ -4,9 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { API_ENDPOINTS, DEV_CONFIG } from "../config/api";
 import { SectionWrapper } from "../hoc";
 import { useCharMetrics } from "../hook/useCharMetrics";
+import {
+  clamp,
+  generateAsciiFramesFromVideo,
+  sanitizeAscii,
+} from "../service/VideoToAscii";
 import { styles } from "../styles";
-
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 function useMeasuredCharAspect() {
   const [aspect, setAspect] = useState(2);
@@ -106,48 +109,7 @@ const VideoToAscii = () => {
   const { wPerFs, hPerFs } = useCharMetrics();
   const charRatio = hPerFs && wPerFs ? hPerFs / wPerFs : 2;
 
-  const sanitizeAscii = (s) => {
-    const set = new Set();
-    for (const ch of s) {
-      const code = ch.charCodeAt(0);
-      if (code >= 32 && code <= 126) set.add(ch);
-    }
-    return Array.from(set).join("");
-  };
-
-  const imageToAscii = useCallback((imageData, width, height, chars) => {
-    const ascii = [];
-    const WHITE_CLAMP = 0.97; // 高亮钳制阈值（0~1），可改 0.95~0.99 之间
-
-    for (let y = 0; y < height; y++) {
-      let line = "";
-      const rowOff = y * width * 4;
-
-      for (let x = 0; x < width; x++) {
-        const idx = rowOff + x * 4;
-        const r = imageData[idx],
-          g = imageData[idx + 1],
-          b = imageData[idx + 2];
-
-        // 1) 计算亮度（0~255）→ 归一化到 0~1
-        const y01 = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-        // 2) 高亮端钳制（clamp）
-        const yClamped = y01 > WHITE_CLAMP ? 1.0 : y01;
-
-        // 3) 映射到字符索引
-        const ci = Math.max(
-          0,
-          Math.min(chars.length - 1, Math.floor(yClamped * (chars.length - 1)))
-        );
-
-        line += chars[ci];
-      }
-
-      ascii.push(line);
-    }
-    return ascii;
-  }, []);
+  // 计算相关函数已移至 ../service/VideoToAscii
 
   const viewportRef = useRef(null);
   const [fontSize, setFontSize] = useState(12);
@@ -179,10 +141,6 @@ const VideoToAscii = () => {
 
   const processVideoFrames = useCallback(
     async (video) => {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      const frames = [];
-
       const rows = clamp(resolution, 20, 120);
       const vw = video.videoWidth || 16;
       const vh = video.videoHeight || 9;
@@ -192,90 +150,16 @@ const VideoToAscii = () => {
         480
       );
 
-      canvas.width = cols;
-      canvas.height = rows;
-      ctx.imageSmoothingEnabled = false;
-
-      const N = cols * rows;
-      let prevY = new Float32Array(N);
-      let prevIdx = new Uint16Array(N);
-
-      const srgb2lin = (v8) => {
-        const v = v8 / 255;
-        return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-      };
-      const toLuma = (r, g, b) => {
-        const R = srgb2lin(r),
-          G = srgb2lin(g),
-          B = srgb2lin(b);
-        let Y = 0.2126 * R + 0.7152 * G + 0.0722 * B; // 线性亮度
-        Y = Math.pow(Y, 1 / gamma); // gamma 调整
-        return Math.max(0, Math.min(1, Y));
-      };
-
-      const EDGE = {
-        parenL: ["(", "{", "["],
-        parenR: [")", "}", "]"],
-        vert: ["|", "I", "!"],
-        horiz: ["-", "_", "="],
-        diagF: ["/"],
-        diagB: ["\\"],
-      };
-      const pick = (arr, w) =>
-        arr[
-          Math.min(
-            arr.length - 1,
-            Math.floor(Math.max(0, Math.min(0.999, w)) * arr.length)
-          )
-        ];
-
-      const chars = sanitizeAscii(characters) || DEFAULT_CHARS;
-      const M = chars.length;
-      const invM1 = 1 / (M - 1);
-      const alpha = emaAlpha;
-      const dead = hysteresis;
-
-      const bayer4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(
-        (x) => (x + 0.5) / 16
-      );
-
-      return new Promise((resolve) => {
-        const step = 1 / clamp(frameRate, 5, 24);
-
-        const doFrame = () => {
-          if (video.currentTime >= video.duration) return resolve(frames);
-
-          ctx.drawImage(video, 0, 0, cols, rows);
-          const imageData = ctx.getImageData(0, 0, cols, rows);
-          const ascii = imageToAscii(
-            imageData.data,
-            cols,
-            rows,
-            sanitizeAscii(characters) || DEFAULT_CHARS
-          );
-          frames.push(ascii);
-          video.currentTime += step;
-          video.addEventListener("seeked", doFrame, { once: true });
-        };
-
-        video.currentTime = 0;
-        video.addEventListener("loadeddata", () => {}, { once: true });
-        video.addEventListener("seeked", doFrame, { once: true });
+      const frames = await generateAsciiFramesFromVideo(video, {
+        rows,
+        cols,
+        frameRate,
+        characters: sanitizeAscii(characters) || DEFAULT_CHARS,
+        canvas: canvasRef.current,
       });
+      return frames;
     },
-    [
-      resolution,
-      frameRate,
-      characters,
-      hPerFs,
-      wPerFs,
-      gamma,
-      emaAlpha,
-      hysteresis,
-      edgeAware,
-      edgeThreshold,
-      edgeStyle,
-    ]
+    [resolution, frameRate, characters, hPerFs, wPerFs]
   );
 
   // ▶️ 后端调用：只有启用且有 token 才发送；否则直接返回
