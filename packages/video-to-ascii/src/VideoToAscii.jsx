@@ -1,15 +1,13 @@
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_ENDPOINTS, DEV_CONFIG } from "../config/api";
-import { SectionWrapper } from "../hoc";
-import { useCharMetrics } from "../hook/useCharMetrics";
+import { API_ENDPOINTS, DEV_CONFIG } from "./config/api";
+import { useCharMetrics } from "./hook/useCharMetrics";
 import {
   clamp,
   generateAsciiFramesFromVideo,
   sanitizeAscii,
-} from "../service/VideoToAscii";
-import { styles } from "../styles";
+} from "./service/VideoToAscii";
 
 function useMeasuredCharAspect() {
   const [aspect, setAspect] = useState(2);
@@ -301,7 +299,7 @@ const VideoToAscii = () => {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h2 className={`${styles.sectionHeadText} text-center`}>
+        <h2 className="text-white font-black md:text-[60px] sm:text-[50px] xs:text-[40px] text-[30px] text-center">
           视频转ASCII动画
         </h2>
         <p className="text-center text-secondary text-lg mt-4">
@@ -660,5 +658,4 @@ const VideoToAscii = () => {
   );
 };
 
-const VideoToAsciiWithWrapper = SectionWrapper(VideoToAscii, "video-to-ascii");
-export default VideoToAsciiWithWrapper;
+export default VideoToAscii;
