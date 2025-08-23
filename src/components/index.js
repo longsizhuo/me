@@ -11,7 +11,10 @@ import ContactAdvanced from "./ContactAdvanced";
 import CanvasLoader from "./Loader";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
 import Album from "./Album";
-import VideoToAscii from "./VideoToAscii";
+import { SectionWrapper } from "../hoc";
+import { VideoToAscii as VideoToAsciiBase } from "@me/video-to-ascii";
+
+const VideoToAscii = SectionWrapper(VideoToAsciiBase, "video-to-ascii");
 
 export {
   Album,
