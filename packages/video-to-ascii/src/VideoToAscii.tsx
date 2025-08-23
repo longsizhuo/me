@@ -358,25 +358,6 @@ const VideoToAscii = ({ config = {} }: { config?: VideoToAsciiConfig }) => {
                 />
               </div>
             )}
-
-            {/* 控制面板（播放/暂停/重置 + 切换前端/后端） */}
-            <div className="mt-6">
-              <ControlPanel
-                settings={settings}
-                isPlaying={isPlaying}
-                isProcessing={isProcessing}
-                isProcessingBackend={isProcessingBackend}
-                // ✅ 传入合并后的帧，避免和右侧显示不一致
-                frames={framesCombined}
-                backendFrames={backendAsciiFrames}
-                useBackendResult={useBackendResult}
-                currentFrame={currentFrame}
-                onPlay={play}
-                onStop={stop}
-                onReset={reset}
-                onToggleBackendResult={toggleBackendResult}
-              />
-            </div>
           </motion.div>
         </div>
 
@@ -399,6 +380,22 @@ const VideoToAscii = ({ config = {} }: { config?: VideoToAsciiConfig }) => {
         crossOrigin="anonymous"
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
+
+      {/* 悬浮控制面板 */}
+      <ControlPanel
+        settings={settings}
+        isPlaying={isPlaying}
+        isProcessing={isProcessing}
+        isProcessingBackend={isProcessingBackend}
+        frames={framesCombined}
+        backendFrames={backendAsciiFrames}
+        useBackendResult={useBackendResult}
+        currentFrame={currentFrame}
+        onPlay={play}
+        onStop={stop}
+        onReset={reset}
+        onToggleBackendResult={toggleBackendResult}
+      />
     </div>
   );
 };
