@@ -3,7 +3,7 @@
  * 功能：递归遍历 assets/album 文件夹下的所有照片，按子文件夹分组并以瀑布流形式展示
  */
 import { Image } from "antd";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";

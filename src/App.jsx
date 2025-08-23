@@ -1,4 +1,4 @@
-import { VideoToAscii } from "@me/video-to-ascii";
+import { VideoToAscii } from "char-anime";
 import { useEffect } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import {

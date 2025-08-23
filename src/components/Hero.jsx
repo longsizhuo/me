@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Card from "@mui/material/Card";
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
