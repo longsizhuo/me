@@ -1,37 +1,42 @@
-import { EarthCanvas, BallCanvas, ComputersCanvas, StarsCanvas } from './canvas';
-import Hero from "./Hero";
-import Navbar from "./Navbar";
 import About from "./About";
-import Tech from "./Tech";
-import Experience from "./Experience";
-import Works from "./Works";
-import Feedbacks from "./Feedbacks";
+import Album from "./Album";
+import {
+  BallCanvas,
+  ComputersCanvas,
+  EarthCanvas,
+  StarsCanvas,
+} from "./canvas";
 import Contact from "./Contact";
 import ContactAdvanced from "./ContactAdvanced";
-import CanvasLoader from "./Loader";
+import Experience from "./Experience";
+import Feedbacks from "./Feedbacks";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
-import Album from "./Album";
-import { SectionWrapper } from "../hoc";
-import { VideoToAscii as VideoToAsciiBase } from "@me/video-to-ascii";
 
-const VideoToAscii = SectionWrapper(VideoToAsciiBase, "video-to-ascii");
+import Hero from "./Hero";
+import CanvasLoader from "./Loader";
+import Navbar from "./Navbar";
+import PhotoGalleryDialog from "./PhotoGalleryDialog";
+import Tech from "./Tech";
+import VideoToAscii from "./VideoToAscii";
+import Works from "./Works";
 
 export {
-  Album,
-  Hero,
-  Navbar,
   About,
-  Tech,
-  Experience,
-  Works,
-  Feedbacks,
+  Album,
+  BallCanvas,
+  CanvasLoader,
+  ComputersCanvas,
   Contact,
   ContactAdvanced,
-  CanvasLoader,
-  EarthCanvas, 
-  BallCanvas, 
-  ComputersCanvas, 
-  StarsCanvas,
+  EarthCanvas,
+  Experience,
+  Feedbacks,
   GlobalLottieBackground,
-  VideoToAscii
+  Hero,
+  Navbar,
+  PhotoGalleryDialog,
+  StarsCanvas,
+  Tech,
+  VideoToAscii,
+  Works,
 };
