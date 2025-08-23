@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx}",
-    "./packages/video-to-ascii/src/**/*.{js,jsx}",
+    "./packages/video-to-ascii/src/**/*.{js,jsx,ts,tsx}",
   ],
   mode: "jit",
   darkMode: "class",
