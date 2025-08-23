@@ -1,3 +1,4 @@
+import { VideoToAscii } from "@me/video-to-ascii";
 import { useEffect } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import {
@@ -9,14 +10,12 @@ import {
   Hero,
   Navbar,
   StarsCanvas,
-  VideoToAscii,
   Works,
 } from "./components";
 import Education from "./components/Education";
 import HelloAlgo from "./Projects/hello-algo";
 import SpotFinder from "./Projects/spot-finder";
 import VisualizationTool from "./Projects/visualization-tool";
-
 function AppContent() {
   const location = useLocation();
 
