@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserSettings, VideoToAsciiConfig } from "../config/types";
 
 interface SettingsPanelProps {
@@ -17,6 +17,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   resetToDefaults,
   config,
 }) => {
+  const [isAdvancedSettingsExpanded, setIsAdvancedSettingsExpanded] =
+    useState(false);
+
   return (
     <div className="bg-tertiary p-6 rounded-2xl space-y-6">
       <h3 className="text-xl font-bold mb-4 text-white">设置</h3>
@@ -154,107 +157,119 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
       {/* 高级设置 */}
       {config.enableAdvancedSettings && (
         <div className="space-y-4">
-          <h4 className="text-white font-semibold text-sm border-b border-gray-700 pb-2">
-            画质与稳定性
-          </h4>
-
-          {/* Gamma 设置 */}
-          {config.enableGamma && (
-            <label className="block text-xs text-gray-300">
-              Gamma（亮度曲线）：
-              <b className="ml-1">{settings.gamma.toFixed(2)}</b>
-              <input
-                type="range"
-                min="0.8"
-                max="2.0"
-                step="0.05"
-                value={settings.gamma}
-                onChange={(e) =>
-                  updateSetting("gamma", parseFloat(e.target.value))
-                }
-                className="w-full mt-1"
-              />
-              <span className="text-[11px] text-gray-400">
-                更大=中间灰更不敏感，更稳；太大对比会弱
-              </span>
-            </label>
-          )}
-
-          {/* EMA 设置 */}
-          {config.enableEma && (
-            <label className="block text-xs text-gray-300">
-              平滑（EMA）：
-              <b className="ml-1">{settings.emaAlpha.toFixed(2)}</b>
-              <input
-                type="range"
-                min="0.00"
-                max="1.00"
-                step="0.01"
-                value={settings.emaAlpha}
-                onChange={(e) =>
-                  updateSetting("emaAlpha", parseFloat(e.target.value))
-                }
-                className="w-full mt-1"
-              />
-              <span className="text-[11px] text-gray-400">
-                越小越稳，但响应更慢（建议 0.20~0.30）
-              </span>
-            </label>
-          )}
-
-          {/* 滞回设置 */}
-          {config.enableHysteresis && (
-            <label className="block text-xs text-gray-300">
-              滞回（抗抖）：
-              <b className="ml-1">{settings.hysteresis.toFixed(3)}</b>
-              <input
-                type="range"
-                min="0.000"
-                max="0.100"
-                step="0.005"
-                value={settings.hysteresis}
-                onChange={(e) =>
-                  updateSetting("hysteresis", parseFloat(e.target.value))
-                }
-                className="w-full mt-1"
-              />
-              <span className="text-[11px] text-gray-400">
-                越大越不易在边界来回跳（建议 0.02~0.05）
-              </span>
-            </label>
-          )}
-
-          {/* 边缘感知设置 */}
-          {config.enableEdgeAware && (
-            <label className="block text-xs text-gray-300">
-              边缘阈值：
-              <b className="ml-1">{settings.edgeThreshold.toFixed(2)}</b>
-              <input
-                type="range"
-                min="0.00"
-                max="1.00"
-                step="0.01"
-                value={settings.edgeThreshold}
-                onChange={(e) =>
-                  updateSetting("edgeThreshold", parseFloat(e.target.value))
-                }
-                className="w-full mt-1"
-              />
-              <span className="text-[11px] text-gray-400">
-                越低捕捉到的边越多，但噪点也会多
-              </span>
-            </label>
-          )}
-
-          {/* 重置按钮 */}
-          <div className="flex gap-2">
+          <div className="flex items-center justify-between border-b border-gray-700 pb-2">
+            <h4 className="text-white font-semibold text-sm">画质与稳定性</h4>
             <button
-              onClick={resetToDefaults}
-              className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-xs hover:bg-gray-600"
+              onClick={() =>
+                setIsAdvancedSettingsExpanded(!isAdvancedSettingsExpanded)
+              }
+              className="text-xs text-gray-400 hover:text-white transition-colors"
             >
-              恢复默认
+              {isAdvancedSettingsExpanded ? "收起 ▼" : "展开 ▶"}
             </button>
           </div>
+
+          {isAdvancedSettingsExpanded && (
+            <div className="space-y-4 pt-2">
+              {/* Gamma 设置 */}
+              {config.enableGamma && (
+                <label className="block text-xs text-gray-300">
+                  Gamma（亮度曲线）：
+                  <b className="ml-1">{settings.gamma.toFixed(2)}</b>
+                  <input
+                    type="range"
+                    min="0.8"
+                    max="2.0"
+                    step="0.05"
+                    value={settings.gamma}
+                    onChange={(e) =>
+                      updateSetting("gamma", parseFloat(e.target.value))
+                    }
+                    className="w-full mt-1"
+                  />
+                  <span className="text-[11px] text-gray-400">
+                    更大=中间灰更不敏感，更稳；太大对比会弱
+                  </span>
+                </label>
+              )}
+
+              {/* EMA 设置 */}
+              {config.enableEma && (
+                <label className="block text-xs text-gray-300">
+                  平滑（EMA）：
+                  <b className="ml-1">{settings.emaAlpha.toFixed(2)}</b>
+                  <input
+                    type="range"
+                    min="0.00"
+                    max="1.00"
+                    step="0.01"
+                    value={settings.emaAlpha}
+                    onChange={(e) =>
+                      updateSetting("emaAlpha", parseFloat(e.target.value))
+                    }
+                    className="w-full mt-1"
+                  />
+                  <span className="text-[11px] text-gray-400">
+                    越小越稳，但响应更慢（建议 0.20~0.30）
+                  </span>
+                </label>
+              )}
+
+              {/* 滞回设置 */}
+              {config.enableHysteresis && (
+                <label className="block text-xs text-gray-300">
+                  滞回（抗抖）：
+                  <b className="ml-1">{settings.hysteresis.toFixed(3)}</b>
+                  <input
+                    type="range"
+                    min="0.000"
+                    max="0.100"
+                    step="0.005"
+                    value={settings.hysteresis}
+                    onChange={(e) =>
+                      updateSetting("hysteresis", parseFloat(e.target.value))
+                    }
+                    className="w-full mt-1"
+                  />
+                  <span className="text-[11px] text-gray-400">
+                    越大越不易在边界来回跳（建议 0.02~0.05）
+                  </span>
+                </label>
+              )}
+
+              {/* 边缘感知设置 */}
+              {config.enableEdgeAware && (
+                <label className="block text-xs text-gray-300">
+                  边缘阈值：
+                  <b className="ml-1">{settings.edgeThreshold.toFixed(2)}</b>
+                  <input
+                    type="range"
+                    min="0.00"
+                    max="1.00"
+                    step="0.01"
+                    value={settings.edgeThreshold}
+                    onChange={(e) =>
+                      updateSetting("edgeThreshold", parseFloat(e.target.value))
+                    }
+                    className="w-full mt-1"
+                  />
+                  <span className="text-[11px] text-gray-400">
+                    越低捕捉到的边越多，但噪点也会多
+                  </span>
+                </label>
+              )}
+
+              {/* 重置按钮 */}
+              <div className="flex gap-2">
+                <button
+                  onClick={resetToDefaults}
+                  className="px-3 py-1 rounded bg-gray-700 text-gray-100 text-xs hover:bg-gray-600"
+                >
+                  恢复默认
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

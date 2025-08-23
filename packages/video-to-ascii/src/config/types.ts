@@ -47,6 +47,21 @@ export interface VideoToAsciiConfig {
   onVideoProcessed?: (frames: string[][]) => void;
   onSettingsChanged?: (settings: any) => void;
   onError?: (error: Error) => void;
+
+  // 新增：默认值配置对象
+  defaults?: {
+    resolution?: number;
+    frameRate?: number;
+    gamma?: number;
+    emaAlpha?: number;
+    hysteresis?: number;
+    edgeAware?: boolean;
+    edgeThreshold?: number;
+    edgeStyle?: "paren" | "bracket" | "mixed";
+    enableBackend?: boolean;
+    backendToken?: string;
+    characters?: string;
+  };
 }
 
 // 默认配置
