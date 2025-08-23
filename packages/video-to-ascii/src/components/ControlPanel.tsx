@@ -124,7 +124,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     <div
       ref={panelRef}
       style={panelStyle}
-      className={`bg-tertiary rounded-2xl shadow-2xl border border-gray-600 transition-all duration-200 select-none ${
+      className={`bg-tertiary rounded-2xl shadow-2xl border border-gray-600 transition-all select-none ${
         isMinimized ? "h-12 overflow-hidden" : "h-auto"
       }`}
       onMouseDown={handleMouseDown}
