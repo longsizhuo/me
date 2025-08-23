@@ -59,26 +59,6 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         </div>
       )}
 
-      {/* 文件上传 */}
-      {config.enableFileUpload && (
-        <div className="space-y-4">
-          <h4 className="text-white font-semibold text-sm border-b border-gray-700 pb-2">
-            文件设置
-          </h4>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              选择视频文件
-            </label>
-            <input
-              type="file"
-              accept="video/*"
-              className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
-            />
-          </div>
-        </div>
-      )}
-
       {/* 字符集设置 */}
       {config.enableCharacterCustomization && (
         <div className="space-y-4">
