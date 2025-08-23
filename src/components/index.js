@@ -17,7 +17,6 @@ import CanvasLoader from "./Loader";
 import Navbar from "./Navbar";
 import PhotoGalleryDialog from "./PhotoGalleryDialog";
 import Tech from "./Tech";
-import VideoToAscii from "./VideoToAscii";
 import Works from "./Works";
 
 export {
@@ -37,6 +36,5 @@ export {
   PhotoGalleryDialog,
   StarsCanvas,
   Tech,
-  VideoToAscii,
   Works,
 };
