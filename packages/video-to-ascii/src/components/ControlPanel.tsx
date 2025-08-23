@@ -32,9 +32,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 20, y: 120 }); // 避免被标题栏遮挡
+  const positionRef = useRef(position);
   const [isMinimized, setIsMinimized] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   // 拖拽处理
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -42,8 +44,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     if ((e.target as HTMLElement).closest(".drag-handle")) {
       setIsDragging(true);
       dragStartRef.current = {
-        x: e.clientX - position.x,
-        y: e.clientY - position.y,
+        x: e.clientX - positionRef.current.x,
+        y: e.clientY - positionRef.current.y,
       };
       e.preventDefault();
       e.stopPropagation();
@@ -59,9 +61,19 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       const maxX = window.innerWidth - (panelRef.current?.offsetWidth || 300);
       const maxY = window.innerHeight - (panelRef.current?.offsetHeight || 200);
 
-      setPosition({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY)),
+      const x = Math.max(0, Math.min(newX, maxX));
+      const y = Math.max(0, Math.min(newY, maxY));
+
+      positionRef.current = { x, y };
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      animationFrameRef.current = requestAnimationFrame(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        }
       });
     }
   };
@@ -69,6 +81,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const handleMouseUp = () => {
     setIsDragging(false);
     dragStartRef.current = null;
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    setPosition(positionRef.current);
   };
 
   // 全局鼠标事件监听
@@ -83,15 +100,24 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     }
   }, [isDragging]);
 
+  useEffect(() => {
+    if (panelRef.current) {
+      const { x, y } = position;
+      panelRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      positionRef.current = { x, y };
+    }
+  }, [position]);
+
   // 悬浮面板样式
   const panelStyle = {
     position: "fixed" as const,
-    left: position.x,
-    top: position.y,
+    left: 0,
+    top: 0,
     zIndex: 9999, // 提高层级，避免被遮挡
     cursor: isDragging ? "grabbing" : "default",
     minWidth: "280px",
     maxWidth: "320px",
+    willChange: "transform" as const,
   };
 
   return (
