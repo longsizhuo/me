@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Tilt } from "react-tilt";
 import { motion } from "motion/react";
 
@@ -7,6 +7,7 @@ import { github } from "../assets";
 import { SectionWrapper } from "../hoc";
 import { projects } from "../constants";
 import { fadeIn, textVariant } from "../utils/motion.ts";
+import ProjectOverlay from "./ProjectOverlay.jsx";
 
 const ProjectCard = ({
   index,
@@ -15,17 +16,10 @@ const ProjectCard = ({
   tags,
   image,
   source_code_link,
+  onClick,
 }) => {
-    const [isExpanded, setIsExpanded] = useState(false); // State to track if the card is expanded
-
-    // Function to handle card click and toggle expansion
-    const handleCardClick = () => {
-        setIsExpanded((prevState) => !prevState);
-    };
   return (
-    <motion.div
-        onClick={handleCardClick}
-        variants={fadeIn("up", "", index * 0.5, 0.75)}>
+    <motion.div onClick={onClick} variants={fadeIn("up", "", index * 0.5, 0.75)}>
       <Tilt
         options={{
           max: 45,
@@ -43,7 +37,10 @@ const ProjectCard = ({
 
           <div className='absolute inset-0 flex justify-end m-3 card-img_hover'>
             <div
-              onClick={() => window.open(source_code_link, "_blank")}
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(source_code_link, "_blank");
+              }}
               className='black-gradient w-10 h-10 rounded-full flex justify-center items-center cursor-pointer'
             >
               <img
@@ -76,6 +73,10 @@ const ProjectCard = ({
 };
 
 const Works = () => {
+  const [selectedProject, setSelectedProject] = useState(null);
+
+  const handleClose = () => setSelectedProject(null);
+
   return (
     <>
       <motion.div variants={textVariant()}>
@@ -98,9 +99,26 @@ const Works = () => {
 
       <div className='mt-20 flex flex-wrap gap-7'>
         {projects.map((project, index) => (
-          <ProjectCard key={`project-${index}`} index={index} {...project} />
+          <ProjectCard
+            key={`project-${index}`}
+            index={index}
+            {...project}
+            onClick={() => setSelectedProject(project)}
+          />
         ))}
       </div>
+      {selectedProject && (
+        <ProjectOverlay
+          open
+          onClose={handleClose}
+          onBack={handleClose}
+          title={selectedProject.name}
+          description={selectedProject.description}
+          photos={selectedProject.photos || []}
+          githubUrl={selectedProject.source_code_link}
+          liveUrl={selectedProject.liveUrl}
+        />
+      )}
     </>
   );
 };
