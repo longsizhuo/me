@@ -13,7 +13,7 @@ These notes explain the folder structure and major components of the site. They 
 - `Hero.jsx` – landing section with animated canvas and intro text
 - `About.jsx` – short bio, skills and interests
 - `Experience.jsx` – chronological timeline of work and study
-- `Projects.jsx` – teaser cards for highlighted projects; full pages live in `src/Projects/`
+- `Projects.jsx` – teaser cards for highlighted projects with an overlay for details
 - `Tech.jsx` – grid of technology logos
 - `Works.jsx` – portfolio case studies
 - `Contact.jsx` / `ContactAdvanced.jsx` – contact forms. The advanced version sends email via EmailJS *and* posts to the API for persistence
@@ -21,7 +21,6 @@ These notes explain the folder structure and major components of the site. They 
 - other components are named after their sections (e.g., Navbar, Footer)
 
 ### Other src folders
-- `Projects/` – individual project pages rendered by `Projects.jsx`
 - `config/` – API base URL and EmailJS configuration
 - `constants/` – navigation links, services list and other static data
 - `hoc/` – higher‑order helpers like `SectionWrapper` that add animations and anchors
