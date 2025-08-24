@@ -10,7 +10,7 @@ NODE_OPTIONS_MAX_OLD_SPACE="2048"                # 构建内存上限（MB）
 NGINX_SITE_ROOT="/var/www/longsizhuo.com"        # ★ Nginx root 不变
 OWNER="www-data:www-data"                        # 目标目录属主
 NGINX_SERVICE="nginx"                            # Nginx 服务名
-GIT_BRANCH="main"
+GIT_BRANCH="master"
 
 # ========= 日志工具 =========
 log()  { printf "\033[1;36m%s\033[0m %s\n" "==>" "$*"; }
