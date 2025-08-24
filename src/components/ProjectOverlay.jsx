@@ -1,47 +1,6 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 
-// 遮罩层的主要样式 - 居中显示，白色背景，最高层级
-const overlayStyle = {
-  position: "fixed", // 固定定位，相对于视口
-  top: "100px", // 顶部边距20px
-  left: "100px", // 左侧边距20px
-  right: "100px", // 右侧边距20px
-  bottom: "100px", // 底部边距20px
-  backgroundColor: "#fff", // 白色背景
-  zIndex: 9999, // 确保在最上层，提高层级
-  overflowY: "auto", // 垂直方向可滚动
-  color: "#000", // 黑色文字
-  borderRadius: "8px", // 圆角边框
-  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)", // 阴影效果
-};
-
-// 顶部导航栏样式 - 包含返回和关闭按钮
-const topBarStyle = {
-  display: "flex", // 弹性布局
-  justifyContent: "space-between", // 两端对齐
-  padding: "10px 20px", // 内边距
-  borderBottom: "1px solid #ccc", // 底部边框
-};
-
-// 图片网格布局样式 - 响应式网格，自动填充列数
-const gridStyle = {
-  display: "grid", // 网格布局
-  gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", // 自动填充列，最小200px
-  gap: "10px", // 网格间距
-  marginTop: "20px", // 顶部外边距
-};
-
-// 按钮样式 - 蓝色主题按钮
-const buttonStyle = {
-  padding: "10px 20px", // 内边距
-  backgroundColor: "#007bff", // 蓝色背景
-  color: "#fff", // 白色文字
-  border: "none", // 无边框
-  borderRadius: "4px", // 圆角
-  cursor: "pointer", // 手型光标
-};
-
 // 项目遮罩层组件 - 显示项目详细信息和图片
 const ProjectOverlay = ({
   open, // 控制遮罩层是否显示
@@ -74,60 +33,98 @@ const ProjectOverlay = ({
 
   // 使用 Portal 直接渲染到 document.body，确保正确的层级
   return createPortal(
-    <div style={overlayStyle}>
+    <div className="fixed top-[100px] left-[100px] right-[100px] bottom-[100px] bg-tertiary z-[9999] overflow-y-auto text-white rounded-2xl shadow-card border border-gray-600">
       {/* 顶部导航栏 */}
-      <div style={topBarStyle}>
-        <button onClick={onBack}>Return</button> {/* 返回按钮 */}
-        <button onClick={onClose}>Close</button> {/* 关闭按钮 */}
+      <div className="flex justify-between items-center px-5 py-4 border-b border-gray-600 bg-black-100 rounded-t-2xl">
+        <button
+          onClick={onBack}
+          className="px-4 py-2 bg-secondary text-black font-medium rounded-lg hover:bg-white transition-colors duration-200"
+        >
+          Return
+        </button>
+        <button
+          onClick={onClose}
+          className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-200"
+        >
+          Close
+        </button>
       </div>
 
       {/* 主要内容区域 */}
-      <div style={{ padding: "20px" }}>
+      <div className="p-6">
         {/* 项目标题 */}
-        {title && <h2>{title}</h2>}
+        {title && (
+          <h2 className="text-white font-black text-[32px] sm:text-[40px] mb-4 leading-tight">
+            {title}
+          </h2>
+        )}
 
         {/* 项目描述 */}
-        {description && <p>{description}</p>}
+        {description && (
+          <p className="text-secondary text-[16px] leading-[28px] mb-6">
+            {description}
+          </p>
+        )}
 
         {/* 项目截图网格 */}
         {photos.length > 0 && (
-          <div style={gridStyle}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {photos.map((src, index) => (
-              <img
+              <div
                 key={index}
-                src={src}
-                alt={`${title || "project"} screenshot ${index + 1}`} // 图片描述
-                style={{ width: "100%", height: "auto" }} // 响应式图片尺寸
-              />
+                className="group relative overflow-hidden rounded-xl"
+              >
+                <img
+                  src={src}
+                  alt={`${title || "project"} screenshot ${index + 1}`}
+                  className="w-full h-auto object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-xl" />
+              </div>
             ))}
           </div>
         )}
 
-        {/* GitHub 链接 */}
-        {githubUrl && (
-          <p style={{ marginTop: "20px" }}>
+        {/* 链接区域 */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+          {/* GitHub 链接 */}
+          {githubUrl && (
             <a
               href={githubUrl}
-              target="_blank" // 新窗口打开
-              rel="noopener noreferrer" // 安全属性
-              style={{ color: "#007bff" }}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-secondary text-black font-semibold rounded-lg hover:bg-white transition-colors duration-200 flex items-center gap-2"
             >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
               GitHub
             </a>
-          </p>
-        )}
+          )}
 
-        {/* 在线演示按钮 */}
-        {liveUrl && (
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
+          {/* 在线演示按钮 */}
+          {liveUrl && (
             <button
-              style={buttonStyle}
-              onClick={() => window.open(liveUrl, "_blank")} // 新窗口打开演示链接
+              onClick={() => window.open(liveUrl, "_blank")}
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2"
             >
-              View
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+              View Live
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>,
     document.body
