@@ -1,4 +1,4 @@
-import { VideoToAscii } from "char-anime";
+import { VideoToAscii } from "../packages/charAnime/src";
 import { useEffect } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import {
@@ -41,8 +41,8 @@ function AppContent() {
       <VideoToAscii />
       {/* <Feedbacks /> */}
       <div className={"relative z-0"}>
-      <ContactAdvanced />
-      <StarsCanvas />
+        <ContactAdvanced />
+        <StarsCanvas />
       </div>
     </div>
   );
