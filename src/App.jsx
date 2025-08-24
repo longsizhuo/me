@@ -13,9 +13,6 @@ import {
   Works,
 } from "./components";
 import Education from "./components/Education";
-import HelloAlgo from "./Projects/hello-algo";
-import SpotFinder from "./Projects/spot-finder";
-import VisualizationTool from "./Projects/visualization-tool";
 function AppContent() {
   const location = useLocation();
 
@@ -44,12 +41,9 @@ function AppContent() {
       <VideoToAscii />
       {/* <Feedbacks /> */}
       <div className={"relative z-0"}>
-        <ContactAdvanced />
-        <StarsCanvas />
+      <ContactAdvanced />
+      <StarsCanvas />
       </div>
-      <HelloAlgo />
-      <SpotFinder />
-      <VisualizationTool />
     </div>
   );
 }
