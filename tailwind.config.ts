@@ -1,7 +1,8 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config: Config = {
   content: [
-    "./src/**/*.{js,jsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
     "./packages/video-to-ascii/src/**/*.{js,jsx,ts,tsx}",
     "./packages/charAnime/src/**/*.{js,jsx,ts,tsx}",
     "./node_modules/char-anime/dist/**/*.{js,jsx,ts,tsx}",
@@ -35,3 +36,5 @@ module.exports = {
   },
   plugins: [],
 };
+
+export default config;
