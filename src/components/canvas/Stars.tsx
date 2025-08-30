@@ -1,9 +1,11 @@
+/* eslint-disable react/no-unknown-property */
 import { PointMaterial, Points, Preload } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as random from "maath/random/dist/maath-random.esm";
 import { Suspense, useRef, useState } from "react";
+import type { StarsProps } from "./TYPE";
 
-const Stars = (props) => {
+const Stars = (props: StarsProps) => {
   const ref = useRef();
   const [sphere] = useState(() => {
     // 需要为每个顶点提供三个坐标，因此数组长度应为 3 的倍数
