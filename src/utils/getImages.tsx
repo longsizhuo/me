@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import React, { useState, useEffect } from 'react';
 import { ImageList, ImageListItem, Grow } from '@mui/material';
 
@@ -27,7 +28,9 @@ export default function SpotFinderImages() {
     }, []);
 
     useEffect(() => {
-        if (visibleImages.length === 0) return;
+        if (visibleImages.length === 0) {
+            return;
+        }
 
         const showImagesSequentially = () => {
             visibleImages.forEach((_, index) => {

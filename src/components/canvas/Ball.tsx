@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import React, { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
@@ -9,8 +10,9 @@ import {
 } from "@react-three/drei";
 
 import CanvasLoader from "../Loader";
+import type { BallCanvasProps, BallProps } from "./TYPE";
 
-const Ball = (props) => {
+const Ball = (props: BallProps) => {
   const [decal] = useTexture([props.imgUrl]);
 
   return (
@@ -37,7 +39,7 @@ const Ball = (props) => {
   );
 };
 
-const BallCanvas = ({ icon }) => {
+const BallCanvas = ({ icon }: BallCanvasProps) => {
   return (
     <Canvas
       frameloop='demand'

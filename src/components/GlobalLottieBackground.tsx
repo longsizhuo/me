@@ -10,7 +10,9 @@ export const GlobalLottieBackground = () => {
   const scrollPerFrame = 20;
 
   useEffect(() => {
-    if (!dotLottie) return;
+    if (!dotLottie) {
+      return;
+    }
 
     const waitForLoad = setInterval(() => {
       try {
@@ -29,13 +31,17 @@ export const GlobalLottieBackground = () => {
   }, [dotLottie]);
 
   useEffect(() => {
-    if (!isReady || !dotLottie) return;
+    if (!isReady || !dotLottie) {
+      return;
+    }
 
     const handleScroll = () => {
       try {
         const deltaY = window.scrollY - lastScrollY.current;
         lastScrollY.current = window.scrollY;
-        if (deltaY === 0) return;
+        if (deltaY === 0) {
+          return;
+        }
 
         const total = dotLottie.totalFrames;
         const frameDelta = deltaY / scrollPerFrame;

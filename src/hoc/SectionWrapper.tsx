@@ -2,8 +2,9 @@ import { motion } from "motion/react";
 
 import { styles } from "../styles";
 import { staggerContainer } from "../utils/motion.ts";
+import type { SectionWrapperType } from "./TYPE";
 
-const StarWrapper = (Component, idName) =>
+const StarWrapper: SectionWrapperType = (Component, idName) =>
   function HOC() {
     return (
       <motion.section

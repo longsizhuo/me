@@ -16,12 +16,6 @@ import {
     figma,
     docker,
     bsh,
-    starbucks,
-    tesla,
-    shopify,
-    carrent,
-    jobit,
-    tripguide,
     threejs, unsw, spotFinder,
 } from "../assets";
 import spotFinderLogo from "../assets/SpotFinder/logo.svg";
@@ -43,7 +37,7 @@ export const navLinks = [
     },
 ];
 
-let services = [
+const services = [
     {
         title: "Web Developer",
         icon: web,

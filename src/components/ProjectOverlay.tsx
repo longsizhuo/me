@@ -1,17 +1,19 @@
+/* eslint-env browser */
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
+import type { ProjectOverlayProps } from "./TYPE";
 
 // 项目遮罩层组件 - 显示项目详细信息和图片
 const ProjectOverlay = ({
-  open, // 控制遮罩层是否显示
-  onClose, // 关闭遮罩层的回调函数
-  onBack, // 返回上一级的回调函数
-  title, // 项目标题
-  description, // 项目描述
-  photos = [], // 项目截图数组，默认为空数组
-  githubUrl, // GitHub 链接
-  liveUrl, // 在线演示链接
-}) => {
+  open,
+  onClose,
+  onBack,
+  title,
+  description,
+  photos = [],
+  githubUrl,
+  liveUrl,
+}: ProjectOverlayProps) => {
   // 当 Overlay 打开/关闭时管理滚动状态
   useEffect(() => {
     if (open) {
@@ -29,7 +31,9 @@ const ProjectOverlay = ({
   }, [open]);
 
   // 如果未打开，不渲染任何内容
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   // 使用 Portal 直接渲染到 document.body，确保正确的层级
   return createPortal(
