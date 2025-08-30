@@ -6,7 +6,8 @@ import { projects } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion.ts";
-import ProjectOverlay from "./ProjectOverlay.jsx";
+import ProjectOverlay from "./ProjectOverlay.tsx";
+import type { ProjectCardProps } from "./TYPE";
 
 const ProjectCard = ({
   index,
@@ -14,9 +15,8 @@ const ProjectCard = ({
   description,
   tags,
   image,
-  source_code_link,
   onClick,
-}) => {
+}: ProjectCardProps) => {
   return (
     <motion.div
       onClick={onClick}

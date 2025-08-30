@@ -1,4 +1,4 @@
-// convert-frame.js
+// convert-frame.ts
 import fs from "fs";
 import Jimp from "jimp";
 

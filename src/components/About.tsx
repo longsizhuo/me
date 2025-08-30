@@ -7,11 +7,19 @@ import { graphql } from "@octokit/graphql";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion.ts";
+import type { ServiceCardProps } from "./TYPE";
 
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
-const ServiceCard = ({ index, title, icon, description, stars, forks }) => (
-  <Tilt className="xs:w-[250px] w-full">
+const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceCardProps) => (
+  <Tilt
+    className="xs:w-[250px] w-full"
+    options={{
+      max: 45,
+      scale: 1,
+      speed: 450,
+    }}
+  >
     <motion.div
       whileInView={{ opacity: 1, y: 0 }} // 当视图中时播放动画
       initial={{ opacity: 0, y: 50 }} // 初始状态
@@ -20,11 +28,6 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }) => (
       className="w-full green-pink-gradient p-[1px] rounded-[20px] shadow-card"
     >
       <div
-        options={{
-          max: 45,
-          scale: 1,
-          speed: 450,
-        }}
         className="bg-tertiary rounded-[20px] py-5 px-12 min-h-[320px] flex justify-evenly items-center flex-col"
       >
         <img

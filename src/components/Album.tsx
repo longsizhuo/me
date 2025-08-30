@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion";
+import type { LazyImageProps } from "./TYPE";
 
 const getGroupedImages = () => {
   // 递归加载所有图片（包括子目录），返回加载函数而不是立即加载
@@ -26,20 +27,24 @@ const getGroupedImages = () => {
     const match = path.match(/album\/([^\/]+)\//);
     const folder = match?.[1] ?? "Uncategorized";
 
-    if (!grouped[folder]) grouped[folder] = [];
+    if (!grouped[folder]) {
+      grouped[folder] = [];
+    }
     grouped[folder].push(loader);
   }
 
   return grouped;
 };
 
-const LazyImage = ({ loader, alt, gap }) => {
+const LazyImage = ({ loader, alt, gap }: LazyImageProps) => {
   const ref = useRef(null);
   const [src, setSrc] = useState("");
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
