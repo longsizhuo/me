@@ -11,8 +11,9 @@ import { styles } from "../styles";
 import { experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { textVariant } from "../utils/motion.ts";
+import type { ExperienceCardProps } from "./TYPE";
 
-const ExperienceCard = ({ experience }) => {
+const ExperienceCard = ({ experience }: ExperienceCardProps) => {
   return (
     <VerticalTimelineElement
       contentStyle={{

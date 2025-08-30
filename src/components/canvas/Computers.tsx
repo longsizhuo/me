@@ -1,10 +1,13 @@
+/* eslint-disable react/no-unknown-property */
+/* eslint-env browser */
 import React, { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Preload, useGLTF } from "@react-three/drei";
 
 import CanvasLoader from "../Loader";
+import type { ComputersProps } from "./TYPE";
 
-const Computers = ({ isMobile }) => {
+const Computers = ({ isMobile }: ComputersProps) => {
   const computer = useGLTF("./desktop_pc/scene.gltf");
 
   return (

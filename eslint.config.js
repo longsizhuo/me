@@ -3,6 +3,7 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import globals from 'globals';
 
 export default [
   {
@@ -11,6 +12,9 @@ export default [
       parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
+      globals: {
+        ...globals.browser,
+      },
     },
     settings: {
       react: { version: '18.3.1' },
@@ -30,7 +34,7 @@ export default [
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'no-unused-vars': 'warn',
       'no-undef': 'error',
-      'no-console': 'warn',
+      'no-console': 'off',
       'prefer-const': 'warn',
       'no-var': 'error',
       eqeqeq: 'warn',

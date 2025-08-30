@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import type { PhotoGalleryDialogProps } from "./TYPE";
 
 /**
  * PhotoGalleryDialog - 通用照片展示组件
@@ -52,7 +53,7 @@ const PhotoGalleryDialog = ({
   description = "",
   maxWidth = "lg",
   fullWidth = true,
-}) => {
+}: PhotoGalleryDialogProps) => {
   const [openGallery, setOpenGallery] = useState(false);
 
   const handleOpenGallery = () => {
