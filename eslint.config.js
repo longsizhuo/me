@@ -8,6 +8,7 @@ import globals from 'globals';
 export default [
   {
     files: ['**/*.{ts,tsx}'],
+    ignores: ['**/.git/**', '**/node_modules/**', '**/dist/**'],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 'latest',
@@ -32,7 +33,12 @@ export default [
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      'no-unused-vars': 'warn',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
       'no-undef': 'error',
       'no-console': 'off',
       'prefer-const': 'warn',
