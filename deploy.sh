@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ========= 配置 =========
-PROJECT_DIR="/home/ubuntu/Project_longs/me"      # 前端项目根目录
+PROJECT_DIR="/home/ubuntu/me"      # 前端项目根目录
 ASSET_ROOT_REL="src/assets/album"                # 递归扫描 HEIC 的资源目录（相对 PROJECT_DIR）
 BUILD_CMD="pnpm build"                           # 构建命令
 INSTALL_CMD="pnpm install --frozen-lockfile"     # 安装依赖命令
