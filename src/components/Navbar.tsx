@@ -86,12 +86,17 @@ const Navbar = () => {
 
         {/* Mobile nav */}
         <div className="sm:hidden flex flex-1 justify-end items-center">
-          <img
-            src={toggle ? close : menu}
-            alt="menu"
-            className="w-[28px] h-[28px] object-contain cursor-pointer"
+          <button
             onClick={() => setToggle(!toggle)}
-          />
+            aria-label={toggle ? "Close menu" : "Open menu"}
+            className="bg-transparent border-none p-0"
+          >
+            <img
+              src={toggle ? close : menu}
+              alt=""
+              className="w-[28px] h-[28px] object-contain"
+            />
+          </button>
 
           <div
             className={`${

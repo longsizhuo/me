@@ -48,9 +48,12 @@ const Honors = () => {
         </motion.div>
       </div>
       <div className={`-mt-20 pb-14 ${styles.paddingX} flex flex-wrap gap-7`}>
-        {(t("honors.items", { returnObjects: true }) as Array<{
-          title: string; issuer: string; date: string; description: string;
-        }>).map((honor, index) => (
+        {(Array.isArray(t("honors.items", { returnObjects: true }))
+          ? t("honors.items", { returnObjects: true }) as Array<{
+              title: string; issuer: string; date: string; description: string;
+            }>
+          : []
+        ).map((honor, index) => (
           <HonorCard key={honor.title} index={index} {...honor} />
         ))}
       </div>
