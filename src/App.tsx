@@ -15,6 +15,7 @@ import Education from "./components/Education";
 import Honors from "./components/Honors";
 import Writing from "./components/Writing";
 import Footer from "./components/Footer";
+import ScrollToTopButton from "./components/ScrollToTop";
 
 const Tools = lazy(() => import("./pages/Tools"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -59,6 +60,7 @@ function HomePage() {
         <StarsCanvas />
       </div>
       <Footer />
+      <ScrollToTopButton />
     </div>
   );
 }
