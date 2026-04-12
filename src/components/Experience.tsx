@@ -73,10 +73,19 @@ const Experience = () => {
 
       <div className='mt-20 flex flex-col'>
         <VerticalTimeline>
-          {experiences.map((experience, index) => (
+          {(t("experience.items", { returnObjects: true }) as Array<{
+            title: string; company: string; date: string; points: string[];
+          }>).map((item, index) => (
             <ExperienceCard
               key={`experience-${index}`}
-              experience={experience}
+              experience={{
+                title: item.title,
+                company_name: item.company,
+                date: item.date,
+                points: item.points,
+                icon: experiences[index]?.icon || "",
+                iconBg: experiences[index]?.iconBg || "#FFF",
+              }}
             />
           ))}
         </VerticalTimeline>
