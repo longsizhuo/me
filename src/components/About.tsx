@@ -55,7 +55,12 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceC
 );
 
 const About = () => {
-  const [services, setServices] = useState([]); // State to hold dynamic GitHub data
+  const [services, setServices] = useState([]);
+  const [ghStats, setGhStats] = useState<{
+    followers: number;
+    repos: number;
+    contributions: number;
+  } | null>(null);
 
   useEffect(() => {
     const fetchPinnedRepos = async () => {
@@ -71,6 +76,11 @@ const About = () => {
         const { user } = await graphqlWithAuth(`
           {
             user(login: "longsizhuo") {
+              followers { totalCount }
+              repositories(privacy: PUBLIC) { totalCount }
+              contributionsCollection {
+                contributionCalendar { totalContributions }
+              }
               pinnedItems(first: 4, types: REPOSITORY) {
                 nodes {
                   ... on Repository {
@@ -90,6 +100,12 @@ const About = () => {
           }
         `);
 
+        setGhStats({
+          followers: user.followers.totalCount,
+          repos: user.repositories.totalCount,
+          contributions: user.contributionsCollection.contributionCalendar.totalContributions,
+        });
+
         const dynamicServices = user.pinnedItems.nodes.map((repo, index) => ({
           title: repo.name,
           icon: repo.owner.avatarUrl,
@@ -99,7 +115,7 @@ const About = () => {
           index,
         }));
 
-        setServices(dynamicServices); // Update services with GitHub data
+        setServices(dynamicServices);
       } catch (error) {
         console.error("Error fetching pinned repos:", error);
       }
@@ -121,6 +137,27 @@ const About = () => {
         Below are some of the GitHub repositories I have contributed to,
         including projects that I have pinned on my GitHub profile.
       </motion.p>
+
+      {ghStats && (
+        <motion.div
+          variants={fadeIn("up", "", 0.3, 0.5)}
+          className="mt-8 flex flex-wrap gap-6"
+        >
+          {[
+            { label: "Followers", value: ghStats.followers },
+            { label: "Public Repos", value: ghStats.repos },
+            { label: "Contributions (Year)", value: ghStats.contributions },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-tertiary px-6 py-4 rounded-xl text-center min-w-[140px]"
+            >
+              <p className="text-white font-bold text-[28px]">{stat.value}</p>
+              <p className="text-secondary text-[14px]">{stat.label}</p>
+            </div>
+          ))}
+        </motion.div>
+      )}
 
       <div className="mt-20 flex flex-wrap gap-10">
         {services.map((service, index) => (
