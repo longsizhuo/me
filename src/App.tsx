@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import {
   About,
@@ -26,6 +27,14 @@ function ScrollToTop() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+  return null;
+}
+
+function HtmlLangSync() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    document.documentElement.lang = i18n.language === "zh" ? "zh-CN" : "en";
+  }, [i18n.language]);
   return null;
 }
 
@@ -73,6 +82,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <HtmlLangSync />
       <Analytics />
       <AnimatePresence mode="wait">
         <Suspense fallback={<div className="bg-primary min-h-screen" />}>
