@@ -1,6 +1,5 @@
-import { VideoToAscii } from "char-anime";
-import { useEffect } from "react";
-import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import {
   About,
   Album,
@@ -13,9 +12,19 @@ import {
   Works,
 } from "./components";
 import Education from "./components/Education";
-function AppContent() {
-  const location = useLocation();
 
+const Tools = lazy(() => import("./pages/Tools"));
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+function Analytics() {
+  const location = useLocation();
   useEffect(() => {
     if (window.gtag) {
       window.gtag("config", "G-LWL6MY0GF4", {
@@ -23,24 +32,23 @@ function AppContent() {
       });
     }
   }, [location]);
+  return null;
+}
 
+function HomePage() {
   return (
     <div className="relative z-0 bg-primary">
       <GlobalLottieBackground />
-      <div className={"bg-hero-pattern bg-cover bg-no-repeat bg-center"}>
+      <div className="bg-hero-pattern bg-cover bg-no-repeat bg-center">
         <Navbar />
         <Hero />
       </div>
       <About />
       <Album />
-      {/*<GitHubCard />*/}
       <Experience />
       <Education />
-      {/* <Tech /> */}
       <Works />
-      <VideoToAscii />
-      {/* <Feedbacks /> */}
-      <div className={"relative z-0"}>
+      <div className="relative z-0">
         <ContactAdvanced />
         <StarsCanvas />
       </div>
@@ -51,7 +59,14 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AppContent />
+      <ScrollToTop />
+      <Analytics />
+      <Suspense fallback={<div className="bg-primary min-h-screen" />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/tools" element={<Tools />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }
