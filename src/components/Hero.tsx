@@ -46,8 +46,9 @@ const Hero = () => {
             <div className={`${styles.heroSubText} mt-2 text-white-100`}>
               <p className="text-[16px] sm:text-[20px] text-secondary leading-[30px] max-w-xl">
                 Full-stack developer & open-source enthusiast based in Sydney.
-                Skilled in Python, Golang, TypeScript, and React. Currently a Frontend
-                Engineer at Kwai and Casual Academic at UNSW.
+                Frontend Engineer at Kwai, Casual Academic at UNSW.
+                Hot cocoa lover, Elden Ring completionist, and proud owner of
+                42 perfect game completions on Steam.
               </p>
               <Typography
                 variant="body1"
@@ -67,6 +68,11 @@ const Hero = () => {
                 <strong>LinkedIn:</strong>{" "}
                 <a href="https://linkedin.com/in/longsizhuo">
                   linkedin.com/in/longsizhuo
+                </a>
+                <br />
+                <strong>Steam:</strong>{" "}
+                <a href="https://steamcommunity.com/id/longsizhuo/">
+                  Loong Loong
                 </a>
               </Typography>
             </div>
