@@ -27,18 +27,18 @@ const EducationCard = ({
 const Education = () => {
   const educations = [
     {
-      degree: "Master of Information Technology",
-      university: "The University of New South Wales",
-      duration: "Sep 2022 - Aug 2024",
+      degree: "Master of Engineering — Information Technology",
+      university: "The University of New South Wales (UNSW)",
+      duration: "Sep 2022 - Sep 2024 | WAM: Distinction",
       coursework:
-        "Relevant Coursework: Data Structures & Algorithms, Computer Vision, Web Front-End Programming, Computer Networks Applications, Blockchain App Architecture.",
+        "Data Structures & Algorithms, Computer Vision, Web Front-End Programming, Computer Networks, Blockchain App Architecture, Extended AI.",
     },
     {
-      degree: "Bachelor of Digital Media Technology",
+      degree: "Bachelor of Engineering — Digital Media Technology",
       university: "Chengdu University of Information Technology (CUIT)",
-      duration: "Sep 2017 - May 2021",
+      duration: "Sep 2017 - Jul 2021",
       coursework:
-        "Relevant Coursework: Advanced Graphics Programming (OpenGL), Network Game Programming Techniques.",
+        "Advanced Graphics Programming (OpenGL), Network Game Programming, Data Structures, R Programming.",
     },
   ];
 
