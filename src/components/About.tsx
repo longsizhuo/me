@@ -139,26 +139,34 @@ const About = () => {
         {t("about.description")}
       </motion.p>
 
-      {ghStats && (
-        <motion.div
-          variants={fadeIn("up", "", 0.3, 0.5)}
-          className="mt-8 flex flex-wrap gap-6"
-        >
-          {[
-            { label: t("about.followers"), value: ghStats.followers },
-            { label: t("about.publicRepos"), value: ghStats.repos },
-            { label: t("about.contributions"), value: ghStats.contributions },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-tertiary px-6 py-4 rounded-xl text-center min-w-[140px]"
-            >
-              <p className="text-white font-bold text-[28px]">{stat.value}</p>
-              <p className="text-secondary text-[14px]">{stat.label}</p>
-            </div>
-          ))}
-        </motion.div>
-      )}
+      <motion.div
+        variants={fadeIn("up", "", 0.3, 0.5)}
+        className="mt-8 flex flex-wrap gap-6"
+      >
+        {ghStats
+          ? [
+              { label: t("about.followers"), value: ghStats.followers },
+              { label: t("about.publicRepos"), value: ghStats.repos },
+              { label: t("about.contributions"), value: ghStats.contributions },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-tertiary px-6 py-4 rounded-xl text-center min-w-[140px]"
+              >
+                <p className="text-white font-bold text-[28px]">{stat.value}</p>
+                <p className="text-secondary text-[14px]">{stat.label}</p>
+              </div>
+            ))
+          : [0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="bg-tertiary px-6 py-4 rounded-xl text-center min-w-[140px] animate-pulse"
+              >
+                <div className="h-8 w-12 bg-white/10 rounded mx-auto mb-2" />
+                <div className="h-4 w-20 bg-white/5 rounded mx-auto" />
+              </div>
+            ))}
+      </motion.div>
 
       <div className="mt-20 flex flex-wrap gap-10">
         {services.map((service, index) => (
