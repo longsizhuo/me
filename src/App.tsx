@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import {
   About,
@@ -70,13 +71,23 @@ function App() {
     <Router>
       <ScrollToTop />
       <Analytics />
-      <Suspense fallback={<div className="bg-primary min-h-screen" />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/tools" element={<Tools />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
+      <AnimatePresence mode="wait">
+        <Suspense fallback={<div className="bg-primary min-h-screen" />}>
+          <Routes>
+            <Route path="/" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <HomePage />
+              </motion.div>
+            } />
+            <Route path="/tools" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <Tools />
+              </motion.div>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </AnimatePresence>
     </Router>
   );
 }
