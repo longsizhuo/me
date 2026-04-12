@@ -1,57 +1,91 @@
 import { motion } from "motion/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tilt } from "react-tilt";
+import { graphql } from "@octokit/graphql";
 
-import { projects } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 import ProjectOverlay from "./ProjectOverlay.tsx";
-import type { ProjectCardProps } from "./TYPE";
+
+const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+
+interface PinnedRepo {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  homepageUrl: string | null;
+  stargazerCount: number;
+  forkCount: number;
+  openGraphImageUrl: string;
+  owner: {
+    login: string;
+    avatarUrl: string;
+  };
+  languages: {
+    nodes: { name: string; color: string }[];
+  };
+}
+
+const langColorMap: Record<string, string> = {
+  TypeScript: "blue-text-gradient",
+  JavaScript: "green-text-gradient",
+  Python: "pink-text-gradient",
+  Go: "blue-text-gradient",
+  Rust: "pink-text-gradient",
+  Java: "green-text-gradient",
+  R: "blue-text-gradient",
+  C: "pink-text-gradient",
+  "C++": "blue-text-gradient",
+  HTML: "green-text-gradient",
+  CSS: "pink-text-gradient",
+};
 
 const ProjectCard = ({
   index,
-  name,
-  description,
-  tags,
-  image,
+  repo,
   onClick,
-}: ProjectCardProps) => {
+}: {
+  index: number;
+  repo: PinnedRepo;
+  onClick: () => void;
+}) => {
+  const tags = repo.languages.nodes.slice(0, 3).map((lang) => ({
+    name: lang.name,
+    color: langColorMap[lang.name] || "blue-text-gradient",
+  }));
+
   return (
-    <motion.div
-      onClick={onClick}
-      variants={fadeIn("up", "", index * 0.5, 0.75)}
-    >
+    <motion.div onClick={onClick} variants={fadeIn("up", "", index * 0.5, 0.75)}>
       <Tilt
-        options={{
-          max: 45,
-          scale: 0.9,
-          speed: 450,
-        }}
-        className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full"
+        options={{ max: 45, scale: 0.9, speed: 450 }}
+        className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full cursor-pointer"
       >
         <div className="relative w-full h-[230px]">
           <img
-            src={image}
-            alt="project_image"
+            src={repo.openGraphImageUrl}
+            alt={repo.name}
             className="w-full h-full object-cover rounded-2xl"
           />
         </div>
 
         <div className="mt-5">
-          <h3 className="text-white font-bold text-[24px]">{name}</h3>
-          <p className="mt-2 text-secondary text-[14px]">{description}</p>
+          <h3 className="text-white font-bold text-[24px]">{repo.name}</h3>
+          <p className="mt-2 text-secondary text-[14px] line-clamp-3">
+            {repo.description || "No description provided."}
+          </p>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2 items-center">
           {tags.map((tag) => (
-            <p
-              key={`${name}-${tag.name}`}
-              className={`text-[14px] ${tag.color}`}
-            >
+            <p key={tag.name} className={`text-[14px] ${tag.color}`}>
               #{tag.name}
             </p>
           ))}
+          <span className="text-secondary text-[13px] ml-auto">
+            {repo.stargazerCount} | {repo.forkCount}
+          </span>
         </div>
       </Tilt>
     </motion.div>
@@ -59,14 +93,62 @@ const ProjectCard = ({
 };
 
 const Works = () => {
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [repos, setRepos] = useState<PinnedRepo[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<PinnedRepo | null>(null);
 
-  const handleClose = () => setSelectedProject(null);
+  useEffect(() => {
+    const fetchPinnedRepos = async () => {
+      if (!GITHUB_TOKEN || GITHUB_TOKEN === "your_github_token_here") return;
+
+      const graphqlWithAuth = graphql.defaults({
+        headers: { authorization: `token ${GITHUB_TOKEN}` },
+      });
+
+      try {
+        const { user } = await graphqlWithAuth<{ user: { pinnedItems: { nodes: PinnedRepo[] } } }>(`
+          {
+            user(login: "longsizhuo") {
+              pinnedItems(first: 6, types: REPOSITORY) {
+                nodes {
+                  ... on Repository {
+                    id
+                    name
+                    description
+                    url
+                    homepageUrl
+                    stargazerCount
+                    forkCount
+                    openGraphImageUrl
+                    owner {
+                      login
+                      avatarUrl
+                    }
+                    languages(first: 3, orderBy: { field: SIZE, direction: DESC }) {
+                      nodes {
+                        name
+                        color
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `);
+
+        setRepos(user.pinnedItems.nodes);
+      } catch (error) {
+        console.error("Error fetching pinned repos:", error);
+      }
+    };
+
+    fetchPinnedRepos();
+  }, []);
 
   return (
     <>
       <motion.div variants={textVariant()}>
-        <p className={`${styles.sectionSubText} `}>My work</p>
+        <p className={`${styles.sectionSubText}`}>My work</p>
         <h2 className={`${styles.sectionHeadText}`}>Projects.</h2>
       </motion.div>
 
@@ -75,39 +157,37 @@ const Works = () => {
           variants={fadeIn("", "", 0.1, 1)}
           className="mt-3 text-secondary text-[17px] max-w-3xl leading-[30px]"
         >
-          Following projects showcases my skills and experience through
-          real-world examples of my work. Each project is briefly described with
-          links to code repositories and live demos in it. It reflects my
-          ability to solve complex problems, work with different technologies,
-          and manage projects effectively.
+          These are the repositories I've pinned on my GitHub profile — projects
+          I'm most proud of or actively contributing to. Click any card to see
+          more details and a live preview.
         </motion.p>
       </div>
 
       <div className="mt-20 flex flex-wrap gap-7">
-        {projects.map((project, index) => (
+        {repos.map((repo, index) => (
           <ProjectCard
-            key={`project-${index}`}
+            key={repo.id}
             index={index}
-            {...project}
-            onClick={() => setSelectedProject(project)}
+            repo={repo}
+            onClick={() => setSelectedRepo(repo)}
           />
         ))}
       </div>
-      {selectedProject && (
+
+      {selectedRepo && (
         <ProjectOverlay
           open
-          onClose={handleClose}
-          onBack={handleClose}
-          title={selectedProject.name}
-          description={selectedProject.description}
-          photos={selectedProject.photos || []}
-          githubUrl={selectedProject.source_code_link}
-          liveUrl={selectedProject.liveUrl}
+          onClose={() => setSelectedRepo(null)}
+          onBack={() => setSelectedRepo(null)}
+          title={selectedRepo.name}
+          description={selectedRepo.description}
+          githubUrl={selectedRepo.url}
+          liveUrl={selectedRepo.homepageUrl || undefined}
         />
       )}
     </>
   );
 };
 
-const WorksWithWrapper = SectionWrapper(Works, "");
+const WorksWithWrapper = SectionWrapper(Works, "projects");
 export default WorksWithWrapper;
