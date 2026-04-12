@@ -130,7 +130,7 @@ const Album = () => {
               </h2>
               <div
                 style={{
-                  columnCount: Math.floor(window.innerWidth / columnWidth),
+                  columnWidth: `${columnWidth}px`,
                   columnGap: gap,
                 }}
               >
