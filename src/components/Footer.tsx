@@ -30,6 +30,15 @@ const socialLinks = [
     ),
   },
   {
+    name: "Xiaohongshu",
+    url: "https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809",
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z" />
+      </svg>
+    ),
+  },
+  {
     name: "Email",
     url: "mailto:longsizhuo@gmail.com",
     icon: (

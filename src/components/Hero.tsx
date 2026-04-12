@@ -63,16 +63,16 @@ const Hero = () => {
                 <a href="https://github.com/longsizhuo">github.com/longsizhuo</a>
                 <br />
                 <strong>Blog:</strong>{" "}
-                <a href="https://longsizhuo.github.io">longsizhuo.github.io</a>
+                <a href="https://involutionhell.com">involutionhell.com</a>
                 <br />
                 <strong>LinkedIn:</strong>{" "}
                 <a href="https://linkedin.com/in/longsizhuo">
                   linkedin.com/in/longsizhuo
                 </a>
                 <br />
-                <strong>Steam:</strong>{" "}
-                <a href="https://steamcommunity.com/id/longsizhuo/">
-                  Loong Loong
+                <strong>XHS:</strong>{" "}
+                <a href="https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809">
+                  @龙龙要打翻你们
                 </a>
               </Typography>
             </div>
