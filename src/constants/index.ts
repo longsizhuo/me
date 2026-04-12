@@ -126,28 +126,28 @@ const technologies = [
 const experiences = [
     {
         title: "Frontend Engineer",
-        company_name: "Kwai",
+        company_name: "Kuaishou Technology (Kwai)",
         icon: kwai,
         iconBg: "#FFF",
         date: "May 2025 - Present",
         points: [
-            "Focused on the implementation and optimization of animation infrastructure for internal web projects.",
-            "Developed and maintained reusable animation modules using SVG, CSS Keyframes, and Lottie, ensuring consistency and efficiency across teams.",
-            "Collaborated with designers and engineers to deliver smooth, subtle, and resource-friendly animation effects.",
-            "Paid special attention to animation performance, accessibility, and maintainability, supporting a wide range of browsers and devices."
+            "Building engaging, high-performance user experiences at scale for Kuaishou's web platform in Beijing HQ.",
+            "Focused on animation infrastructure — designing and optimizing reusable animation modules using SVG, CSS Keyframes, and Lottie.",
+            "Collaborated with designers and engineers to deliver smooth, resource-friendly animation effects across teams.",
+            "Received 'A' Performance rating. Passionate about rendering performance, accessibility, and maintainability."
         ],
     },
     {
-        title: "Casual Academic",
+        title: "Casual Academic — COMP9021 & COMP3900/9900",
         company_name: "University of New South Wales",
         icon: unsw,
         iconBg: "#FFF",
-        date: "Sep 2024 - Present",
+        date: "Aug 2024 - May 2025",
         points: [
-            "Teaching and guiding students in the Principles of Programming and Computer Science Project courses.",
-            "Assisting students with programming concepts, debugging, and project management techniques.",
-            "Providing clear and constructive feedback on assignments and projects to ensure academic growth.",
-            "Collaborating with fellow academics to improve course delivery and student engagement."
+            "Taught Principles of Programming (COMP9021) and guided student teams in Computer Science Project (COMP3900/9900).",
+            "Led students through agile development with Scrum — Sprint planning, daily standups, iterative development, and retrospectives.",
+            "Managed project tracking on Jira, assisting with task decomposition, prioritization, and problem-solving.",
+            "Provided targeted academic feedback to improve project quality and delivery outcomes."
         ],
     },
     {
