@@ -5,11 +5,13 @@ import * as random from "maath/random/dist/maath-random.esm";
 import { Suspense, useRef, useState } from "react";
 import type { StarsProps } from "./TYPE";
 
+const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
 const Stars = (props: StarsProps) => {
   const ref = useRef();
   const [sphere] = useState(() => {
-    // 需要为每个顶点提供三个坐标，因此数组长度应为 3 的倍数
-    const positions = random.inSphere(new Float32Array(15000), { radius: 1.2 });
+    const count = isMobile ? 3000 : 15000;
+    const positions = random.inSphere(new Float32Array(count), { radius: 1.2 });
     // 验证并清理所有非有限值
     for (let i = 0; i < positions.length; i++) {
       if (!Number.isFinite(positions[i])) {
