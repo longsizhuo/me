@@ -16,6 +16,7 @@ import Honors from "./components/Honors";
 import Footer from "./components/Footer";
 
 const Tools = lazy(() => import("./pages/Tools"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -69,6 +70,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/tools" element={<Tools />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </Router>
