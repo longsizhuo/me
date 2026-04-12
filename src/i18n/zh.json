@@ -131,7 +131,12 @@
     "title": "项目展示",
     "description": "个人项目、开源贡献和学术作品的合集。点击卡片查看详情和在线预览。",
     "openSource": "开源项目",
-    "githubPinned": "GitHub 精选"
+    "githubPinned": "GitHub 精选",
+    "staticItems": [
+      { "name": "Spot Finder", "description": "一个停车位分时租赁系统，解决城市停车难题，增加车位拥有者收入。USYD 编程节冠军项目。" },
+      { "name": "Hello-algo", "description": "通过可视化动画和交互式学习材料简化数据结构与算法。GitHub 89K+ stars。" },
+      { "name": "降维聚类可视化工具", "description": "一个基于 Web 的工具，通过直观的可视化技术简化单细胞 RNA-seq 数据分析。已获软件著作权。" }
+    ]
   },
   "writing": {
     "subtitle": "思考与分享",

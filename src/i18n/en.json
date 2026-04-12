@@ -131,7 +131,12 @@
     "title": "Projects.",
     "description": "A mix of personal projects, open-source contributions, and academic work. Click any card to see more details and a live preview.",
     "openSource": "Open Source",
-    "githubPinned": "GitHub Pinned."
+    "githubPinned": "GitHub Pinned.",
+    "staticItems": [
+      { "name": "Spot Finder", "description": "A parking space time-sharing rental system, addressing urban parking challenges and increasing income for parking space owners." },
+      { "name": "Hello-algo", "description": "Simplifying data structures and algorithms through visual animations and interactive learning materials." },
+      { "name": "Dimensionality Reduction Clustering Visualization Tool", "description": "A web-based tool designed to simplify the analysis of single-cell RNA-seq data through intuitive visualization techniques." }
+    ]
   },
   "writing": {
     "subtitle": "Thoughts & Sharing",
