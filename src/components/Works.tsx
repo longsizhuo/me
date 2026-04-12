@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Tilt } from "react-tilt";
 import { graphql } from "@octokit/graphql";
 
@@ -135,6 +136,7 @@ const GitHubProjectCard = ({
 };
 
 const Works = () => {
+  const { t } = useTranslation();
   const [repos, setRepos] = useState<PinnedRepo[]>([]);
   const [selectedOverlay, setSelectedOverlay] = useState<{
     title: string;
@@ -196,8 +198,8 @@ const Works = () => {
   return (
     <>
       <motion.div variants={textVariant()}>
-        <p className={`${styles.sectionSubText}`}>My work</p>
-        <h2 className={`${styles.sectionHeadText}`}>Projects.</h2>
+        <p className={`${styles.sectionSubText}`}>{t("projects.subtitle")}</p>
+        <h2 className={`${styles.sectionHeadText}`}>{t("projects.title")}</h2>
       </motion.div>
 
       <div className="w-full flex">
@@ -205,40 +207,45 @@ const Works = () => {
           variants={fadeIn("", "", 0.1, 1)}
           className="mt-3 text-secondary text-[17px] max-w-3xl leading-[30px]"
         >
-          A mix of personal projects, open-source contributions, and academic work.
-          Click any card to see more details and a live preview.
+          {t("projects.description")}
         </motion.p>
       </div>
 
       {/* Hardcoded projects (closed-source, graduation projects, etc.) */}
       <div className="mt-10 flex flex-wrap gap-7">
-        {projects.map((project, index) => (
-          <StaticProjectCard
-            key={`static-${index}`}
-            index={index}
-            name={project.name}
-            description={project.description}
-            tags={project.tags}
-            image={project.image}
-            onClick={() =>
-              setSelectedOverlay({
-                title: project.name,
-                description: project.description,
-                githubUrl: project.source_code_link,
-                photos: project.photos || [],
-              })
-            }
-          />
-        ))}
+        {projects.map((project, index) => {
+          const i18nItems = t("projects.staticItems", { returnObjects: true }) as Array<{ name: string; description: string }>;
+          const i18nItem = i18nItems[index];
+          const name = i18nItem?.name || project.name;
+          const description = i18nItem?.description || project.description;
+          return (
+            <StaticProjectCard
+              key={`static-${index}`}
+              index={index}
+              name={name}
+              description={description}
+              tags={project.tags}
+              image={project.image}
+              onClick={() =>
+                setSelectedOverlay({
+                  title: name,
+                  description: description,
+                  githubUrl: project.source_code_link,
+                  photos: project.photos || [],
+                })
+              }
+            />
+          );
+        })}
       </div>
 
       {/* GitHub pinned repos */}
       {repos.length > 0 && (
         <>
           <motion.div variants={textVariant()} className="mt-16">
-            <p className={`${styles.sectionSubText}`}>Open Source</p>
+            <p className={`${styles.sectionSubText}`}>{t("projects.openSource")}</p>
             <h3 className="text-white font-bold text-[30px]">
-              GitHub Pinned.
+              {t("projects.githubPinned")}
             </h3>
           </motion.div>
 
