@@ -10,7 +10,7 @@ import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
 
 const ContactAdvanced = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const formRef = useRef();
   const [form, setForm] = useState({
     name: "",
@@ -95,7 +95,7 @@ const ContactAdvanced = () => {
         email: form.email,
         message: form.message,
         to_name: toName,
-        timestamp: new Date().toLocaleString('zh-CN'),
+        timestamp: new Date().toLocaleString(i18n.language === 'zh' ? 'zh-CN' : 'en-AU'),
       };
 
       // 发送邮件

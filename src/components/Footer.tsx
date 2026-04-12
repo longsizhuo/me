@@ -55,12 +55,20 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-black-100 border-t border-gray-800">
+    <footer className="bg-black-100 border-t border-white/5">
       <div className={`${styles.paddingX} max-w-7xl mx-auto py-8`}>
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-secondary text-[14px]">
-            &copy; {year} {t("footer.copyright")}
-          </p>
+          <div className="text-secondary text-[14px] flex flex-wrap gap-x-4 gap-y-1 items-center justify-center">
+            <span>&copy; {year} {t("footer.copyright")}</span>
+            <a
+              href="https://involutionhell.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-secondary hover:text-white transition-colors"
+            >
+              Involution Hell
+            </a>
+          </div>
 
           <div className="flex gap-4">
             {socialLinks.map((link) => (
