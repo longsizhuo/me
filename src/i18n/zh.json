@@ -30,15 +30,101 @@
   },
   "experience": {
     "subtitle": "我的职业经历",
-    "title": "工作经验"
+    "title": "工作经验",
+    "items": [
+      {
+        "title": "前端工程师",
+        "company": "快手科技 (Kuaishou Technology)",
+        "date": "2025年5月 - 至今",
+        "points": [
+          "在北京总部为快手 Web 平台构建大规模高性能用户体验。",
+          "专注于动画基础设施 — 使用 SVG、CSS Keyframes 和 Lottie 设计和优化可复用的动画模块。",
+          "与设计师和工程师协作，跨团队交付流畅、节省资源的动画效果。",
+          "获得 'A' 绩效评级。热衷于渲染性能、可访问性和可维护性。"
+        ]
+      },
+      {
+        "title": "助教 — COMP9021 & COMP3900/9900",
+        "company": "新南威尔士大学",
+        "date": "2024年8月 - 2025年5月",
+        "points": [
+          "教授编程原理 (COMP9021) 课程，指导学生团队完成计算机科学项目 (COMP3900/9900)。",
+          "通过 Scrum 框架引导学生进行敏捷开发 — Sprint 规划、每日站会、迭代开发和回顾会议。",
+          "在 Jira 上管理项目进度，协助任务分解、优先级排序和问题解决。",
+          "提供有针对性的学术反馈，提升项目质量和交付成果。"
+        ]
+      },
+      {
+        "title": "Scrum Master & 后端开发",
+        "company": "Spot Finder",
+        "date": "2024年1月 - 至今",
+        "points": [
+          "使用 Golang 和 MySQL 主导开发停车位分时租赁系统。",
+          "使用 Docker、Cloudflare、Redis 和 Nginx 管理后端部署。",
+          "监督团队任务，确保里程碑达成和项目质量。",
+          "实现 WebSocket 实时通信和离线消息功能。"
+        ]
+      },
+      {
+        "title": "研发实习生",
+        "company": "百事花健康信息技术有限公司",
+        "date": "2021年1月 - 2021年4月",
+        "points": [
+          "协助医院系统的维护和代码测试，确保功能正常运行。",
+          "编写测试计划和脚本以验证新系统功能。",
+          "与跨职能团队协作，收集和分析用户需求以改进系统。",
+          "提供技术支持以加强销售和营销工作。"
+        ]
+      }
+    ]
   },
   "education": {
     "subtitle": "我的学术背景",
-    "title": "教育经历"
+    "title": "教育经历",
+    "items": [
+      {
+        "degree": "工学硕士 — 信息技术",
+        "university": "新南威尔士大学 (UNSW)",
+        "duration": "2022年9月 - 2024年9月 | 成绩：优等 (Distinction)",
+        "coursework": "数据结构与算法、计算机视觉、Web 前端编程、计算机网络应用、区块链应用架构、扩展人工智能。"
+      },
+      {
+        "degree": "工学学士 — 数字媒体技术",
+        "university": "成都信息工程大学 (CUIT)",
+        "duration": "2017年9月 - 2021年7月",
+        "coursework": "高级图形学编程 (OpenGL)、网络游戏编程技术、数据结构、R 语言编程。"
+      }
+    ]
   },
   "honors": {
     "subtitle": "所获荣誉",
-    "title": "奖项与专利"
+    "title": "奖项与专利",
+    "items": [
+      {
+        "title": "蓝桥杯 — 第一名",
+        "issuer": "蓝桥杯大赛组委会，国际 Python 算法研究生/A 类",
+        "date": "2024年4月",
+        "description": "在第15届蓝桥杯国际 Python 算法竞赛中获得第一名。"
+      },
+      {
+        "title": "悉尼大学编程节 — 冠军",
+        "issuer": "悉尼大学",
+        "date": "2024年",
+        "description": "凭借 SpotFinder（城市停车位分时租赁系统）获得最佳项目创意奖冠军。"
+      },
+      {
+        "title": "UNSW Peter Farrell Cup",
+        "issuer": "UNSW 创业孵化器",
+        "date": "2024年2月",
+        "description": "SpotFinder 项目入选 UNSW Peter Farrell Cup 创业计划。"
+      },
+      {
+        "title": "软件著作权 — 降维聚类可视化工具",
+        "issuer": "软件著作权 2021SR1180633",
+        "date": "2021年8月",
+        "description": "单细胞 RNA-seq 数据降维聚类可视化工具系统的软件著作权。"
+      }
+    ]
   },
   "projects": {
     "subtitle": "我的作品",

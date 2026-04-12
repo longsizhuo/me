@@ -30,15 +30,101 @@
   },
   "experience": {
     "subtitle": "What I have done so far",
-    "title": "Work Experience."
+    "title": "Work Experience.",
+    "items": [
+      {
+        "title": "Frontend Engineer",
+        "company": "Kuaishou Technology (Kwai)",
+        "date": "May 2025 - Present",
+        "points": [
+          "Building engaging, high-performance user experiences at scale for Kuaishou's web platform in Beijing HQ.",
+          "Focused on animation infrastructure — designing and optimizing reusable animation modules using SVG, CSS Keyframes, and Lottie.",
+          "Collaborated with designers and engineers to deliver smooth, resource-friendly animation effects across teams.",
+          "Received 'A' Performance rating. Passionate about rendering performance, accessibility, and maintainability."
+        ]
+      },
+      {
+        "title": "Casual Academic — COMP9021 & COMP3900/9900",
+        "company": "University of New South Wales",
+        "date": "Aug 2024 - May 2025",
+        "points": [
+          "Taught Principles of Programming (COMP9021) and guided student teams in Computer Science Project (COMP3900/9900).",
+          "Led students through agile development with Scrum — Sprint planning, daily standups, iterative development, and retrospectives.",
+          "Managed project tracking on Jira, assisting with task decomposition, prioritization, and problem-solving.",
+          "Provided targeted academic feedback to improve project quality and delivery outcomes."
+        ]
+      },
+      {
+        "title": "Scrum Master & Backend Developer",
+        "company": "Spot Finder",
+        "date": "Jan 2024 - Present",
+        "points": [
+          "Led the development of a parking space time-sharing rental system using Golang and MySQL.",
+          "Managed the deployment of the backend using Docker, Cloudflare, Redis, and Nginx.",
+          "Supervised team tasks, ensuring milestone achievement and project quality.",
+          "Implemented WebSocket for real-time communication and offline messaging."
+        ]
+      },
+      {
+        "title": "Research & Development Intern",
+        "company": "Gem Flower Healthcare Information Technology Ltd.",
+        "date": "Jan 2021 - Apr 2021",
+        "points": [
+          "Assisted in the maintenance of hospital systems and code testing to ensure functionality.",
+          "Developed test plans and scripts to validate new system features.",
+          "Collaborated with cross-functional teams to gather and analyze user requirements for system improvements.",
+          "Provided technical support to strengthen sales and marketing efforts."
+        ]
+      }
+    ]
   },
   "education": {
     "subtitle": "My academic background",
-    "title": "Education."
+    "title": "Education.",
+    "items": [
+      {
+        "degree": "Master of Engineering — Information Technology",
+        "university": "The University of New South Wales (UNSW)",
+        "duration": "Sep 2022 - Sep 2024 | WAM: Distinction",
+        "coursework": "Data Structures & Algorithms, Computer Vision, Web Front-End Programming, Computer Networks, Blockchain App Architecture, Extended AI."
+      },
+      {
+        "degree": "Bachelor of Engineering — Digital Media Technology",
+        "university": "Chengdu University of Information Technology (CUIT)",
+        "duration": "Sep 2017 - Jul 2021",
+        "coursework": "Advanced Graphics Programming (OpenGL), Network Game Programming, Data Structures, R Programming."
+      }
+    ]
   },
   "honors": {
     "subtitle": "Recognition",
-    "title": "Awards & Patents."
+    "title": "Awards & Patents.",
+    "items": [
+      {
+        "title": "Lanqiao Cup — 1st Place",
+        "issuer": "Lanqiao Cup Competition, International Python (Postgraduate/A)",
+        "date": "Apr 2024",
+        "description": "Achieved first place in the 15th Lanqiao Cup International Python Algorithm competition."
+      },
+      {
+        "title": "USYD Coding Fest — Champion",
+        "issuer": "University of Sydney",
+        "date": "2024",
+        "description": "Won the Outstanding Project Idea Award (Champion) with SpotFinder — an urban parking space time-sharing rental system."
+      },
+      {
+        "title": "UNSW Peter Farrell Cup",
+        "issuer": "UNSW Incubator",
+        "date": "Feb 2024",
+        "description": "Selected for the UNSW Peter Farrell Cup Program with SpotFinder project."
+      },
+      {
+        "title": "Patent — Dimensionality Reduction Clustering Tool",
+        "issuer": "Software Copyright 2021SR1180633",
+        "date": "Aug 2021",
+        "description": "Patented a visualization tool system for single-cell RNA-seq data dimensionality reduction and clustering analysis."
+      }
+    ]
   },
   "projects": {
     "subtitle": "My work",

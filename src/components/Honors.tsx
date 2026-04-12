@@ -6,36 +6,7 @@ import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 import { useTranslation } from "react-i18next";
 
-const honors = [
-  {
-    title: "Lanqiao Cup — 1st Place",
-    issuer: "Lanqiao Cup Competition, International Python (Postgraduate/A)",
-    date: "Apr 2024",
-    description:
-      "Achieved first place in the 15th Lanqiao Cup International Python Algorithm competition.",
-  },
-  {
-    title: "USYD Coding Fest — Champion",
-    issuer: "University of Sydney",
-    date: "2024",
-    description:
-      'Won the Outstanding Project Idea Award (Champion) with SpotFinder — an urban parking space time-sharing rental system.',
-  },
-  {
-    title: "UNSW Peter Farrell Cup",
-    issuer: "UNSW Incubator",
-    date: "Feb 2024",
-    description:
-      "Selected for the UNSW Peter Farrell Cup Program with SpotFinder project.",
-  },
-  {
-    title: "Patent — Dimensionality Reduction Clustering Tool",
-    issuer: "Software Copyright 2021SR1180633",
-    date: "Aug 2021",
-    description:
-      "Patented a visualization tool system for single-cell RNA-seq data dimensionality reduction and clustering analysis.",
-  },
-];
+// Honors data is loaded from i18n JSON files
 
 const HonorCard = ({
   title,
@@ -77,7 +48,9 @@ const Honors = () => {
         </motion.div>
       </div>
       <div className={`-mt-20 pb-14 ${styles.paddingX} flex flex-wrap gap-7`}>
-        {honors.map((honor, index) => (
+        {(t("honors.items", { returnObjects: true }) as Array<{
+          title: string; issuer: string; date: string; description: string;
+        }>).map((honor, index) => (
           <HonorCard key={honor.title} index={index} {...honor} />
         ))}
       </div>
