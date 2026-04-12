@@ -1,6 +1,8 @@
 import { VideoToAscii } from "char-anime";
 import { Link } from "react-router-dom";
 import { styles } from "../styles";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const tools = [
   {
@@ -13,8 +15,9 @@ const tools = [
 
 const Tools = () => {
   return (
-    <div className="relative z-0 bg-primary min-h-screen">
-      <div className={`${styles.paddingX} pt-28 pb-10 max-w-7xl mx-auto`}>
+    <div className="relative z-0 bg-primary min-h-screen flex flex-col">
+      <Navbar />
+      <div className={`${styles.paddingX} pt-28 pb-10 max-w-7xl mx-auto flex-1`}>
         <Link
           to="/"
           className="text-secondary hover:text-white text-[14px] transition-colors"
@@ -45,6 +48,7 @@ const Tools = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

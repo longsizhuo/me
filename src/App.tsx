@@ -12,6 +12,7 @@ import {
   Works,
 } from "./components";
 import Education from "./components/Education";
+import Footer from "./components/Footer";
 
 const Tools = lazy(() => import("./pages/Tools"));
 
@@ -52,6 +53,7 @@ function HomePage() {
         <ContactAdvanced />
         <StarsCanvas />
       </div>
+      <Footer />
     </div>
   );
 }
