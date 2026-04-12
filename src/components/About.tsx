@@ -127,15 +127,20 @@ const About = () => {
     <>
       <motion.div variants={textVariant()}>
         <p className={styles.sectionSubText}>Introduction</p>
-        <h2 className={styles.sectionHeadText}>Contribute.</h2>
+        <h2 className={styles.sectionHeadText}>About Me.</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        Below are some of the GitHub repositories I have contributed to,
-        including projects that I have pinned on my GitHub profile.
+        I'm a frontend engineer passionate about interactive design, animation
+        principles, and rendering performance. My work at Kuaishou Technology
+        focuses on building engaging, high-performance user experiences at scale.
+        Previously, I served as Scrum Master on SpotFinder (Champion, USYD Coding
+        Fest) and contributed to Hello-algo, an open-source algorithm platform
+        with 89K+ GitHub stars. I also hold a patent for a single-cell RNA-seq
+        visualization tool.
       </motion.p>
 
       {ghStats && (
