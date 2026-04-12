@@ -95,7 +95,7 @@ const Contact = () => {
               value={form.name}
               onChange={handleChange}
               placeholder="What's your good name?"
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
             />
           </label>
@@ -107,7 +107,7 @@ const Contact = () => {
               value={form.email}
               onChange={handleChange}
               placeholder="What's your web address?"
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
             />
           </label>
@@ -119,7 +119,7 @@ const Contact = () => {
               value={form.message}
               onChange={handleChange}
               placeholder='What you want to say?'
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
             />
           </label>
@@ -127,7 +127,7 @@ const Contact = () => {
           <button
             type='submit'
             disabled={loading}
-            className='bg-tertiary py-3 px-8 rounded-xl outline-hidden w-fit text-white font-bold shadow-md shadow-primary disabled:opacity-50 disabled:cursor-not-allowed'
+            className='bg-tertiary py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md shadow-primary disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {loading ? "Sending..." : "Send"}
           </button>
