@@ -59,14 +59,14 @@ const Navbar = () => {
         </div>
 
         {/* Desktop nav */}
-        <ul className="list-none hidden sm:flex flex-row gap-8 items-center">
+        <ul className="list-none hidden sm:flex flex-row gap-4 lg:gap-6 items-center">
           {isHome &&
             navLinks.map((nav) => (
               <li
                 key={nav.id}
                 className={`${
                   active === nav.title ? "text-white" : "text-secondary"
-                } hover:text-white text-[16px] font-medium cursor-pointer transition-colors`}
+                } hover:text-white text-[14px] lg:text-[15px] font-medium cursor-pointer transition-colors`}
                 onClick={() => setActive(nav.title)}
               >
                 <a href={`#${nav.id}`}>{t(`nav.${nav.id}`)}</a>
@@ -77,7 +77,7 @@ const Navbar = () => {
               to="/tools"
               className={`${
                 location.pathname === "/tools" ? "text-white" : "text-secondary"
-              } hover:text-white text-[16px] font-medium cursor-pointer transition-colors`}
+              } hover:text-white text-[14px] lg:text-[15px] font-medium cursor-pointer transition-colors`}
             >
               {t("nav.tools")}
             </Link>
