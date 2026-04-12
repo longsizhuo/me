@@ -45,10 +45,10 @@ const Hero = () => {
             </h1>
             <div className={`${styles.heroSubText} mt-2 text-white-100`}>
               <p className="text-[16px] sm:text-[20px] text-secondary leading-[30px] max-w-xl">
-                Full-stack developer & open-source enthusiast based in Sydney.
-                Frontend Engineer at Kwai, Casual Academic at UNSW.
-                Hot cocoa lover, Elden Ring completionist, and proud owner of
-                42 perfect game completions on Steam.
+                Frontend Engineer at Kuaishou Technology, Beijing.
+                UNSW Master of IT (Distinction). Lanqiao Cup 1st Place.
+                Passionate about interactive design, animation, and rendering
+                performance. Hot cocoa lover & Elden Ring completionist.
               </p>
               <Typography
                 variant="body1"
