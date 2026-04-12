@@ -25,7 +25,7 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceC
       initial={{ opacity: 0, y: 50 }} // 初始状态
       transition={{ duration: 0.5 }} // 动画时长
       variants={fadeIn("right", "spring", index * 0.5, 0.75)}
-      className="w-full green-pink-gradient p-[1px] rounded-[20px] shadow-card"
+      className="w-full green-pink-gradient p-px rounded-[20px] shadow-card"
     >
       <div
         className="bg-tertiary rounded-[20px] py-5 px-12 min-h-[320px] flex justify-evenly items-center flex-col"
