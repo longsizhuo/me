@@ -7,7 +7,7 @@ import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
 interface ArticleItem {
-  title: string;
+  title: { zh: string; en: string };
   likes: number;
   platform: "xiaohongshu" | "blog";
   url: string;
@@ -15,66 +15,64 @@ interface ArticleItem {
 }
 
 const articles: ArticleItem[] = [
-  // Pinned / Top
   {
-    title: '我"转码"过程中的良师 Dr. Eric Martin',
+    title: { zh: '我"转码"过程中的良师 Dr. Eric Martin', en: "My Mentor in the Journey of Career Switching — Dr. Eric Martin" },
     likes: 1048,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/6814f561000000002100375d",
     category: "Career",
   },
   {
-    title: "你为什么找不到工作",
+    title: { zh: "你为什么找不到工作", en: "Why You're Not Getting Interview Calls" },
     likes: 508,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/68f11f26000000000302134b",
     category: "Career",
   },
-  // Tech & Open Source
   {
-    title: "挑战开箱一米长的校招礼盒！",
+    title: { zh: "挑战开箱一米长的校招礼盒！", en: "Unboxing a 1-Meter Campus Recruitment Gift Box!" },
     likes: 181,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/69c6f2e700000000210399ad",
     category: "Life @ Kuaishou",
   },
   {
-    title: "如何利用开源社区学习",
+    title: { zh: "如何利用开源社区学习", en: "How to Learn Through Open Source Communities" },
     likes: 152,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/682b673100000000210015ea",
     category: "Open Source",
   },
   {
-    title: "Apex 黑屏解决方案",
+    title: { zh: "Apex 黑屏解决方案", en: "Apex Legends Black Screen Fix" },
     likes: 138,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/6953e0ad000000001f00a83b",
     category: "Tech",
   },
   {
-    title: "《只是为了好玩》",
+    title: { zh: "《只是为了好玩》", en: '"Just for Fun"' },
     likes: 133,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/69b15c9f0000000015020434",
     category: "Life",
   },
   {
-    title: "我们创建了一个开源的学习社区",
+    title: { zh: "我们创建了一个开源的学习社区", en: "We Built an Open Source Learning Community" },
     likes: 104,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/68c68780000000001d003a2f",
     category: "Open Source",
   },
   {
-    title: "快手校招培训开始了",
+    title: { zh: "快手校招培训开始了", en: "Kuaishou Campus Hire Training Begins" },
     likes: 93,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/6874eaed000000001c032b04",
     category: "Life @ Kuaishou",
   },
   {
-    title: "如何发布自己的第一个NPM包",
+    title: { zh: "如何发布自己的第一个NPM包", en: "How to Publish Your First NPM Package" },
     likes: 90,
     platform: "xiaohongshu",
     url: "https://www.xiaohongshu.com/explore/68a9c10e000000001b034723",
@@ -88,7 +86,8 @@ const platformBadge = {
 };
 
 const Writing = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = (i18n.language === "zh" ? "zh" : "en") as "zh" | "en";
   return (
     <>
       <motion.div variants={textVariant()}>
@@ -142,7 +141,7 @@ const Writing = () => {
               </span>
             </div>
             <h3 className="text-white font-semibold text-[16px] leading-[22px] group-hover:text-[#915EFF] transition-colors">
-              {article.title}
+              {article.title[lang]}
             </h3>
             <p className="mt-2 text-secondary text-[13px]">
               {article.likes} {t("writing.likes")}
