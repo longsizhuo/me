@@ -74,6 +74,11 @@ const Hero = () => {
                 <a href="https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809">
                   @龙龙要打翻你们
                 </a>
+                <br />
+                <strong>Steam:</strong>{" "}
+                <a href="https://steamcommunity.com/id/longsizhuo/">
+                  Loong Loong
+                </a>
               </Typography>
             </div>
           </div>
