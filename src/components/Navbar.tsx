@@ -45,8 +45,8 @@ const Navbar = () => {
             }}
           >
             <p className="text-white text-[18px] font-bold cursor-pointer flex">
-              Sizhuo Long &nbsp;
-              <span className="sm:block hidden"> | Full-stack</span>
+              {t("nav.brandName")} &nbsp;
+              <span className="sm:block hidden"> | {t("nav.brandRole")}</span>
             </p>
           </Link>
           <button
