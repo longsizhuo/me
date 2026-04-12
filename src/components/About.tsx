@@ -59,6 +59,8 @@ const About = () => {
 
   useEffect(() => {
     const fetchPinnedRepos = async () => {
+      if (!GITHUB_TOKEN || GITHUB_TOKEN === 'your_github_token_here') return;
+
       const graphqlWithAuth = graphql.defaults({
         headers: {
           authorization: `token ${GITHUB_TOKEN}`,

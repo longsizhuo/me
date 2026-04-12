@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
-import axios from "axios";
 import emailjs from '@emailjs/browser';
 
 import { styles } from "../styles";
@@ -8,7 +7,6 @@ import { EarthCanvas } from "./canvas";
 import { SectionWrapper } from "../hoc";
 import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
-import { API_ENDPOINTS } from "../config/api";
 
 const ContactAdvanced = () => {
   const formRef = useRef();
@@ -98,34 +96,11 @@ const ContactAdvanced = () => {
         timestamp: new Date().toLocaleString('zh-CN'),
       };
 
-      // 并行处理所有请求
-      const [emailResponse, dbResponse, healthResponse] = await Promise.allSettled([
-        emailjs.send(serviceId, templateId, templateParams, publicKey),
-        axios.post(API_ENDPOINTS.CONTACT, form),
-        axios.get(API_ENDPOINTS.HEALTH)
-      ]);
+      // 发送邮件
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      showStatus('success', '消息发送成功！我会尽快回复您。');
+      setForm({ name: "", email: "", message: "" });
 
-      // 分析结果
-      const results = {
-        email: emailResponse.status === 'fulfilled' ? 'success' : 'failed',
-        database: dbResponse.status === 'fulfilled' ? 'success' : 'failed',
-        health: healthResponse.status === 'fulfilled' ? 'success' : 'failed'
-      };
-
-      // 邮件发送成功即视为成功
-      if (results.email === 'success') {
-        showStatus('success', '消息发送成功！我会尽快回复您。', results);
-        setForm({ name: "", email: "", message: "" });
-      } else {
-        showStatus('error', '发送失败，请稍后重试。', results);
-      }
-
-      // 记录详细信息到控制台
-      console.log('Contact form submission results:', {
-        email: emailResponse,
-        database: dbResponse,
-        health: healthResponse
-      });
 
     } catch (error) {
       console.error('Contact form error:', error);
