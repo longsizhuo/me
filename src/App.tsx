@@ -12,6 +12,7 @@ import {
   Works,
 } from "./components";
 import Education from "./components/Education";
+import Honors from "./components/Honors";
 import Footer from "./components/Footer";
 
 const Tools = lazy(() => import("./pages/Tools"));
@@ -48,6 +49,7 @@ function HomePage() {
       <Album />
       <Experience />
       <Education />
+      <Honors />
       <Works />
       <div className="relative z-0">
         <ContactAdvanced />
