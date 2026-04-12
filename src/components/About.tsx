@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Tilt } from "react-tilt";
 
 import Typography from "@mui/material/Typography";
@@ -55,6 +56,7 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceC
 );
 
 const About = () => {
+  const { t } = useTranslation();
   const [services, setServices] = useState([]);
   const [ghStats, setGhStats] = useState<{
     followers: number;
@@ -126,21 +128,15 @@ const About = () => {
   return (
     <>
       <motion.div variants={textVariant()}>
-        <p className={styles.sectionSubText}>Introduction</p>
-        <h2 className={styles.sectionHeadText}>About Me.</h2>
+        <p className={styles.sectionSubText}>{t("about.subtitle")}</p>
+        <h2 className={styles.sectionHeadText}>{t("about.title")}</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        I'm a frontend engineer passionate about interactive design, animation
-        principles, and rendering performance. My work at Kuaishou Technology
-        focuses on building engaging, high-performance user experiences at scale.
-        Previously, I served as Scrum Master on SpotFinder (Champion, USYD Coding
-        Fest) and contributed to Hello-algo, an open-source algorithm platform
-        with 89K+ GitHub stars. I also hold a patent for a single-cell RNA-seq
-        visualization tool.
+        {t("about.description")}
       </motion.p>
 
       {ghStats && (
@@ -149,9 +145,9 @@ const About = () => {
           className="mt-8 flex flex-wrap gap-6"
         >
           {[
-            { label: "Followers", value: ghStats.followers },
-            { label: "Public Repos", value: ghStats.repos },
-            { label: "Contributions (Year)", value: ghStats.contributions },
+            { label: t("about.followers"), value: ghStats.followers },
+            { label: t("about.publicRepos"), value: ghStats.repos },
+            { label: t("about.contributions"), value: ghStats.contributions },
           ].map((stat) => (
             <div
               key={stat.label}

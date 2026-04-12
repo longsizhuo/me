@@ -1,19 +1,22 @@
 import { VideoToAscii } from "char-anime";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-const tools = [
-  {
-    id: "video-to-ascii",
-    name: "Video to ASCII",
-    description: "Convert video into real-time ASCII art animation in the browser.",
-    component: <VideoToAscii />,
-  },
-];
-
 const Tools = () => {
+  const { t } = useTranslation();
+
+  const tools = [
+    {
+      id: "video-to-ascii",
+      name: t("tools.videoToAscii.name"),
+      description: t("tools.videoToAscii.description"),
+      component: <VideoToAscii />,
+    },
+  ];
+
   return (
     <div className="relative z-0 bg-primary min-h-screen flex flex-col">
       <Navbar />
@@ -22,14 +25,14 @@ const Tools = () => {
           to="/"
           className="text-secondary hover:text-white text-[14px] transition-colors"
         >
-          &larr; Back to Home
+          {t("tools.back")}
         </Link>
 
         <h1 className={`${styles.sectionHeadText} text-white mt-4`}>
-          Tools.
+          {t("tools.title")}
         </h1>
         <p className={`${styles.sectionSubText} mt-2`}>
-          Fun little tools I built for myself and others
+          {t("tools.subtitle")}
         </p>
 
         <div className="mt-12 flex flex-col gap-16">

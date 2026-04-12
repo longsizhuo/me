@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 import type { EducationCardProps } from "./TYPE";
+import { useTranslation } from "react-i18next";
 
 const EducationCard = ({
   degree,
@@ -25,6 +26,7 @@ const EducationCard = ({
 );
 
 const Education = () => {
+  const { t } = useTranslation();
   const educations = [
     {
       degree: "Master of Engineering — Information Technology",
@@ -48,8 +50,8 @@ const Education = () => {
         className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[300px]`}
       >
         <motion.div variants={textVariant()}>
-          <p className={styles.sectionSubText}>My academic background</p>
-          <h2 className={styles.sectionHeadText}>Education.</h2>
+          <p className={styles.sectionSubText}>{t("education.subtitle")}</p>
+          <h2 className={styles.sectionHeadText}>{t("education.title")}</h2>
         </motion.div>
       </div>
       <div className={`-mt-20 pb-14 ${styles.paddingX} flex flex-wrap gap-7`}>

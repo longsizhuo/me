@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 import emailjs from '@emailjs/browser';
 
 import { styles } from "../styles";
@@ -9,6 +10,7 @@ import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
 
 const ContactAdvanced = () => {
+  const { t } = useTranslation();
   const formRef = useRef();
   const [form, setForm] = useState({
     name: "",
@@ -51,23 +53,23 @@ const ContactAdvanced = () => {
 
   const validateForm = () => {
     if (!form.name.trim()) {
-      showStatus('error', '请输入您的姓名');
+      showStatus('error', t('contact.error_name'));
       return false;
     }
     if (!form.email.trim()) {
-      showStatus('error', '请输入您的邮箱地址');
+      showStatus('error', t('contact.error_email'));
       return false;
     }
     if (!form.email.includes('@')) {
-      showStatus('error', '请输入有效的邮箱地址');
+      showStatus('error', t('contact.error_email_invalid'));
       return false;
     }
     if (!form.message.trim()) {
-      showStatus('error', '请输入您的消息');
+      showStatus('error', t('contact.error_message'));
       return false;
     }
     if (form.message.length < 10) {
-      showStatus('error', '消息内容至少需要10个字符');
+      showStatus('error', t('contact.error_message_short'));
       return false;
     }
     return true;
@@ -98,13 +100,13 @@ const ContactAdvanced = () => {
 
       // 发送邮件
       await emailjs.send(serviceId, templateId, templateParams, publicKey);
-      showStatus('success', '消息发送成功！我会尽快回复您。');
+      showStatus('success', t('contact.success'));
       setForm({ name: "", email: "", message: "" });
 
 
     } catch (error) {
       console.error('Contact form error:', error);
-      showStatus('error', '发生未知错误，请稍后重试。', { error: error.message });
+      showStatus('error', t('contact.error'), { error: error.message });
     } finally {
       setLoading(false);
     }
@@ -135,9 +137,9 @@ const ContactAdvanced = () => {
         className='flex-[0.75] bg-black-100 p-8 rounded-2xl'
       >
         <p className={styles.sectionSubText}>
-          Get in touch
+          {t('contact.subtitle')}
         </p>
-        <h3 className={styles.sectionHeadText}>Contact</h3>
+        <h3 className={styles.sectionHeadText}>{t('contact.title')}</h3>
 
         {/* 状态消息显示 */}
         {status.message && (
@@ -171,39 +173,39 @@ const ContactAdvanced = () => {
           className='mt-12 flex flex-col gap-8'
         >
           <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your Name</span>
+            <span className='text-white font-medium mb-4'>{t('contact.name_label')}</span>
             <input
               type='text'
               name='name'
               value={form.name}
               onChange={handleChange}
-              placeholder="What's your good name?"
+              placeholder={t("contact.name_placeholder")}
               className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
               disabled={loading}
             />
           </label>
           <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your email</span>
+            <span className='text-white font-medium mb-4'>{t('contact.email_label')}</span>
             <input
               type='email'
               name='email'
               value={form.email}
               onChange={handleChange}
-              placeholder="What's your web address?"
+              placeholder={t("contact.email_placeholder")}
               className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
               disabled={loading}
             />
           </label>
           <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your Message</span>
+            <span className='text-white font-medium mb-4'>{t('contact.message_label')}</span>
             <textarea
               rows={7}
               name='message'
               value={form.message}
               onChange={handleChange}
-              placeholder='What you want to say?'
+              placeholder={t("contact.message_placeholder")}
               className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
               required
               disabled={loading}
@@ -218,10 +220,10 @@ const ContactAdvanced = () => {
             {loading ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Sending...
+                {t("contact.sending")}
               </div>
             ) : (
-              "Send"
+              t("contact.send")
             )}
           </button>
         </form>

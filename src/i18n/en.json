@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "about": "About",
+    "album": "Album",
+    "work": "Work",
+    "education": "Education",
+    "honors": "Honors",
+    "projects": "Projects",
+    "writing": "Writing",
+    "contact": "Contact",
+    "tools": "Tools"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "Siz Long",
+    "bio": "Frontend Engineer at Kuaishou Technology, Beijing. UNSW Master of IT (Distinction). Lanqiao Cup 1st Place. Passionate about interactive design, animation, and rendering performance. Hot cocoa lover & Elden Ring completionist."
+  },
+  "about": {
+    "subtitle": "Introduction",
+    "title": "About Me.",
+    "description": "I'm a frontend engineer passionate about interactive design, animation principles, and rendering performance. My work at Kuaishou Technology focuses on building engaging, high-performance user experiences at scale. Previously, I served as Scrum Master on SpotFinder (Champion, USYD Coding Fest) and contributed to Hello-algo, an open-source algorithm platform with 89K+ GitHub stars. I also hold a patent for a single-cell RNA-seq visualization tool.",
+    "followers": "Followers",
+    "publicRepos": "Public Repos",
+    "contributions": "Contributions (Year)"
+  },
+  "album": {
+    "subtitle": "Gallery",
+    "title": "Photo Album.",
+    "description": "Moments from work, travel, and life — organized by occasion."
+  },
+  "experience": {
+    "subtitle": "What I have done so far",
+    "title": "Work Experience."
+  },
+  "education": {
+    "subtitle": "My academic background",
+    "title": "Education."
+  },
+  "honors": {
+    "subtitle": "Recognition",
+    "title": "Awards & Patents."
+  },
+  "projects": {
+    "subtitle": "My work",
+    "title": "Projects.",
+    "description": "A mix of personal projects, open-source contributions, and academic work. Click any card to see more details and a live preview.",
+    "openSource": "Open Source",
+    "githubPinned": "GitHub Pinned."
+  },
+  "writing": {
+    "subtitle": "Thoughts & Sharing",
+    "title": "Writing.",
+    "description_prefix": "I write about tech, career advice, and life on",
+    "xhs_label": "Xiaohongshu (2.2K followers)",
+    "description_middle": "and share technical articles on",
+    "blog_label": "Involution Hell",
+    "description_suffix": ". Here are some of my most popular posts.",
+    "likes": "likes"
+  },
+  "contact": {
+    "subtitle": "Get in touch",
+    "title": "Contact",
+    "name_label": "Your Name",
+    "name_placeholder": "What's your good name?",
+    "email_label": "Your email",
+    "email_placeholder": "What's your email address?",
+    "message_label": "Your Message",
+    "message_placeholder": "What you want to say?",
+    "send": "Send",
+    "sending": "Sending...",
+    "success": "Message sent successfully! I'll get back to you soon.",
+    "error": "Failed to send, please try again later.",
+    "error_name": "Please enter your name",
+    "error_email": "Please enter your email",
+    "error_email_invalid": "Please enter a valid email",
+    "error_message": "Please enter your message",
+    "error_message_short": "Message must be at least 10 characters"
+  },
+  "tools": {
+    "title": "Tools.",
+    "subtitle": "Fun little tools I built for myself and others",
+    "back": "← Back to Home",
+    "videoToAscii": {
+      "name": "Video to ASCII",
+      "description": "Convert video into real-time ASCII art animation in the browser."
+    }
+  },
+  "footer": {
+    "copyright": "Sizhuo Long. Built with React & Three.js."
+  },
+  "notFound": {
+    "message": "This page doesn't exist — maybe it wandered off to find some hot cocoa.",
+    "goHome": "Go Home"
+  }
+}

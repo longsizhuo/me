@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
@@ -58,14 +59,15 @@ const ExperienceCard = ({ experience }: ExperienceCardProps) => {
 };
 
 const Experience = () => {
+  const { t } = useTranslation();
   return (
     <>
       <motion.div variants={textVariant()}>
         <p className={`${styles.sectionSubText} text-center`}>
-          What I have done so far
+          {t("experience.subtitle")}
         </p>
         <h2 className={`${styles.sectionHeadText} text-center`}>
-          Work Experience.
+          {t("experience.title")}
         </h2>
       </motion.div>
 

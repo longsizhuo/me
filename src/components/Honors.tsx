@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
+import { useTranslation } from "react-i18next";
 
 const honors = [
   {
@@ -66,12 +67,13 @@ const HonorCard = ({
 );
 
 const Honors = () => {
+  const { t } = useTranslation();
   return (
     <div className="mt-12 bg-black-100 rounded-[20px]">
       <div className={`bg-tertiary rounded-2xl ${styles.padding} min-h-[200px]`}>
         <motion.div variants={textVariant()}>
-          <p className={styles.sectionSubText}>Recognition</p>
-          <h2 className={styles.sectionHeadText}>Awards & Patents.</h2>
+          <p className={styles.sectionSubText}>{t("honors.subtitle")}</p>
+          <h2 className={styles.sectionHeadText}>{t("honors.title")}</h2>
         </motion.div>
       </div>
       <div className={`-mt-20 pb-14 ${styles.paddingX} flex flex-wrap gap-7`}>
