@@ -4,7 +4,7 @@ import { styles } from "../styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import profilePicture from "../assets/IMG_2862.png";
+import profilePicture from "../assets/IMG_2862.webp";
 
 const Hero = () => {
   const { t } = useTranslation();
