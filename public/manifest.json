@@ -1,0 +1,21 @@
+{
+  "name": "Sizhuo Long | Portfolio",
+  "short_name": "Siz Long",
+  "description": "Frontend Engineer at Kuaishou Technology. UNSW MEng (Distinction).",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": [
+    {
+      "src": "/avatar.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/avatar.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
