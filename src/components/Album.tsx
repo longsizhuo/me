@@ -101,21 +101,20 @@ const Album = () => {
   return (
     <div className="relative w-full">
       <motion.div variants={textVariant()}>
-        <p className={`${styles.sectionSubText} text-white`}>Gallery</p>
-        <h2 className={`${styles.sectionHeadText} text-white`}>Photo Album</h2>
+        <p className={styles.sectionSubText}>Gallery</p>
+        <h2 className={styles.sectionHeadText}>Photo Album.</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
-        className="mt-4 text-white text-[17px] max-w-3xl leading-[30px]"
+        className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        Here are my photo collections organized by folders. All photos are
-        automatically collected from the assets/album directory.
+        Moments from work, travel, and life — organized by occasion.
       </motion.p>
 
       <div
         id="album-scroll"
-        className="p-4 mt-10 bg-transparent shadow-inner overflow-y-scroll border-2 border-white rounded-2xl"
+        className="p-4 mt-10 bg-black-100/50 shadow-inner overflow-y-scroll border border-gray-700 rounded-2xl"
         style={{
           maxHeight: "520px",
           width: "100%",
@@ -124,16 +123,7 @@ const Album = () => {
         <Image.PreviewGroup>
           {Object.entries(albumMap).map(([folderName, imageList]) => (
             <div key={folderName} style={{ marginBottom: 40 }}>
-              <h2
-                style={{
-                  fontSize: "20px",
-                  fontWeight: 600,
-                  margin: "16px 0",
-                  color: "#fff",
-                  borderBottom: "2px solid #fff",
-                  paddingBottom: "8px",
-                }}
-              >
+              <h2 className="text-white text-[20px] font-semibold my-4 pb-2 border-b border-gray-600">
                 {folderName}
               </h2>
               <div
