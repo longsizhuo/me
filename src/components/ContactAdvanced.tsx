@@ -91,8 +91,8 @@ const ContactAdvanced = () => {
 
       // 准备 EmailJS 模板参数
       const templateParams = {
-        from_name: form.name,
-        from_email: form.email,
+        name: form.name,
+        email: form.email,
         message: form.message,
         to_name: toName,
         timestamp: new Date().toLocaleString('zh-CN'),
@@ -112,27 +112,10 @@ const ContactAdvanced = () => {
         health: healthResponse.status === 'fulfilled' ? 'success' : 'failed'
       };
 
-      // 根据结果显示相应消息
-      if (results.email === 'success' && results.database === 'success') {
+      // 邮件发送成功即视为成功
+      if (results.email === 'success') {
         showStatus('success', '消息发送成功！我会尽快回复您。', results);
-        
-        // 清空表单
-        setForm({
-          name: "",
-          email: "",
-          message: "",
-        });
-      } else if (results.database === 'success' && results.email === 'failed') {
-        showStatus('warning', '消息已保存到数据库，但邮件发送失败。我会稍后查看您的消息。', results);
-        
-        // 清空表单
-        setForm({
-          name: "",
-          email: "",
-          message: "",
-        });
-      } else if (results.database === 'failed') {
-        showStatus('error', '保存失败，请稍后重试。', results);
+        setForm({ name: "", email: "", message: "" });
       } else {
         showStatus('error', '发送失败，请稍后重试。', results);
       }
