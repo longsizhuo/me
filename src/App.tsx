@@ -44,6 +44,9 @@ function Analytics() {
 function HomePage() {
   return (
     <div className="relative z-0 bg-primary">
+      <a href="#about" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-tertiary focus:text-white focus:rounded-lg">
+        Skip to content
+      </a>
       <GlobalLottieBackground />
       <div className="bg-hero-pattern bg-cover bg-no-repeat bg-center">
         <Navbar />
