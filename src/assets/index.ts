@@ -30,7 +30,7 @@ import tesla from "./company/tesla.png";
 
 import carrent from "./carrent.png";
 import jobit from "./jobit.png";
-import tripguide from "./tripguide.png";
+import tripguide from "./tripguide.webp";
 
 import logo_dark from "./SpotFinder/logo3.svg"
 import logo_normal from "./SpotFinder/logo4.svg"
