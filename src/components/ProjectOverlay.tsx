@@ -3,6 +3,27 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { ProjectOverlayProps } from "./TYPE";
 
+const IframeWithLoader = ({ src, title }: { src: string; title: string }) => {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div className="relative w-full h-full">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black-100">
+          <div className="w-8 h-8 border-3 border-[#915EFF] border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+      <iframe
+        src={src}
+        title={`${title} preview`}
+        className="w-full h-full"
+        sandbox="allow-scripts allow-same-origin allow-popups"
+        onLoad={() => setLoading(false)}
+        loading="lazy"
+      />
+    </div>
+  );
+};
+
 const ProjectOverlay = ({
   open,
   onClose,
@@ -76,14 +97,7 @@ const ProjectOverlay = ({
                 Live Preview
               </h4>
               <div className="relative w-full rounded-xl overflow-hidden border border-gray-600 bg-white" style={{ height: "500px" }}>
-                <iframe
-                  src={liveUrl}
-                  title={`${title} preview`}
-                  className="w-full h-full"
-                  sandbox="allow-scripts allow-same-origin allow-popups"
-                  onError={() => setIframeError(true)}
-                  loading="lazy"
-                />
+                <IframeWithLoader src={liveUrl} title={title || "project"} />
               </div>
             </div>
           )}
