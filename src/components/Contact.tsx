@@ -45,48 +45,28 @@ const Contact = () => {
       to_name: toName,
     };
 
-    // 同时处理 EmailJS 发送邮件和数据库保存
+    // 邮件发送为主，数据库保存为辅
     const sendEmail = emailjs.send(serviceId, templateId, templateParams, publicKey);
-    const saveToDatabase = axios.post(API_ENDPOINTS.CONTACT, form);
-    const healthCheck = axios.get(API_ENDPOINTS.HEALTH);
+    const saveToDatabase = axios.post(API_ENDPOINTS.CONTACT, form).catch(e => {
+      console.warn('Database save failed (non-critical):', e);
+      return null;
+    });
 
-    // 使用 Promise.all 同时处理所有请求
-    Promise.all([sendEmail, saveToDatabase, healthCheck])
-      .then(([emailResponse, dbResponse, healthResponse]) => {
+    sendEmail
+      .then((emailResponse) => {
         setLoading(false);
-        
-        // 邮件发送成功
         console.log('Email sent successfully:', emailResponse);
-        
-        // 数据库保存成功
-        console.log('Database save successful:', dbResponse.data);
-        
-        // 健康检查成功
-        console.log('Health Check Success:', healthResponse.data);
-        
-        // 显示成功消息
         alert('消息发送成功！我会尽快回复你。');
-        
-        // 清空表单
-        setForm({
-          name: "",
-          email: "",
-          message: "",
-        });
+        setForm({ name: "", email: "", message: "" });
       })
       .catch((error) => {
         setLoading(false);
-        console.error("Error:", error);
-        
-        // 根据错误类型显示不同的错误消息
-        if (error.message && error.message.includes('EmailJS')) {
-          alert('邮件发送失败，但消息已保存到数据库。请稍后重试。');
-        } else if (error.response?.data?.error) {
-          alert(error.response.data.error);
-        } else {
-          alert('发送失败，请稍后重试。');
-        }
+        console.error("EmailJS error:", error);
+        alert('发送失败，请稍后重试。');
       });
+
+    // 后台保存到数据库，不阻塞用户体验
+    saveToDatabase;
   };
 
   return (
