@@ -28,8 +28,20 @@ export const navLinks = [
         title: "About",
     },
     {
+        id: "album",
+        title: "Album",
+    },
+    {
         id: "work",
         title: "Work",
+    },
+    {
+        id: "education",
+        title: "Education",
+    },
+    {
+        id: "projects",
+        title: "Projects",
     },
     {
         id: "contact",
