@@ -33,9 +33,9 @@ const ProjectOverlay = ({
   if (!open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-8">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-xs" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative bg-tertiary z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-card border border-gray-600">
