@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import { useTranslation } from "react-i18next";
 
 const socialLinks = [
   {
@@ -50,6 +51,7 @@ const socialLinks = [
 ];
 
 const Footer = () => {
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
@@ -57,7 +59,7 @@ const Footer = () => {
       <div className={`${styles.paddingX} max-w-7xl mx-auto py-8`}>
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-secondary text-[14px]">
-            &copy; {year} Sizhuo Long. Built with React & Three.js.
+            &copy; {year} {t("footer.copyright")}
           </p>
 
           <div className="flex gap-4">

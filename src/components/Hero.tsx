@@ -3,9 +3,11 @@ import Card from "@mui/material/Card";
 import { styles } from "../styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import profilePicture from "../assets/IMG_2862.png";
 
 const Hero = () => {
+  const { t } = useTranslation();
   const [giggle, setGiggle] = useState(false);
 
   return (
@@ -22,7 +24,7 @@ const Hero = () => {
 
           <div>
             <h1 className={`${styles.heroHeadText} text-white`}>
-              Hi, I&apos;m{" "}
+              {t("hero.greeting")}{" "}
               <motion.span
                 className="text-[#915EFF]"
                 style={{ display: "inline-block", cursor: "pointer" }}
@@ -40,15 +42,12 @@ const Hero = () => {
                 onClick={() => setGiggle(true)}
                 onAnimationComplete={() => setGiggle(false)}
               >
-                Siz Long
+                {t("hero.name")}
               </motion.span>
             </h1>
             <div className={`${styles.heroSubText} mt-2 text-white-100`}>
               <p className="text-[16px] sm:text-[20px] text-secondary leading-[30px] max-w-xl">
-                Frontend Engineer at Kuaishou Technology, Beijing.
-                UNSW Master of IT (Distinction). Lanqiao Cup 1st Place.
-                Passionate about interactive design, animation, and rendering
-                performance. Hot cocoa lover & Elden Ring completionist.
+                {t("hero.bio")}
               </p>
               <Typography
                 variant="body1"

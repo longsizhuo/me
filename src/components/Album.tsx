@@ -5,6 +5,7 @@
 import { Image } from "antd";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion";
@@ -88,6 +89,7 @@ const LazyImage = ({ loader, alt, gap }: LazyImageProps) => {
 };
 
 const Album = () => {
+  const { t } = useTranslation();
   /** @type {[Record<string, Array<() => Promise<{ default: string }>>>, Function]} */
   const [albumMap, setAlbumMap] = useState({});
   const gap = 16;
@@ -101,15 +103,15 @@ const Album = () => {
   return (
     <div className="relative w-full">
       <motion.div variants={textVariant()}>
-        <p className={styles.sectionSubText}>Gallery</p>
-        <h2 className={styles.sectionHeadText}>Photo Album.</h2>
+        <p className={styles.sectionSubText}>{t("album.subtitle")}</p>
+        <h2 className={styles.sectionHeadText}>{t("album.title")}</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        Moments from work, travel, and life — organized by occasion.
+        {t("album.description")}
       </motion.p>
 
       <div

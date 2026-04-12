@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
+import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
@@ -87,36 +88,37 @@ const platformBadge = {
 };
 
 const Writing = () => {
+  const { t } = useTranslation();
   return (
     <>
       <motion.div variants={textVariant()}>
-        <p className={styles.sectionSubText}>Thoughts & Sharing</p>
-        <h2 className={styles.sectionHeadText}>Writing.</h2>
+        <p className={styles.sectionSubText}>{t("writing.subtitle")}</p>
+        <h2 className={styles.sectionHeadText}>{t("writing.title")}</h2>
       </motion.div>
 
       <motion.p
         variants={fadeIn("", "", 0.1, 1)}
         className="mt-4 text-secondary text-[17px] max-w-3xl leading-[30px]"
       >
-        I write about tech, career advice, and life on{" "}
+        {t("writing.description_prefix")}{" "}
         <a
           href="https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809"
           target="_blank"
           rel="noopener noreferrer"
           className="text-white hover:underline"
         >
-          Xiaohongshu (2.2K followers)
+          {t("writing.xhs_label")}
         </a>{" "}
-        and share technical articles on{" "}
+        {t("writing.description_middle")}{" "}
         <a
           href="https://involutionhell.com/docs/CommunityShare/Leetcode"
           target="_blank"
           rel="noopener noreferrer"
           className="text-white hover:underline"
         >
-          Involution Hell
+          {t("writing.blog_label")}
         </a>
-        . Here are some of my most popular posts.
+        {t("writing.description_suffix")}
       </motion.p>
 
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -143,7 +145,7 @@ const Writing = () => {
               {article.title}
             </h3>
             <p className="mt-2 text-secondary text-[13px]">
-              {article.likes} likes
+              {article.likes} {t("writing.likes")}
             </p>
           </motion.a>
         ))}

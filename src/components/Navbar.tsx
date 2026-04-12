@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { navLinks } from "../constants";
 import { menu, close } from "../assets";
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const [active, setActive] = useState("");
   const [toggle, setToggle] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+
+  const toggleLang = () => {
+    const newLang = i18n.language === "en" ? "zh" : "en";
+    i18n.changeLanguage(newLang);
+    localStorage.setItem("lang", newLang);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,19 +35,28 @@ const Navbar = () => {
       }`}
     >
       <div className="w-full flex justify-between items-center max-w-7xl mx-auto">
-        <Link
-          to="/"
-          className="flex items-center gap-2"
-          onClick={() => {
-            setActive("");
-            window.scrollTo(0, 0);
-          }}
-        >
-          <p className="text-white text-[18px] font-bold cursor-pointer flex">
-            Sizhuo Long &nbsp;
-            <span className="sm:block hidden"> | Full-stack</span>
-          </p>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="flex items-center gap-2"
+            onClick={() => {
+              setActive("");
+              window.scrollTo(0, 0);
+            }}
+          >
+            <p className="text-white text-[18px] font-bold cursor-pointer flex">
+              Sizhuo Long &nbsp;
+              <span className="sm:block hidden"> | Full-stack</span>
+            </p>
+          </Link>
+          <button
+            onClick={toggleLang}
+            className="text-secondary hover:text-white text-[13px] font-medium border border-secondary/30 hover:border-white/50 px-2 py-0.5 rounded transition-colors"
+            title={i18n.language === "en" ? "切换到中文" : "Switch to English"}
+          >
+            {i18n.language === "en" ? "中文" : "EN"}
+          </button>
+        </div>
 
         {/* Desktop nav */}
         <ul className="list-none hidden sm:flex flex-row gap-8 items-center">
@@ -52,7 +69,7 @@ const Navbar = () => {
                 } hover:text-white text-[16px] font-medium cursor-pointer transition-colors`}
                 onClick={() => setActive(nav.title)}
               >
-                <a href={`#${nav.id}`}>{nav.title}</a>
+                <a href={`#${nav.id}`}>{t(`nav.${nav.id}`)}</a>
               </li>
             ))}
           <li>
@@ -62,7 +79,7 @@ const Navbar = () => {
                 location.pathname === "/tools" ? "text-white" : "text-secondary"
               } hover:text-white text-[16px] font-medium cursor-pointer transition-colors`}
             >
-              Tools
+              {t("nav.tools")}
             </Link>
           </li>
         </ul>
@@ -94,14 +111,14 @@ const Navbar = () => {
                       setActive(nav.title);
                     }}
                   >
-                    <a href={`#${nav.id}`}>{nav.title}</a>
+                    <a href={`#${nav.id}`}>{t(`nav.${nav.id}`)}</a>
                   </li>
                 ))}
               <li
                 className="font-poppins font-medium cursor-pointer text-[16px] text-secondary"
                 onClick={() => setToggle(false)}
               >
-                <Link to="/tools">Tools</Link>
+                <Link to="/tools">{t("nav.tools")}</Link>
               </li>
             </ul>
           </div>

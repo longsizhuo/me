@@ -1,0 +1,95 @@
+{
+  "nav": {
+    "about": "关于",
+    "album": "相册",
+    "work": "工作",
+    "education": "教育",
+    "honors": "荣誉",
+    "projects": "项目",
+    "writing": "写作",
+    "contact": "联系",
+    "tools": "工具"
+  },
+  "hero": {
+    "greeting": "你好，我是",
+    "name": "龙思卓",
+    "bio": "快手科技前端工程师，坐标北京。新南威尔士大学 IT 硕士（优等）。蓝桥杯国际赛 Python 算法第一名。热衷于交互设计、动画基础设施和渲染性能优化。热可可爱好者 & 艾尔登法环全成就玩家。"
+  },
+  "about": {
+    "subtitle": "自我介绍",
+    "title": "关于我",
+    "description": "我是一名前端工程师，热衷于交互设计、动画原理和渲染性能。目前在快手科技，专注于构建大规模的高性能用户体验。此前曾担任 SpotFinder 项目的 Scrum Master（悉尼大学编程节冠军），也参与了 Hello-algo 开源算法学习平台的贡献（GitHub 89K+ stars）。我还持有单细胞 RNA-seq 降维聚类可视化工具的软件著作权。",
+    "followers": "关注者",
+    "publicRepos": "开源仓库",
+    "contributions": "年度贡献"
+  },
+  "album": {
+    "subtitle": "影集",
+    "title": "照片墙",
+    "description": "工作、旅行和生活中的瞬间 —— 按场合整理。"
+  },
+  "experience": {
+    "subtitle": "我的职业经历",
+    "title": "工作经验"
+  },
+  "education": {
+    "subtitle": "我的学术背景",
+    "title": "教育经历"
+  },
+  "honors": {
+    "subtitle": "所获荣誉",
+    "title": "奖项与专利"
+  },
+  "projects": {
+    "subtitle": "我的作品",
+    "title": "项目展示",
+    "description": "个人项目、开源贡献和学术作品的合集。点击卡片查看详情和在线预览。",
+    "openSource": "开源项目",
+    "githubPinned": "GitHub 精选"
+  },
+  "writing": {
+    "subtitle": "思考与分享",
+    "title": "写作",
+    "description_prefix": "我在",
+    "xhs_label": "小红书（2257 粉丝）",
+    "description_middle": "分享技术、职场和生活感悟，技术文章发布在",
+    "blog_label": "内卷地狱",
+    "description_suffix": "。以下是我最受欢迎的帖子。",
+    "likes": "赞"
+  },
+  "contact": {
+    "subtitle": "联系我",
+    "title": "留言",
+    "name_label": "你的姓名",
+    "name_placeholder": "请输入你的姓名",
+    "email_label": "你的邮箱",
+    "email_placeholder": "请输入你的邮箱",
+    "message_label": "你的留言",
+    "message_placeholder": "想对我说什么？",
+    "send": "发送",
+    "sending": "发送中...",
+    "success": "消息发送成功！我会尽快回复您。",
+    "error": "发送失败，请稍后重试。",
+    "error_name": "请输入您的姓名",
+    "error_email": "请输入您的邮箱地址",
+    "error_email_invalid": "请输入有效的邮箱地址",
+    "error_message": "请输入您的消息",
+    "error_message_short": "消息内容至少需要10个字符"
+  },
+  "tools": {
+    "title": "工具箱",
+    "subtitle": "我做的一些好玩的小工具",
+    "back": "← 返回首页",
+    "videoToAscii": {
+      "name": "视频转 ASCII",
+      "description": "在浏览器中将视频实时转换为 ASCII 字符动画。"
+    }
+  },
+  "footer": {
+    "copyright": "龙思卓。使用 React 和 Three.js 构建。"
+  },
+  "notFound": {
+    "message": "这个页面不存在 —— 也许它跑去找热可可了。",
+    "goHome": "回到首页"
+  }
+}
