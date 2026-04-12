@@ -13,6 +13,7 @@ i18n.use(initReactI18next).init({
   lng: savedLang || "en",
   fallbackLng: "en",
   interpolation: { escapeValue: false },
+  returnObjects: true,
 });
 
 export default i18n;

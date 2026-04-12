@@ -15,12 +15,10 @@ const universityIcons: Record<number, { icon: string; iconBg: string }> = {
 
 const Education = () => {
   const { t } = useTranslation();
-  const educations = t("education.items", { returnObjects: true }) as Array<{
-    degree: string;
-    university: string;
-    duration: string;
-    coursework: string;
-  }>;
+  const raw = t("education.items", { returnObjects: true });
+  const educations = Array.isArray(raw) ? raw as Array<{
+    degree: string; university: string; duration: string; coursework: string;
+  }> : [];
 
   return (
     <div className="mt-12 bg-black-100 rounded-[20px]">
