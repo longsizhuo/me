@@ -20,7 +20,7 @@ const Tools = () => {
   return (
     <div className="relative z-0 bg-primary min-h-screen flex flex-col">
       <Navbar />
-      <div className={`${styles.paddingX} pt-28 pb-10 max-w-7xl mx-auto flex-1`}>
+      <div className="px-4 sm:px-8 pt-28 pb-10 max-w-[1400px] mx-auto flex-1 w-full">
         <Link
           to="/"
           className="text-secondary hover:text-white text-[14px] transition-colors"
@@ -44,7 +44,7 @@ const Tools = () => {
               <p className="text-secondary text-[16px] mb-6">
                 {tool.description}
               </p>
-              <div className="bg-tertiary rounded-2xl p-6 w-full">
+              <div className="bg-tertiary rounded-2xl p-4 w-full">
                 {tool.component}
               </div>
             </div>
