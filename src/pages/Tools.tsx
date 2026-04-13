@@ -44,7 +44,7 @@ const Tools = () => {
               <p className="text-secondary text-[16px] mb-6">
                 {tool.description}
               </p>
-              <div className="bg-tertiary rounded-2xl p-6">
+              <div className="bg-tertiary rounded-2xl p-6 w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>
                 {tool.component}
               </div>
             </div>

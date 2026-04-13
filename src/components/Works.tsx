@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Tilt } from "react-tilt";
 import { graphql } from "@octokit/graphql";
 
-import { projects } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
 import { fadeIn, textVariant } from "../utils/motion.ts";
@@ -44,48 +43,6 @@ const langColorMap: Record<string, string> = {
 };
 
 // Card for hardcoded projects (e.g. closed-source graduation projects)
-const StaticProjectCard = ({
-  index,
-  name,
-  description,
-  tags,
-  image,
-  onClick,
-}: {
-  index: number;
-  name: string;
-  description: string;
-  tags: { name: string; color: string }[];
-  image: string;
-  onClick: () => void;
-}) => (
-  <motion.div onClick={onClick} variants={fadeIn("up", "", index * 0.5, 0.75)}>
-    <Tilt
-      options={{ max: 45, scale: 0.9, speed: 450 }}
-      className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full cursor-pointer"
-    >
-      <div className="relative w-full h-[230px]">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover rounded-2xl"
-        />
-      </div>
-      <div className="mt-5">
-        <h3 className="text-white font-bold text-[24px]">{name}</h3>
-        <p className="mt-2 text-secondary text-[14px] line-clamp-3">{description}</p>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <p key={tag.name} className={`text-[14px] ${tag.color}`}>
-            #{tag.name}
-          </p>
-        ))}
-      </div>
-    </Tilt>
-  </motion.div>
-);
-
 // Card for GitHub pinned repos
 const GitHubProjectCard = ({
   index,
@@ -211,44 +168,9 @@ const Works = () => {
         </motion.p>
       </div>
 
-      {/* Hardcoded projects (closed-source, graduation projects, etc.) */}
-      <div className="mt-10 flex flex-wrap gap-7">
-        {projects.map((project, index) => {
-          const i18nItems = t("projects.staticItems", { returnObjects: true }) as Array<{ name: string; description: string }>;
-          const i18nItem = i18nItems[index];
-          const name = i18nItem?.name || project.name;
-          const description = i18nItem?.description || project.description;
-          return (
-            <StaticProjectCard
-              key={`static-${index}`}
-              index={index}
-              name={name}
-              description={description}
-              tags={project.tags}
-              image={project.image}
-              onClick={() =>
-                setSelectedOverlay({
-                  title: name,
-                  description: description,
-                  githubUrl: project.source_code_link,
-                  photos: project.photos || [],
-                })
-              }
-            />
-          );
-        })}
-      </div>
-
       {/* GitHub pinned repos */}
       {repos.length > 0 && (
         <>
-          <motion.div variants={textVariant()} className="mt-16">
-            <p className={`${styles.sectionSubText}`}>{t("projects.openSource")}</p>
-            <h3 className="text-white font-bold text-[30px]">
-              {t("projects.githubPinned")}
-            </h3>
-          </motion.div>
-
           <div className="mt-10 flex flex-wrap gap-7">
             {repos.map((repo, index) => (
               <GitHubProjectCard
