@@ -6,7 +6,7 @@ import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
-import lanqiaoLogo from "../assets/awards/lanqiao.png";
+import lanqiaoLogo from "../assets/awards/lanqiao.webp";
 import usydLogo from "../assets/awards/usyd.png";
 import unswLogo from "../assets/company/unsw.png";
 import copyrightLogo from "../assets/awards/copyright.png";

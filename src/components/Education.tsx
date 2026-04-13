@@ -7,7 +7,7 @@ import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
 import unswLogo from "../assets/company/unsw.png";
-import cuitLogo from "../assets/company/cuit.png";
+import cuitLogo from "../assets/company/cuit.jpg";
 
 const universityIcons: Record<number, { icon: string; iconBg: string }> = {
   0: { icon: unswLogo, iconBg: "#FFF" },
