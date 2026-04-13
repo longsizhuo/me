@@ -6,10 +6,10 @@ import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
-import lanqiaoLogo from "../assets/awards/lanqiao.svg";
-import usydLogo from "../assets/awards/usyd.svg";
+import lanqiaoLogo from "../assets/awards/lanqiao.png";
+import usydLogo from "../assets/awards/usyd.png";
 import unswLogo from "../assets/company/unsw.png";
-import copyrightLogo from "../assets/awards/software-copyright.svg";
+import copyrightLogo from "../assets/awards/copyright.png";
 
 const honorIcons = [lanqiaoLogo, usydLogo, unswLogo, copyrightLogo];
 
