@@ -45,14 +45,13 @@ const Contact = () => {
       to_name: toName,
     };
 
-    // 邮件发送为主，数据库保存为辅
-    const sendEmail = emailjs.send(serviceId, templateId, templateParams, publicKey);
-    const saveToDatabase = axios.post(API_ENDPOINTS.CONTACT, form).catch(e => {
+    // 邮件发送为主，数据库保存为辅（fire-and-forget）
+    void axios.post(API_ENDPOINTS.CONTACT, form).catch(e => {
       console.warn('Database save failed (non-critical):', e);
-      return null;
     });
 
-    sendEmail
+    emailjs
+      .send(serviceId, templateId, templateParams, publicKey)
       .then((emailResponse) => {
         setLoading(false);
         console.log('Email sent successfully:', emailResponse);
@@ -64,9 +63,6 @@ const Contact = () => {
         console.error("EmailJS error:", error);
         alert('发送失败，请稍后重试。');
       });
-
-    // 后台保存到数据库，不阻塞用户体验
-    saveToDatabase;
   };
 
   return (
