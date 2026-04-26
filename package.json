@@ -61,7 +61,8 @@
   },
   "pnpm": {
     "overrides": {
-      "yaml": ">=2.8.3"
+      "yaml": ">=2.8.3",
+      "follow-redirects": ">=1.16.0"
     }
   }
 }
