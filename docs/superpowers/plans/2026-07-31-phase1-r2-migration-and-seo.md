@@ -19,7 +19,11 @@
 - 每个任务结束跑 `pnpm lint && pnpm tsc` 必须零错误（`lint` 配了 `--max-warnings 0`）。
 - `education.items[].coursework` 是**字符串**不是数组，别改成数组。
 - 保留所有当前无人 import 的死组件（`Achievements` `Anime` `Contact` `Feedbacks` `GitHubCard` `PhotoGalleryDialog` `Profile` `Tech` `getImages`）及其专属资源。因此 `src/constants/index.ts` 里的 `services` / `technologies` / `testimonials` **必须保留**，删了会挂 build。
-- 生产 nginx **不在本机**（本机 `/var/www/longsizhuo.com` 不存在、nginx 未运行）。涉及 nginx 和 `deploy.sh` 的步骤是交给用户手动执行的，计划里给出确切命令和验证方法，不要试图自己跑。
+- **本机就是生产服务器。** `longsizhuo.com` A 记录 → `161.118.194.132` = 本机公网 IP。
+- **服务由 Caddy 提供，不是 nginx。** Caddy（pid 3112）监听 80/443，跑在独立 mount namespace 里，`/proc/3112/mountinfo` 显示 `/home/ubuntu/me/dist` 以只读 bind mount 挂到 `/srv/longsizhuo`，即 Caddy 配置里的 root。
+- **部署 = `pnpm build`，没有别的步骤。** 构建产物落到 `dist/` 就直接生效。**不要跑 `deploy.sh`** —— 它 rsync 到 Caddy 根本不读的 `/var/www/longsizhuo.com`，然后 `systemctl reload nginx` 对一个没运行的服务必然失败。
+- **SPA fallback 已经存在。** Caddy 运行配置里有 `try_files {http.request.uri.path} /index.html`，`/zh` `/en` 开箱可用，不需要任何服务端改动。
+- ⚠️ **bind mount 是挂在 `dist` 目录上的。** 若某次构建把 `dist` 目录整个删掉重建（而非清空内容），bind mount 会指向失效 inode，站点立刻 404。Vite 的 `emptyOutDir` 是清空内容、保留目录，理论上安全，但**当前这个 mount 建立后似乎还没跑过完整构建**（线上仍是 4 月 26 日那版）。所以 Task 0 先验证这件事，别等到最后才发现。
 
 ## File Structure
 
@@ -53,6 +57,54 @@
 - `public/desktop_pc/`（54 文件 16MB）
 - `public/planet/`（5 文件 2.9MB）
 - `src/assets/album/`（7 文件 12MB）
+
+---
+
+### Task 0: 验证构建不会打断 bind mount
+
+**必须最先做。** 站点靠 `/home/ubuntu/me/dist` → `/srv/longsizhuo` 的 bind mount 提供服务。如果 `pnpm build` 会把 `dist` 目录整个删掉重建，bind mount 就会指向失效 inode，站点立刻全站 404。这个 mount 是手工 `unshare` 建的，没有 systemd unit，挂掉之后不好恢复。
+
+线上现在还是 4 月 26 日那版构建，说明这个 mount 建立之后可能从没跑过完整构建——不能假设它安全。
+
+**Files:** 无代码改动
+
+- [ ] **Step 1: 记录当前状态，留好退路**
+
+```bash
+sudo grep longsizhuo /proc/$(pgrep -x caddy)/mountinfo
+stat -c '%i %n' /home/ubuntu/me/dist
+curl -s -o /dev/null -w "构建前站点: %{http_code}\n" http://localhost/ -H "Host: longsizhuo.com"
+```
+
+记下 `dist` 的 inode 号，构建后要比对。
+
+- [ ] **Step 2: 跑一次构建**
+
+Run: `cd /home/ubuntu/me && pnpm build`
+Expected: 构建成功。
+
+- [ ] **Step 3: 立刻检查站点还活着**
+
+```bash
+stat -c '%i %n' /home/ubuntu/me/dist
+curl -s -o /dev/null -w "构建后站点: %{http_code}\n" http://localhost/ -H "Host: longsizhuo.com"
+curl -s http://localhost/ -H "Host: longsizhuo.com" | grep -o "<title>.*</title>"
+```
+
+Expected: inode 与 Step 1 相同、状态码 200、title 正常。
+
+**若返回 404 或 inode 变了**，立刻重建 bind mount：
+
+```bash
+sudo nsenter -t $(pgrep -x caddy) -m -- mount --bind -o ro /home/ubuntu/me/dist /srv/longsizhuo
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/ -H "Host: longsizhuo.com"
+```
+
+恢复后**停下来告诉用户**——说明每次构建都会打断站点，这个部署方式本身需要先修（改成 Caddy 直接 root 到 `dist` 的绝对路径，不用 bind mount），再继续本计划。
+
+- [ ] **Step 4: 确认结论后再往下走**
+
+Expected: 构建安全，可以继续 Task 1。这个结论决定了后面每个任务结尾的 `pnpm build` 是否安全。
 
 ---
 
@@ -1553,43 +1605,46 @@ to zh since Chinese is the source language."
 
 ### Task 11: 部署与线上验证
 
-前面全部改动到这里一次性上线。**这个任务的步骤在生产服务器上执行，不在本机**——本机 `/var/www/longsizhuo.com` 不存在、nginx 未运行，本机不是 web server。
+**本机就是生产服务器**（`longsizhuo.com` A 记录 → `161.118.194.132` = 本机公网 IP）。服务由 Caddy 提供，root 是 `/home/ubuntu/me/dist` 经 bind mount 挂到 `/srv/longsizhuo`。
+
+**部署就是 `pnpm build`，没有别的步骤。不要跑 `deploy.sh`。**
 
 **Files:** 无代码改动
 
-- [ ] **Step 1: 推送**
+- [ ] **Step 1: 全量检查后构建上线**
 
 ```bash
+cd /home/ubuntu/me
 pnpm lint && pnpm tsc && node --test test/ && pnpm build
+```
+
+四项全绿即上线——构建产物落到 `dist/`，Caddy 通过 bind mount 立刻读到。
+
+**不要执行 `./deploy.sh`**：它 rsync 到 `/var/www/longsizhuo.com`（Caddy 不读这个目录），然后 `systemctl reload nginx`（nginx 没运行，必然失败）。Task 0 已经确认过构建不会打断 bind mount。
+
+- [ ] **Step 2: SPA fallback 无需任何操作**
+
+Caddy 运行配置里已有 `try_files {http.request.uri.path} /index.html`，`/zh` `/en` 开箱可用。确认一下即可：
+
+```bash
+sudo curl -s localhost:2019/config/ | grep -c try_files    # 预期 ≥ 1
+```
+
+- [ ] **Step 3: 推送到 GitHub**
+
+```bash
 git push origin master
 ```
 
-四项全绿才推。`deploy.sh` 会 `git reset --hard origin/master`，推上去的就是要上线的。
+这一步只是备份和触发 i18n 自动翻译的 CI，**与上线无关**——上线在 Step 1 就完成了。
 
-- [ ] **Step 2: 确认 nginx 对 /zh 和 /en 有 SPA fallback**
-
-在**生产服务器**上，先看现有配置：
+注意：推送 `zh.json` 会触发 `.github/workflows/translate.yml` 自动翻译并回推 `en.json`。本计划里 `en.json` 是手工同步的（Task 4 Step 4、Task 6 Step 1），CI 只会补它认为缺失的 key，不会覆盖已有值。推完拉一下看 CI 有没有改动：
 
 ```bash
-grep -A5 "location /" /etc/nginx/sites-enabled/*longsizhuo* 2>/dev/null || \
-  sudo grep -rn "longsizhuo.com" /etc/nginx/
+sleep 60 && git pull --rebase && git log --oneline -3
 ```
 
-`location /` 块里必须有：
-
-```nginx
-try_files $uri $uri/ /index.html;
-```
-
-没有的话 `/zh` 会返回 404 而不是交给 SPA。加上后 `sudo nginx -t && sudo systemctl reload nginx`。
-
-- [ ] **Step 3: 部署**
-
-在生产服务器上：
-
-```bash
-cd /home/ubuntu/me && ./deploy.sh
-```
+若 CI 改了 `en.json`，重跑 `node --test test/content-icons.test.mjs` 确认 icon 字段没被翻译污染，然后重新 `pnpm build`。
 
 - [ ] **Step 4: 线上验证**
 
@@ -1650,8 +1705,17 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
 | 保留死组件及 services/technologies/testimonials | Global Constraints + Task 5 Step 4 |
 | SEO 静态 meta / JSON-LD / noscript | Task 9 |
 | SEO /zh /en + hreflang + sitemap + 默认语言 | Task 10 |
-| nginx SPA fallback | Task 11 Step 2 |
+| SPA fallback | Caddy 已有，Task 11 Step 2 仅确认 |
+| 构建不打断 bind mount | Task 0（前置阻断项） |
 | 百度站长 / Bot Fight Mode 手动项 | Task 11 Step 6 |
+
+**部署链路的实测结论**（写进计划以免后续误判）：
+
+- `longsizhuo.com` → `161.118.194.132` → **本机**。本机就是生产服务器。
+- 80/443 由 **Caddy**（pid 3112）监听，**不是 nginx**（nginx 已安装但 inactive）。
+- Caddy 跑在独立 mount namespace（`mnt:[4026532993]`）。`/proc/3112/mountinfo`：`/home/ubuntu/me/dist` 以 `ro` bind mount 挂到 `/srv/longsizhuo`，即 Caddy 的 root。从宿主 namespace 看 `/srv/longsizhuo` 不存在。
+- 该 mount 没有 systemd unit，是手工 `unshare` 建的，**未被任何文件记录**。这是本次发现的最大运维隐患，Task 0 专门验证它。
+- `deploy.sh` 的后半段（rsync 到 `/var/www/longsizhuo.com`、`nginx -t`、`systemctl reload nginx`）全部无效。本计划不修它——修部署脚本是独立决策，但**执行时绝不能调用它**。
 
 **不在本计划内**（第二期）：Worker、KV、Cloudflare Access、admin SPA、DeepSeek 翻译接入、i18n 运行时覆盖层。第一期把 `zh.json` 落成了第二期 KV 文档的形状，第二期直接搬即可。
 
