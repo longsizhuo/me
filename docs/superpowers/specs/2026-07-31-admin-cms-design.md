@@ -91,7 +91,8 @@ KV `content` 单个 JSON 文档，一次读写，无 schema 迁移：
         "iconBg": "#FFF"
       }]
     },
-    "education": { "subtitle": "…", "title": "…", "items": [{ "id", "degree", "university", "duration", "coursework": [], "icon", "iconBg" }] },
+    "education": { "subtitle": "…", "title": "…", "items": [{ "id", "degree", "university", "duration", "coursework", "icon", "iconBg" }] },
+    //                                                          ↑ coursework 是单个字符串，不是数组（Education.tsx:21 如此声明）
     "honors":    { "subtitle": "…", "title": "…", "items": [{ "id", "title", "issuer", "date", "description", "icon" }] },
     "projects":  {
       "subtitle": "…", "title": "…", "description": "…", "openSource": "…", "githubPinned": "…",
