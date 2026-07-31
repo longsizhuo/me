@@ -183,11 +183,85 @@ USYDCodingFest 归档在 R2 而非直接丢弃，admin 里随时能把 `_archive
 | `constants/index.ts` | 移除 `experiences` / `projects`（进内容文档）。**`services` / `technologies` / `testimonials` 必须保留** —— 它们被保留下来的死组件 `Tech.tsx` / `Feedbacks.tsx` import，删了会挂 typecheck 和 build |
 | `assets/index.ts` | 只移除迁到 R2 且无人再引用的导出，保留死组件仍需的部分 |
 
+## 中文名 SEO
+
+目标：搜「龙思卓」能搜到 longsizhuo.com。
+
+### 现状诊断
+
+已有：canonical、OG、Twitter card、sitemap、robots、JSON-LD Person。基础不差。
+
+问题在于**中文名只出现在两个没权重的地方**：
+
+- `<meta name="keywords">` —— Google 2009 年起完全忽略，百度权重极低。
+- JSON-LD `alternateName` 数组 —— 辅助信号，不是主信号。
+
+真正有权重的 `<title>`、`<meta name="description">`、页面 `<h1>`、noscript 正文，一个中文字都没有。
+
+更根本的两层：
+
+1. **默认语言是 en**（`src/i18n/index.ts` 的 `lng: savedLang || "en"`）。Googlebot 渲染 JS 后看到的是英文页面，中文内容根本没进索引。
+2. **中文版没有独立 URL。** 语言存在 localStorage 里，`longsizhuo.com/` 对爬虫只有一个英文版本。没有可索引的中文 URL，就没有可排名的中文页面。
+3. **百度基本不执行 JS。** 对百度来说，这个站的全部可抓取内容就是 `index.html` 的静态部分。
+
+### 改动
+
+**1. 静态 meta 加中文名**（`index.html`，改动最小、收益最大）
+
+```html
+<title>龙思卓 (Sizhuo Long) | 快手前端工程师 · 个人主页</title>
+<meta name="description" content="龙思卓（Sizhuo Long），快手科技前端工程师，坐标北京。新南威尔士大学 UNSW 信息技术硕士（优等）。蓝桥杯国际赛 Python 算法第一名。专注交互设计、动画基础设施与渲染性能优化。">
+```
+
+OG / Twitter 的 title 和 description 同步改成中文优先。
+
+**2. JSON-LD 主名改中文**
+
+`name` 从 `"Sizhuo Long"` 改成 `"龙思卓"`，`alternateName` 收纳 `["Sizhuo Long", "Siz Long", "Long Sizhuo", "Loong Loong"]`。目标是中文名排名，主名就该是中文名。`worksFor` 补 `"快手科技"`、`alumniOf` 补中文校名，都放进 `alternateName`。
+
+**3. noscript 块改成真正的中文简介**
+
+现在写的是「Please enable JavaScript」——对爬虫等于空页面。改成带 `<h1>龙思卓</h1>` 的完整中文简介：姓名、职位、公司、学历、获奖、邮箱、GitHub。**这是百度唯一能读到的正文。**
+
+**4. 可索引的中文 URL：`/zh` 与 `/en` 路由**
+
+- `src/i18n/index.ts` 语言优先级改为：URL 路径 > localStorage > 浏览器语言 > `zh`。
+- `App.tsx` 加 `/zh` `/en` 路由，均渲染 `HomePage`，进入时 `i18n.changeLanguage`。
+- 语言切换时 `history.replaceState` 同步 URL。
+- `index.html` 加 hreflang 互指：
+
+```html
+<link rel="alternate" hreflang="zh-CN" href="https://longsizhuo.com/zh">
+<link rel="alternate" hreflang="en"    href="https://longsizhuo.com/en">
+<link rel="alternate" hreflang="x-default" href="https://longsizhuo.com/">
+```
+
+- `sitemap.xml` 补 `/zh` `/en`，各带 `xhtml:link` 交叉引用。
+
+**注意**：nginx 需要对 `/zh` `/en` 做 SPA fallback 回 `index.html`。若现有配置只对已知路径 fallback，得补一条 `try_files $uri $uri/ /index.html`。
+
+**5. 默认语言从 en 改 zh**
+
+无 URL 无 localStorage 时默认中文。中文名 SEO 是目标，首屏就该是中文；英文受众走 `/en` 或手动切换。
+
+### 需要你手动做的（我做不了）
+
+- **百度站长平台**（ziyuan.baidu.com）提交站点和 sitemap。不提交百度基本不会主动收录个人站。
+- **检查 Cloudflare Bot Fight Mode 是否挡了 Baiduspider。** 开着的话百度蜘蛛会被拦，前面所有工作白费。在 Security → Bots 里确认，或给 Baiduspider 加放行规则。
+- 域名无 ICP 备案会显著影响百度收录质量，这是政策问题，无技术解法。
+
+### 已知天花板
+
+- **本质仍是客户端渲染。** Google 能渲染 JS 所以问题不大，百度只能吃到 `index.html` 的静态内容 —— 也就是上面第 1、3 条覆盖的范围。要让百度看到完整正文，得上预渲染（`vite-plugin-prerender` / react-snap，把 `/`、`/zh`、`/en`、`/tools` 预渲染成静态 HTML）。**本次不做**，等验证过收录效果不够再说。
+- **第二期 KV 覆盖层的内容进不了静态 HTML。** admin 改完的文本对百度不可见，静态 meta 仍是构建时那份。可接受：meta 是介绍性文案，本来就很少变。
+
 ## 分两期做
 
 两期各自可独立上线和验证，第一期不碰任何 Cloudflare 基建。
 
-**第一期：图片迁 R2 + 修下标坑。** 站点仍是纯静态，内容仍从打包的 `zh.json` 读。做完就能验证：git 从 140MB 掉到 5MB、logo 不再按下标错位、相册照片从 CDN 加载、3D 模型正常。这一期把内容文档结构落成 `src/i18n/zh.json` 里的新形状（每条自带 `icon`），Worker 上线后直接搬进 KV 即可，不用二次改结构。
+**第一期：图片迁 R2 + 修下标坑 + 中文名 SEO。** 站点仍是纯静态，内容仍从打包的 `zh.json` 读。做完就能验证：git 从 140MB 掉到 5MB、logo 不再按下标错位、相册照片从 CDN 加载、3D 模型正常、`/zh` 可访问且静态 HTML 里有中文名。这一期把内容文档结构落成 `src/i18n/zh.json` 里的新形状（每条自带 `icon`），Worker 上线后直接搬进 KV 即可，不用二次改结构。
+
+SEO 放第一期是因为它跟第二期无耦合，且见效需要时间——越早上线越早被收录。
 
 **第二期：Worker + KV + admin。** 加 6 行 fetch 覆盖层、部署 Worker、配 Access、做 admin SPA。第一期的 `zh.json` 天然成为兜底基线。
 
@@ -224,6 +298,7 @@ USYDCodingFest 归档在 R2 而非直接丢弃，admin 里随时能把 `_archive
 ## 非目标
 
 - 不做站点重构、不改视觉设计。
+- 不做 SSR / 预渲染（SEO 章节已列为天花板）。
 - 不做 Writing / Contact / Tools 段落的管理（继续走 i18n JSON + 现有 CI 翻译）。
 - 不清理死组件（本次明确保留）。
 - 不改 `deploy.sh` 部署流程。
