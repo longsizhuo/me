@@ -713,7 +713,7 @@ which removes the masonry reflow that happened as each image landed."
 - [ ] **Step 1: 上传 logo**
 
 Run: `node scripts/migrate-to-r2.mjs logos`
-Expected: 打印各 logo 的 key，最后报 `R2 上 logos/ 现有 N 个对象`（N ≈ 28）。
+Expected: 打印各 logo 的 key，最后报 `R2 上 logos/ 现有 23 个对象`。
 
 - [ ] **Step 2: 列出实际 key，照着写 URL**
 
@@ -807,21 +807,14 @@ test("中英条目一一对应，且非文本字段完全一致", () => {
   }
 });
 
-test("在列表中间插入条目后，其余条目的 icon 不变——这是本次要修的 bug", () => {
-  const before = zh.honors.items.map((it) => [it.id, it.icon]);
-  const mutated = [...zh.honors.items];
-  mutated.splice(1, 0, { id: "inserted", title: "新荣誉", issuer: "x", date: "2026",
-                         description: "x", icon: "https://cdn.longsizhuo.com/logos/awards/usyd.png" });
-  const after = mutated.filter((it) => it.id !== "inserted").map((it) => [it.id, it.icon]);
-  assert.deepEqual(after, before,
-    "插入条目后原有条目的 icon 发生了变化——说明 icon 仍与位置绑定");
-});
+// 「icon 跟着条目走」这条性质在数据层测不了 —— 本任务之后已经没有
+// 位置数组可供对照。真正的回归测试在 Task 5 用 Playwright 端到端做。
 ```
 
 - [ ] **Step 6: 跑测试**
 
 Run: `node --test test/content-icons.test.mjs`
-Expected: PASS，4 个测试全绿。
+Expected: PASS，3 个测试全绿。
 
 - [ ] **Step 7: 抽查 CDN 上的 logo 真能访问**
 
@@ -956,13 +949,102 @@ Expected: 零错误零警告。若报 `experiences is not exported`，说明 Ste
 Run: `pnpm dev`
 Expected：工作经验时间线 4 个 logo、教育 2 个校徽、荣誉 4 个奖章图标，全部正常显示且对应正确。切中英文再看一遍，logo 不应变化。
 
-- [ ] **Step 7: 手动验证 bug 确实修好了**
+- [ ] **Step 7: 写真正的端到端回归测试**
 
-在 `src/i18n/zh.json` 的 `honors.items` **开头**临时插一条假数据（`id: "tmp"`，icon 用软著那张 `copyright.png`），`pnpm dev` 看：
+这是整个阶段的核心保证，必须有一个会真的失败的测试来守。数据层测不了这个性质（改完之后已经没有位置数组可对照），只能在渲染后测。Playwright 和 Chromium 已装好，`scripts/verify-page.py` 是现成的用法参考。
 
-Expected: 新条目显示软著图标，**原有 4 条的图标全部不变**。改之前这么做会让 4 条全部错位一格。
+新建 `test/icon-binding.spec.py`：
 
-验证完把假数据删掉。
+```python
+#!/usr/bin/env python3
+"""回归测试：每张卡片显示的是它自己的 logo，而不是按位置取的第 N 个。
+
+改造前 Honors.tsx 用 honorIcons[index]、Education.tsx 用 universityIcons[index]，
+在列表开头插一条会让后面所有 logo 顶错一格。本测试通过临时插入一条数据
+并断言其余卡片 logo 不变来守住这个性质 —— 在改造前它会失败。
+
+用法（调用方需先起好 preview 服务）：
+    python3 test/icon-binding.spec.py http://localhost:4173/
+"""
+import json, pathlib, shutil, subprocess, sys, time
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+ZH = ROOT / "src/i18n/zh.json"
+URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:4173/"
+
+def card_icons(url):
+    """返回 {卡片标题: 图标 URL}，覆盖荣誉和教育两个区块。"""
+    from playwright.sync_api import sync_playwright
+    out = {}
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        pg = b.new_page(viewport={"width": 1440, "height": 1200})
+        pg.goto(url, wait_until="load", timeout=60000)
+        pg.wait_for_timeout(4000)
+        for h3 in pg.query_selector_all("h3"):
+            title = (h3.inner_text() or "").strip()
+            if not title:
+                continue
+            # 从标题向上找到卡片容器，再在容器内找 img
+            img = h3.evaluate_handle(
+                "el => { let n = el; for (let i = 0; i < 5 && n; i++) {"
+                " const m = n.querySelector && n.querySelector('img');"
+                " if (m) return m; n = n.parentElement; } return null; }"
+            ).as_element()
+            if img:
+                out[title] = img.get_attribute("src")
+        b.close()
+    return out
+
+def build_and_serve():
+    subprocess.run(["pnpm", "build"], cwd=ROOT, check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+backup = ZH.with_suffix(".json.bak")
+shutil.copy(ZH, backup)
+try:
+    build_and_serve()
+    before = card_icons(URL)
+    assert before, "没抓到任何卡片，测试本身失效了"
+
+    data = json.loads(ZH.read_text(encoding="utf-8"))
+    data["honors"]["items"].insert(0, {
+        "id": "tmp-probe", "title": "TMP PROBE", "issuer": "x", "date": "2026",
+        "description": "x",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/copyright.png",
+    })
+    ZH.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    build_and_serve()
+    after = card_icons(URL)
+finally:
+    shutil.move(backup, ZH)
+    build_and_serve()
+
+shared = set(before) & set(after) - {"TMP PROBE"}
+assert len(shared) >= 6, f"共同卡片太少（{len(shared)}），测试覆盖不足"
+drift = {k: (before[k], after[k]) for k in shared if before[k] != after[k]}
+if drift:
+    for k, (b, a) in drift.items():
+        print(f"  错位: {k}\n    改前 {b}\n    改后 {a}")
+    sys.exit(f"{len(drift)} 张卡片在插入条目后 logo 发生变化 —— icon 仍与位置绑定")
+print(f"通过 ✓ 插入条目后 {len(shared)} 张卡片的 logo 全部不变")
+```
+
+跑法：
+
+```bash
+pnpm build
+nohup pnpm preview --port 4173 >/tmp/prev.log 2>&1 &
+sleep 4
+python3 test/icon-binding.spec.py http://localhost:4173/
+```
+
+Expected: `通过 ✓ 插入条目后 N 张卡片的 logo 全部不变`。
+
+**这个测试必须能真的失败。** 验证它有效：先 `git stash` 掉本任务对三个组件的改动（恢复 `honorIcons[index]` 那版），跑一次，它应该报错位；再 `git stash pop` 跑一次，应该通过。**没做这一步就不算完成**——一个从不失败的测试等于没有测试，这正是上一版计划犯的错。
+
+注意脚本会临时改写 `zh.json` 并在 `finally` 里恢复，跑完确认 `git status` 干净。
 
 - [ ] **Step 8: 提交**
 

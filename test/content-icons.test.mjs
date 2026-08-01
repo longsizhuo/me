@@ -35,13 +35,3 @@ test("中英条目一一对应，且非文本字段完全一致", () => {
     }
   }
 });
-
-test("在列表中间插入条目后，其余条目的 icon 不变——这是本次要修的 bug", () => {
-  const before = zh.honors.items.map((it) => [it.id, it.icon]);
-  const mutated = [...zh.honors.items];
-  mutated.splice(1, 0, { id: "inserted", title: "新荣誉", issuer: "x", date: "2026",
-                         description: "x", icon: "https://cdn.longsizhuo.com/logos/awards/usyd.png" });
-  const after = mutated.filter((it) => it.id !== "inserted").map((it) => [it.id, it.icon]);
-  assert.deepEqual(after, before,
-    "插入条目后原有条目的 icon 发生了变化——说明 icon 仍与位置绑定");
-});
