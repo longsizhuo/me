@@ -1,64 +1,32 @@
-/**
- * Album 组件 - 照片相册展示
- * 功能：递归遍历 assets/album 文件夹下的所有照片，按子文件夹分组并以瀑布流形式展示
- */
 import { Image } from "antd";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
+import { album, cdnUrl, type AlbumPhoto } from "../content";
 import { fadeIn, textVariant } from "../utils/motion";
-import type { LazyImageProps } from "./TYPE";
 
-const getGroupedImages = () => {
-  // 递归加载所有图片（包括子目录），返回加载函数而不是立即加载
-  const imageModules = import.meta.glob(
-    "/src/assets/album/**/*.{jpg,jpeg,png,webp,gif,heic,HEIC}",
-    { eager: false }
-  );
-
-  /** @type {Record<string, Array<() => Promise<{ default: string }>>>} */
-  const grouped = {};
-
-  for (const path in imageModules) {
-    const loader = imageModules[path];
-
-    // 提取子目录名（例如 Kwai, 2025-Kwai, 2025-UNSW）
-    const match = path.match(/album\/([^\/]+)\//);
-    const folder = match?.[1] ?? "Uncategorized";
-
-    if (!grouped[folder]) {
-      grouped[folder] = [];
-    }
-    grouped[folder].push(loader);
-  }
-
-  return grouped;
-};
-
-const LazyImage = ({ loader, alt, gap }: LazyImageProps) => {
-  const ref = useRef(null);
-  const [src, setSrc] = useState("");
+const LazyImage = ({ photo, alt, gap }: { photo: AlbumPhoto; alt: string; gap: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) {
       return;
     }
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          loader().then((mod) => setSrc(mod.default));
+          setVisible(true);
           observer.disconnect();
         }
       });
     });
-
     observer.observe(node);
     return () => observer.disconnect();
-  }, [loader]);
+  }, []);
 
   return (
     <div
@@ -66,21 +34,20 @@ const LazyImage = ({ loader, alt, gap }: LazyImageProps) => {
       style={{
         breakInside: "avoid",
         marginBottom: `${gap}px`,
-        borderRadius: "12px",
+        borderRadius: 12,
         overflow: "hidden",
+        // 加载前先按真实比例占位，消除瀑布流抖动
+        aspectRatio: `${photo.w} / ${photo.h}`,
+        background: "#151030",
       }}
     >
-      {src && (
+      {visible && (
         <Image
-          src={src}
+          src={cdnUrl(photo.key)}
           alt={alt}
           loading="lazy"
-          style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: 12,
-            objectFit: "cover",
-          }}
+          width="100%"
+          style={{ display: "block", borderRadius: 12, objectFit: "cover" }}
           placeholder
         />
       )}
@@ -90,15 +57,8 @@ const LazyImage = ({ loader, alt, gap }: LazyImageProps) => {
 
 const Album = () => {
   const { t } = useTranslation();
-  /** @type {[Record<string, Array<() => Promise<{ default: string }>>>, Function]} */
-  const [albumMap, setAlbumMap] = useState({});
   const gap = 16;
   const columnWidth = 250;
-
-  useEffect(() => {
-    const grouped = getGroupedImages();
-    setAlbumMap(grouped);
-  }, []);
 
   return (
     <div className="relative w-full">
@@ -117,28 +77,20 @@ const Album = () => {
       <div
         id="album-scroll"
         className="p-4 mt-10 bg-black-100/50 shadow-inner overflow-y-scroll border border-gray-700 rounded-2xl"
-        style={{
-          maxHeight: "520px",
-          width: "100%",
-        }}
+        style={{ maxHeight: "520px", width: "100%" }}
       >
         <Image.PreviewGroup>
-          {Object.entries(albumMap).map(([folderName, imageList]) => (
-            <div key={folderName} style={{ marginBottom: 40 }}>
+          {album.map((group) => (
+            <div key={group.id} style={{ marginBottom: 40 }}>
               <h2 className="text-white text-[20px] font-semibold my-4 pb-2 border-b border-gray-600">
-                {folderName}
+                {group.folder}
               </h2>
-              <div
-                style={{
-                  columnWidth: `${columnWidth}px`,
-                  columnGap: gap,
-                }}
-              >
-                {imageList.map((loader, idx) => (
+              <div style={{ columnWidth: `${columnWidth}px`, columnGap: gap }}>
+                {group.photos.map((photo, idx) => (
                   <LazyImage
-                    key={idx}
-                    loader={loader}
-                    alt={`${folderName}-${idx}`}
+                    key={photo.key}
+                    photo={photo}
+                    alt={`${group.folder}-${idx}`}
                     gap={gap}
                   />
                 ))}
