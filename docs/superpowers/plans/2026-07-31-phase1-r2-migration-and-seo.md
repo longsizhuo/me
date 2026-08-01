@@ -120,7 +120,7 @@ Expected: 构建安全，可以继续 Task 1。这个结论决定了后面每个
 - Test: `test/r2-key.test.mjs`
 
 **Interfaces:**
-- Produces: `putObject(key: string, filePath: string, contentType: string): Promise<void>`、`listObjects(prefix: string): Promise<string[]>`、`r2Key(localPath: string, prefix: string): string`
+- Produces: `putObject(key: string, filePath: string, contentType?: string): Promise<void>`、`listObjects(prefix: string): Promise<string[]>`、`r2Key(localPath: string, stripPrefix: string, keyPrefix: string): string`、`mimeOf(path: string): string`
 
 - [ ] **Step 1: 创建 bucket**
 
