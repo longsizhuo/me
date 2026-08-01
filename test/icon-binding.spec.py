@@ -37,12 +37,17 @@ URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:4173/"
 SECTION_IDS = ["work", "education", "honors"]  # Experience/Education/Honors 各自的 hash-span id
 
 def card_icons(url):
-    """返回 {卡片标题: 图标 URL}，只看工作经验/教育/荣誉三个区块。
+    """返回 {"区块id::卡片标题": 图标 URL}，只看工作经验/教育/荣誉三个区块。
 
     页面上还有一个 GitHub 项目区块（id="projects"），它的卡片图片是 @octokit
     调用 GitHub API 实时拿到的签名 URL，每次构建都会变（时间戳/签名不同）——
     如果不把扫描范围限制在这三个区块，projects 卡片会被误判成"漂移"，
     跟本测试要守的 icon-与位置绑定 完全无关。
+
+    key 带区块前缀（而不是裸标题）：一是不同区块的标题理论上可能撞车
+    （比如某条 education.degree 恰好等于某条 experience.title），裸标题会
+    在字典里互相覆盖，悄悄漏测；二是让下面的覆盖率检查能按区块断言，而不是
+    只看一个总数。
     """
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
@@ -66,7 +71,7 @@ def card_icons(url):
                             if (img) break;
                             node = node.parentElement;
                         }
-                        if (img) out[title] = img.getAttribute('src');
+                        if (img) out[id + '::' + title] = img.getAttribute('src');
                     }
                 }
                 return out;
@@ -83,6 +88,25 @@ def build_and_serve():
 
 
 backup = EN.with_suffix(".json.bak")
+
+# 前置检查：en.json 必须是干净的。这个脚本会临时改写它、只在 try/finally 里
+# 恢复——finally 挡得住异常/断言失败/Ctrl-C，挡不住 SIGKILL。en.json 是被
+# git 跟踪的文件，没有 .bak 的 gitignore 规则，一次被强杀的运行会把三条
+# TMP PROBE 数据和一个 en.json.bak 留在工作区，后面一次 `git commit -am`
+# 就会把探针数据带上线。用 git status 兜底，同时这也正好能测出「上次是不是
+# 被强杀过」。
+dirty = subprocess.run(
+    ["git", "status", "--porcelain", "src/i18n/en.json"],
+    cwd=ROOT, check=True, capture_output=True, text=True,
+).stdout.strip()
+if dirty:
+    sys.exit(
+        "src/i18n/en.json 不干净，拒绝启动（怕是上一次运行被强杀，留下了探针数据）。\n"
+        f"  git status 输出: {dirty}\n"
+        f"  若存在 {backup} ，用它恢复：mv {backup} {EN} && git diff src/i18n/en.json 确认无探针残留后再重跑。\n"
+        "  若 .bak 不存在，直接 git checkout -- src/i18n/en.json。"
+    )
+
 shutil.copy(EN, backup)
 try:
     build_and_serve()
@@ -90,7 +114,7 @@ try:
     assert before, "没抓到任何卡片，测试本身失效了"
 
     PROBE_ICON = "https://cdn.longsizhuo.com/logos/awards/copyright.png"
-    PROBE_TITLES = {"TMP PROBE H", "TMP PROBE E", "TMP PROBE X"}
+    PROBE_TITLES = {"honors::TMP PROBE H", "education::TMP PROBE E", "work::TMP PROBE X"}
     data = json.loads(EN.read_text(encoding="utf-8"))
     data["honors"]["items"].insert(0, {
         "id": "tmp-probe-honor", "title": "TMP PROBE H", "issuer": "x",
@@ -113,6 +137,12 @@ finally:
     build_and_serve()
 
 shared = set(before) & set(after) - PROBE_TITLES
+covered = {k.split("::", 1)[0] for k in shared}
+missing = set(SECTION_IDS) - covered
+assert not missing, (
+    f"缺区块: {missing} —— 该区块的卡片一张都没被扫到，"
+    "测试对它已经形同虚设（不是覆盖率不够，是覆盖率归零）"
+)
 assert len(shared) >= 6, f"共同卡片太少（{len(shared)}），测试覆盖不足"
 drift = {k: (before[k], after[k]) for k in shared if before[k] != after[k]}
 if drift:
