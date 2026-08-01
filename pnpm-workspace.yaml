@@ -1,0 +1,11 @@
+# pnpm 11 起，overrides 等设置从 package.json 的 "pnpm" 字段迁到这里。
+# 这两条是安全 pin，别删 —— 放回 package.json 会被 pnpm 11 静默忽略：
+#   yaml             — 见 commit fd2c575
+#   follow-redirects — 见 commit e76a5d0
+overrides:
+  yaml: '>=2.8.3'
+  follow-redirects: '>=1.16.0'
+
+# esbuild 的 postinstall 只是下载对应平台的二进制，放行。
+allowBuilds:
+  esbuild: true
