@@ -16,7 +16,10 @@
 - 上传走 Cloudflare REST API `PUT /accounts/{account_id}/r2/buckets/{bucket}/objects/{key}`，`Content-Type: application/octet-stream` 之外用 `Content-Type` header 指定真实 MIME。**不新增任何 npm 依赖**——用 `fetch` 即可，无需 SigV4 签名。
 - 图片宽高用系统已装的 ImageMagick：`identify -format "%w %h" <file>`。
 - 测试用 Node 内置 `node --test`，不引入测试框架。
-- 每个任务结束跑 `pnpm lint && pnpm tsc` 必须零错误（`lint` 配了 `--max-warnings 0`）。
+- 包管理器是 **pnpm 11.9.0**（`packageManager` 字段已钉）。`overrides` 只认 `pnpm-workspace.yaml`，**不要**往 `package.json` 的 `pnpm` 字段放东西——pnpm 11 会静默忽略，那里有两条安全 pin。安装用 `CI=true pnpm install --frozen-lockfile`。
+- 每个任务结束跑 `pnpm lint` 必须**零错误**（配了 `--max-warnings 0`），这条从一开始就满足。
+- `pnpm tsc` **基线有 69 个既有错误**（这个项目的 tsc 从未通过过；`build` 能过是因为 Vite/Rolldown 不做类型检查）。Task 1-10 的要求是**不新增**错误：改动前后各跑一次 `pnpm tsc 2>&1 | grep -c "error TS"`，数字不许变大。Task 11 专门把它清零，之后才恢复「必须零错误」。
+  - 基线分布：死文件 30（`getImages` `GitHubCard` `PhotoGalleryDialog` `Contact` `convert-frame`）、`Album.tsx` 9（Task 3 重写后自动消失）、活文件 30。
 - `education.items[].coursework` 是**字符串**不是数组，别改成数组。
 - 保留所有当前无人 import 的死组件（`Achievements` `Anime` `Contact` `Feedbacks` `GitHubCard` `PhotoGalleryDialog` `Profile` `Tech` `getImages`）及其专属资源。因此 `src/constants/index.ts` 里的 `services` / `technologies` / `testimonials` **必须保留**，删了会挂 build。
 - **本机就是生产服务器。** `longsizhuo.com` A 记录 → `161.118.194.132` = 本机公网 IP。
@@ -1603,7 +1606,142 @@ to zh since Chinese is the source language."
 
 ---
 
-### Task 11: 部署与线上验证
+### Task 11: 把 `pnpm tsc` 清零
+
+放在 Task 1-10 之后做，是因为 `Album.tsx` 的 9 个错误会被 Task 3 的重写自动消掉，先修就是白干。
+
+**Files:**
+- Delete: `src/utils/getImages.tsx`, `src/components/GitHubCard.tsx`, `src/components/PhotoGalleryDialog.tsx`, `src/components/Contact.tsx`, `src/constants/convert-frame.ts`
+- Modify: 剩余报错的活文件
+
+- [ ] **Step 1: 确认这五个文件确实没人引用**
+
+```bash
+for f in getImages GitHubCard PhotoGalleryDialog Contact convert-frame; do
+  n=$(grep -rln "$f" src index.html --include='*.ts' --include='*.tsx' --include='*.html' 2>/dev/null \
+       | grep -v "/$f\.tsx\$\|/$f\.ts\$" | tr '\n' ' ')
+  echo "$f -> ${n:-无人引用}"
+done
+```
+
+Expected: 五个都是「无人引用」。`Contact` 可能因为 `ContactAdvanced` 含有 `Contact` 子串而误报——单独核对 `grep -rn "from \"./Contact\"\|from '\./Contact'" src`，确认没有精确匹配再删。
+
+`src/components/index.ts` 若导出了它们，一并删掉导出行。
+
+- [ ] **Step 2: 删除并确认错误数下降**
+
+```bash
+git rm src/utils/getImages.tsx src/components/GitHubCard.tsx \
+       src/components/PhotoGalleryDialog.tsx src/components/Contact.tsx \
+       src/constants/convert-frame.ts
+pnpm tsc 2>&1 | grep -c "error TS"
+```
+
+Expected: 从约 30 降到 0 附近再看——此时 Album 已被 Task 3 重写，剩下的应该只有活文件的约 30 个。
+
+- [ ] **Step 3: 逐个修活文件**
+
+按文件逐个处理，每修完一个跑一次 `pnpm tsc 2>&1 | grep -c "error TS"` 确认数字在降。常见修法：
+
+- `Property 'gtag' does not exist on type 'Window'`（`App.tsx`）→ 在 `src/vite-env.d.ts` 加全局声明：
+  ```typescript
+  declare global {
+    interface Window {
+      gtag?: (...args: unknown[]) => void;
+    }
+  }
+  export {};
+  ```
+- `Parameter 'x' implicitly has an 'any' type` → 补上真实类型，**不要**用 `any` 糊过去。
+- `'ref.current' is of type 'unknown'`（`Stars.tsx`）→ `useRef<Points>(null)` 之类给出泛型参数。
+- `Could not find a declaration file for module 'react-vertical-timeline-component'`（`Experience.tsx`）→ 该包无官方类型。在 `src/vite-env.d.ts` 加 `declare module "react-vertical-timeline-component";`，或装 `@types/react-vertical-timeline-component`（若存在）。
+- `Argument of type 'HTMLElement | null'`（`main.tsx`）→ `document.getElementById("root")!` 或显式判空后再 `createRoot`。
+
+**不要**为了消错误而放宽 `tsconfig.json` 的 `noImplicitAny` / `strictNullChecks`——那是把问题藏起来，不是修好。
+
+- [ ] **Step 4: 确认归零**
+
+```bash
+pnpm lint && pnpm tsc && echo "lint + tsc 双绿"
+pnpm build && echo "build 通过"
+```
+
+Expected: 三项全过，`pnpm tsc` 零输出。
+
+- [ ] **Step 5: 目视回归**
+
+Run: `pnpm dev`
+Expected: 首页所有区块正常——尤其 `GlobalLottieBackground`（背景动画）、`Stars`（星空）、`ContactAdvanced`（联系表单）、`About`（GitHub 数据），这四个是本任务改动最多的活文件。
+
+- [ ] **Step 6: 提交**
+
+```bash
+git add -A
+git commit -m "fix: pnpm tsc passes clean for the first time
+
+Deletes five files nothing imports and fixes the remaining type errors
+in live code. Does not relax noImplicitAny or strictNullChecks — the
+point is that tsc can now be a gate, which phase 2 needs when it rewires
+eight components onto a runtime content layer."
+```
+
+---
+
+### Task 12: Tailwind 3.4 → 4.x
+
+**排在最后。** 配置格式大改版，全站样式都要回归验证。放最后是为了：万一出问题，前面的 R2 迁移和 SEO 成果已经稳了，可以单独回滚这一个 commit。
+
+**Files:**
+- Modify: `package.json`, `postcss.config.ts`, `src/index.css`, `tailwind.config.ts`（大概率删除）
+
+- [ ] **Step 1: 先记录改造前的样子**
+
+```bash
+pnpm build && pnpm dev
+```
+
+浏览器逐屏截图或记录：Hero、About、相册、工作经验时间线、教育、荣誉、项目卡片、联系表单、页脚。改完要逐一比对。**这一步不能省**——Tailwind 4 的样式回归很难靠读代码发现。
+
+- [ ] **Step 2: 读官方迁移指南，别凭记忆改**
+
+```bash
+pnpm dlx @tailwindcss/upgrade@latest
+```
+
+官方升级工具会自动改 PostCSS 配置、`@tailwind` 指令、以及大部分改名了的工具类。先让它跑，再人工核对 diff。
+
+- [ ] **Step 3: 迁移自定义主题**
+
+`tailwind.config.ts` 里的自定义值要搬进 CSS 的 `@theme`。当前有这些自定义项，一个都不能漏：
+
+- 颜色：`primary` `secondary` `tertiary` `black-100` `black-200` `white-100`
+- 背景图：`hero-pattern-dark` `hero-pattern-light`（注意：`App.tsx` 用的是 `bg-hero-pattern`，这个类名**不存在**，是既有 bug，迁移时顺手确认要不要修）
+- 自定义断点 `xs`
+
+改完 `grep -rn "bg-primary\|text-secondary\|bg-tertiary\|bg-black-100\|bg-black-200\|text-white-100\|xs:" src/` 逐个确认仍然生效。
+
+- [ ] **Step 4: 构建并逐屏比对**
+
+```bash
+pnpm lint && pnpm tsc && pnpm build
+pnpm dev
+```
+
+Expected: 三项全绿，且 Step 1 记录的九个区块**视觉上无差异**。有差异就逐个查，不要"看起来差不多"就放过。
+
+- [ ] **Step 5: 提交**
+
+```bash
+git add -A
+git commit -m "build: upgrade Tailwind to 4.x
+
+Config moves from tailwind.config.ts into CSS @theme. All nine sections
+visually diffed against the pre-upgrade build."
+```
+
+---
+
+### Task 13: 部署与线上验证
 
 **本机就是生产服务器**（`longsizhuo.com` A 记录 → `161.118.194.132` = 本机公网 IP）。服务由 Caddy 提供，root 是 `/home/ubuntu/me/dist` 经 bind mount 挂到 `/srv/longsizhuo`。
 
@@ -1705,9 +1843,12 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
 | 保留死组件及 services/technologies/testimonials | Global Constraints + Task 5 Step 4 |
 | SEO 静态 meta / JSON-LD / noscript | Task 9 |
 | SEO /zh /en + hreflang + sitemap + 默认语言 | Task 10 |
-| SPA fallback | Caddy 已有，Task 11 Step 2 仅确认 |
-| 构建不打断 bind mount | Task 0（前置阻断项） |
-| 百度站长 / Bot Fight Mode 手动项 | Task 11 Step 6 |
+| SPA fallback | Caddy 已有，Task 13 Step 2 仅确认 |
+| 构建不打断 bind mount | Task 0 ✅ 已实测通过（dist inode 未变，站点 200） |
+| 百度站长 / Bot Fight Mode 手动项 | Task 13 Step 6 |
+| pnpm 11 迁移 + 安全 overrides 复位 | 已完成，commit 6c4a76d |
+| tsc 清零 | Task 11 |
+| Tailwind 4 升级 | Task 12 |
 
 **部署链路的实测结论**（写进计划以免后续误判）：
 
