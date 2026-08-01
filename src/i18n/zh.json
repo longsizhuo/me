@@ -35,9 +35,12 @@
     "title": "工作经验",
     "items": [
       {
+        "id": "kwai",
         "title": "前端工程师",
         "company": "快手科技 (Kuaishou Technology)",
         "date": "2025年5月 - 至今",
+        "icon": "https://cdn.longsizhuo.com/logos/kwai-vector-logo-seeklogo/kwai.png",
+        "iconBg": "#FFF",
         "points": [
           "在北京总部为快手 Web 平台构建大规模高性能用户体验。",
           "专注于动画基础设施 — 使用 SVG、CSS Keyframes 和 Lottie 设计和优化可复用的动画模块。",
@@ -46,9 +49,12 @@
         ]
       },
       {
+        "id": "unsw-ta",
         "title": "助教 — COMP9021 & COMP3900/9900",
         "company": "新南威尔士大学",
         "date": "2024年8月 - 2025年5月",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
+        "iconBg": "#FFF",
         "points": [
           "教授编程原理 (COMP9021) 课程，指导学生团队完成计算机科学项目 (COMP3900/9900)。",
           "通过 Scrum 框架引导学生进行敏捷开发 — Sprint 规划、每日站会、迭代开发和回顾会议。",
@@ -57,9 +63,12 @@
         ]
       },
       {
+        "id": "spotfinder",
         "title": "Scrum Master & 后端开发",
         "company": "Spot Finder",
         "date": "2024年1月 - 至今",
+        "icon": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
+        "iconBg": "#000",
         "points": [
           "使用 Golang 和 MySQL 主导开发停车位分时租赁系统。",
           "使用 Docker、Cloudflare、Redis 和 Nginx 管理后端部署。",
@@ -68,9 +77,12 @@
         ]
       },
       {
+        "id": "gemflower",
         "title": "研发实习生",
         "company": "百事花健康信息技术有限公司",
         "date": "2021年1月 - 2021年4月",
+        "icon": "https://cdn.longsizhuo.com/logos/company/bsh.png",
+        "iconBg": "#E6DEDD",
         "points": [
           "协助医院系统的维护和代码测试，确保功能正常运行。",
           "编写测试计划和脚本以验证新系统功能。",
@@ -85,15 +97,21 @@
     "title": "教育经历",
     "items": [
       {
+        "id": "unsw-meng",
         "degree": "工学硕士 — 信息技术",
         "university": "新南威尔士大学 (UNSW)",
         "duration": "2022年9月 - 2024年9月 | 成绩：优等 (Distinction)",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
+        "iconBg": "#FFF",
         "coursework": "数据结构与算法、计算机视觉、Web 前端编程、计算机网络应用、区块链应用架构、扩展人工智能。"
       },
       {
+        "id": "cuit-beng",
         "degree": "工学学士 — 数字媒体技术",
         "university": "成都信息工程大学 (CUIT)",
         "duration": "2017年9月 - 2021年7月",
+        "icon": "https://cdn.longsizhuo.com/logos/company/cuit.jpg",
+        "iconBg": "#FFF",
         "coursework": "高级图形学编程 (OpenGL)、网络游戏编程技术、数据结构、R 语言编程。"
       }
     ]
@@ -103,27 +121,35 @@
     "title": "奖项与专利",
     "items": [
       {
+        "id": "lanqiao",
         "title": "蓝桥杯 — 第一名",
         "issuer": "蓝桥杯大赛组委会，国际 Python 算法研究生/A 类",
         "date": "2024年4月",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/lanqiao.webp",
         "description": "在第15届蓝桥杯国际 Python 算法竞赛中获得第一名。"
       },
       {
+        "id": "usyd-codingfest",
         "title": "悉尼大学编程节 — 冠军",
         "issuer": "悉尼大学",
         "date": "2024年",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/usyd.png",
         "description": "凭借 SpotFinder（城市停车位分时租赁系统）获得最佳项目创意奖冠军。"
       },
       {
+        "id": "unsw-ta-award",
         "title": "UNSW Peter Farrell Cup",
         "issuer": "UNSW 创业孵化器",
         "date": "2024年2月",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
         "description": "SpotFinder 项目入选 UNSW Peter Farrell Cup 创业计划。"
       },
       {
+        "id": "copyright",
         "title": "软件著作权 — 降维聚类可视化工具",
         "issuer": "软件著作权 2021SR1180633",
         "date": "2021年8月",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/copyright.png",
         "description": "单细胞 RNA-seq 数据降维聚类可视化工具系统的软件著作权。"
       }
     ]

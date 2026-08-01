@@ -35,9 +35,12 @@
     "title": "Work Experience.",
     "items": [
       {
+        "id": "kwai",
         "title": "Frontend Engineer",
         "company": "Kuaishou Technology (Kwai)",
         "date": "May 2025 - Present",
+        "icon": "https://cdn.longsizhuo.com/logos/kwai-vector-logo-seeklogo/kwai.png",
+        "iconBg": "#FFF",
         "points": [
           "Building engaging, high-performance user experiences at scale for Kuaishou's web platform in Beijing HQ.",
           "Focused on animation infrastructure — designing and optimizing reusable animation modules using SVG, CSS Keyframes, and Lottie.",
@@ -46,9 +49,12 @@
         ]
       },
       {
+        "id": "unsw-ta",
         "title": "Casual Academic — COMP9021 & COMP3900/9900",
         "company": "University of New South Wales",
         "date": "Aug 2024 - May 2025",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
+        "iconBg": "#FFF",
         "points": [
           "Taught Principles of Programming (COMP9021) and guided student teams in Computer Science Project (COMP3900/9900).",
           "Led students through agile development with Scrum — Sprint planning, daily standups, iterative development, and retrospectives.",
@@ -57,9 +63,12 @@
         ]
       },
       {
+        "id": "spotfinder",
         "title": "Scrum Master & Backend Developer",
         "company": "Spot Finder",
         "date": "Jan 2024 - Present",
+        "icon": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
+        "iconBg": "#000",
         "points": [
           "Led the development of a parking space time-sharing rental system using Golang and MySQL.",
           "Managed the deployment of the backend using Docker, Cloudflare, Redis, and Nginx.",
@@ -68,9 +77,12 @@
         ]
       },
       {
+        "id": "gemflower",
         "title": "Research & Development Intern",
         "company": "Gem Flower Healthcare Information Technology Ltd.",
         "date": "Jan 2021 - Apr 2021",
+        "icon": "https://cdn.longsizhuo.com/logos/company/bsh.png",
+        "iconBg": "#E6DEDD",
         "points": [
           "Assisted in the maintenance of hospital systems and code testing to ensure functionality.",
           "Developed test plans and scripts to validate new system features.",
@@ -85,15 +97,21 @@
     "title": "Education.",
     "items": [
       {
+        "id": "unsw-meng",
         "degree": "Master of Engineering — Information Technology",
         "university": "The University of New South Wales (UNSW)",
         "duration": "Sep 2022 - Sep 2024 | WAM: Distinction",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
+        "iconBg": "#FFF",
         "coursework": "Data Structures & Algorithms, Computer Vision, Web Front-End Programming, Computer Networks, Blockchain App Architecture, Extended AI."
       },
       {
+        "id": "cuit-beng",
         "degree": "Bachelor of Engineering — Digital Media Technology",
         "university": "Chengdu University of Information Technology (CUIT)",
         "duration": "Sep 2017 - Jul 2021",
+        "icon": "https://cdn.longsizhuo.com/logos/company/cuit.jpg",
+        "iconBg": "#FFF",
         "coursework": "Advanced Graphics Programming (OpenGL), Network Game Programming, Data Structures, R Programming."
       }
     ]
@@ -103,27 +121,35 @@
     "title": "Awards & Patents.",
     "items": [
       {
+        "id": "lanqiao",
         "title": "Lanqiao Cup — 1st Place",
         "issuer": "Lanqiao Cup Competition, International Python (Postgraduate/A)",
         "date": "Apr 2024",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/lanqiao.webp",
         "description": "Achieved first place in the 15th Lanqiao Cup International Python Algorithm competition."
       },
       {
+        "id": "usyd-codingfest",
         "title": "USYD Coding Fest — Champion",
         "issuer": "University of Sydney",
         "date": "2024",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/usyd.png",
         "description": "Won the Outstanding Project Idea Award (Champion) with SpotFinder — an urban parking space time-sharing rental system."
       },
       {
+        "id": "unsw-ta-award",
         "title": "UNSW Peter Farrell Cup",
         "issuer": "UNSW Incubator",
         "date": "Feb 2024",
+        "icon": "https://cdn.longsizhuo.com/logos/company/unsw.png",
         "description": "Selected for the UNSW Peter Farrell Cup Program with SpotFinder project."
       },
       {
+        "id": "copyright",
         "title": "Patent — Dimensionality Reduction Clustering Tool",
         "issuer": "Software Copyright 2021SR1180633",
         "date": "Aug 2021",
+        "icon": "https://cdn.longsizhuo.com/logos/awards/copyright.png",
         "description": "Patented a visualization tool system for single-cell RNA-seq data dimensionality reduction and clustering analysis."
       }
     ]
