@@ -56,7 +56,11 @@ const GROUPS = {
       manifest.push({
         id: folder.toLowerCase(),
         folder,
-        photos: files.map((f, i) => ({ key: keys[i], ...(dimensions(f) ?? { w: 0, h: 0 }) })),
+        photos: files.map((f, i) => {
+          const dim = dimensions(f);
+          if (!dim) console.error(`宽高读取失败，将写入 w:0 h:0：${f}`);
+          return { key: keys[i], ...(dim ?? { w: 0, h: 0 }) };
+        }),
       });
     }
     await mkdir("src/content", { recursive: true });
