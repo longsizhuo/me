@@ -6,13 +6,6 @@ import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
-import lanqiaoLogo from "../assets/awards/lanqiao.webp";
-import usydLogo from "../assets/awards/usyd.png";
-import unswLogo from "../assets/company/unsw.png";
-import copyrightLogo from "../assets/awards/copyright.png";
-
-const honorIcons = [lanqiaoLogo, usydLogo, unswLogo, copyrightLogo];
-
 const HonorCard = ({
   title,
   issuer,
@@ -34,7 +27,12 @@ const HonorCard = ({
   >
     <div className="flex-shrink-0 mt-1">
       <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
-        <img src={icon} alt="" className="w-8 h-8 object-contain" />
+        <img
+          src={icon}
+          alt=""
+          className="w-8 h-8 object-contain"
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
       </div>
     </div>
     <div className="flex-1">
@@ -53,7 +51,8 @@ const Honors = () => {
   const { t } = useTranslation();
   const items = Array.isArray(t("honors.items", { returnObjects: true }))
     ? (t("honors.items", { returnObjects: true }) as Array<{
-        title: string; issuer: string; date: string; description: string;
+        id: string; title: string; issuer: string; date: string;
+        description: string; icon: string;
       }>)
     : [];
 
@@ -67,12 +66,7 @@ const Honors = () => {
       </div>
       <div className={`-mt-20 pb-14 ${styles.paddingX} flex flex-wrap gap-7`}>
         {items.map((honor, index) => (
-          <HonorCard
-            key={honor.title}
-            index={index}
-            icon={honorIcons[index] || ""}
-            {...honor}
-          />
+          <HonorCard key={honor.id} index={index} {...honor} />
         ))}
       </div>
     </div>

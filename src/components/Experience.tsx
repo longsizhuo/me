@@ -9,7 +9,6 @@ import { motion } from "motion/react";
 import "react-vertical-timeline-component/style.min.css";
 
 import { styles } from "../styles";
-import { experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { textVariant } from "../utils/motion.ts";
 import type { ExperienceCardProps } from "./TYPE";
@@ -30,6 +29,7 @@ const ExperienceCard = ({ experience }: ExperienceCardProps) => {
             src={experience.icon}
             alt={experience.company_name}
             className='w-[60%] h-[60%] object-contain'
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
         </div>
       }
@@ -75,19 +75,20 @@ const Experience = () => {
         <VerticalTimeline>
           {(Array.isArray(t("experience.items", { returnObjects: true }))
             ? t("experience.items", { returnObjects: true }) as Array<{
-                title: string; company: string; date: string; points: string[];
+                id: string; title: string; company: string; date: string;
+                points: string[]; icon: string; iconBg: string;
               }>
             : []
-          ).map((item, index) => (
+          ).map((item) => (
             <ExperienceCard
-              key={`experience-${index}`}
+              key={item.id}
               experience={{
                 title: item.title,
                 company_name: item.company,
                 date: item.date,
                 points: item.points,
-                icon: experiences[index]?.icon || "",
-                iconBg: experiences[index]?.iconBg || "#FFF",
+                icon: item.icon,
+                iconBg: item.iconBg,
               }}
             />
           ))}
