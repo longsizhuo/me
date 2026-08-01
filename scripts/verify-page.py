@@ -33,9 +33,20 @@ with sync_playwright() as p:
                        failed.append(f"HTTP {r.status} {r.url[:120]}") if r.status >= 400 else None))
 
     page.goto(url, wait_until="load", timeout=60000)
-    # 滚到底再滚回顶，触发所有 IntersectionObserver 懒加载
+    # 滚到底再滚回顶，触发 IntersectionObserver 懒加载。
+    # 相册等区块有自己的 overflow-y 滚动容器，window 滚动碰不到它们里面的图，
+    # 所以额外把每个可滚动容器也滚一遍 —— 否则会漏统计 CDN 资源。
     page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
     page.wait_for_timeout(settle_ms // 2)
+    page.evaluate("""() => {
+        for (const el of document.querySelectorAll('*')) {
+            if (el.scrollHeight > el.clientHeight + 50 && el !== document.documentElement
+                && ['auto', 'scroll'].includes(getComputedStyle(el).overflowY)) {
+                el.scrollTop = el.scrollHeight;
+            }
+        }
+    }""")
+    page.wait_for_timeout(settle_ms)
     page.evaluate("window.scrollTo(0, 0)")
     page.wait_for_timeout(settle_ms // 2)
     page.screenshot(path=shot, full_page=True)
