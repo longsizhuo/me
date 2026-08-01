@@ -1909,6 +1909,152 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
 
 ---
 
+### Task 14: llms.txt、IndexNow、JSON-LD 转义
+
+**在 Task 10 之后做**（依赖 `/zh` `/en` 路由已存在，llms.txt 和 sitemap 要指向它们）。
+
+三样东西都来自 involutionhell-project，同一个账户下的现成方案。**先读清楚各自的实际效果，别高估**：
+
+- `llms.txt` —— 给 AI agent 看的站点导航。**不是 SEO 手段**：2026 Q1 为止 OpenAI / Google / Anthropic / Meta / Mistral 均未公开承诺在生产系统读取它，某 90 天 5 亿次 AI 爬虫访问的日志里只有 408 次请求它。真正会读的是 Cursor / Continue / Cline 这类编程 agent、部分 MCP 集成，以及 Perplexity。成本 30 行，做。
+- IndexNow —— Bing / Yandex 的主动推送协议。**Google 不支持**（且 Google 2023 年起已弃用 sitemap ping）。
+- `safeJsonLdString()` —— JSON-LD 注入防护。当前 JSON-LD 是硬编码的没有风险，但第二期内容从 KV 动态来，那时必须有。提前铺路。
+
+**前置条件（用户手动，不做则前两项无意义）**：Cloudflare → longsizhuo.com → Security → Bots → 关闭 "Block AI Scrapers and Crawlers"。当前 `ai_bots_protection = block`，实测 GPTBot / ClaudeBot / PerplexityBot 全部 403，而 Baiduspider 和 Googlebot 是 200。Bot Fight Mode 保持开启（已确认不影响百度和谷歌）。
+
+**Files:**
+- Create: `public/llms.txt`, `public/<indexnow-key>.txt`, `src/lib/json-ld.ts`
+- Modify: `index.html`（JSON-LD 改用转义函数）, `public/robots.txt`
+
+- [ ] **Step 1: 写 public/llms.txt**
+
+按 llmstxt.org 规范：H1 站名 → blockquote 摘要 → 可选正文 → H2 分节链接列表。内容用中文优先，因为目标是让 AI agent 正确理解「龙思卓」这个人。
+
+```markdown
+# 龙思卓 (Sizhuo Long)
+
+> 快手科技前端工程师，坐标北京。新南威尔士大学（UNSW）信息技术硕士（优等）。
+> 第15届蓝桥杯国际赛 Python 算法研究生 A 类第一名。专注交互设计、动画基础设施与渲染性能优化。
+
+本站是个人主页，内容包括工作经历、教育背景、获奖与专利、开源项目和写作。
+中文版 https://longsizhuo.com/zh ，英文版 https://longsizhuo.com/en 。
+
+## 页面
+
+- [首页](https://longsizhuo.com/): 完整个人介绍、工作经历、教育、荣誉、项目、写作
+- [中文版](https://longsizhuo.com/zh): 同上，中文
+- [English](https://longsizhuo.com/en): 同上，英文
+- [工具箱](https://longsizhuo.com/tools): 自制的小工具，目前有视频转 ASCII
+
+## 关于本人
+
+- [GitHub](https://github.com/longsizhuo): 开源贡献
+- [小红书](https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809): 技术、职场与生活分享
+- [内卷地狱](https://involutionhell.com): 参与建设的技术社区
+
+## Optional
+
+- [站点地图](https://longsizhuo.com/sitemap.xml)
+```
+
+`## Optional` 是规范里的保留小节名，表示上下文不够时可以裁掉。
+
+- [ ] **Step 2: robots.txt 明确欢迎 AI 爬虫并指向 llms.txt**
+
+当前 `public/robots.txt` 已经是 `User-agent: * / Allow: /`，功能上没挡任何东西。不要添加一堆冗余的 per-bot `Allow`（那是噪音）。只加一行注释指明 llms.txt 位置：
+
+```
+User-agent: *
+Allow: /
+
+# AI agents: see /llms.txt for a structured site index
+Sitemap: https://longsizhuo.com/sitemap.xml
+```
+
+- [ ] **Step 3: IndexNow key 文件**
+
+生成一个 32 位十六进制 key，文件名就是 key，内容也是 key：
+
+```bash
+KEY=$(python3 -c "import secrets;print(secrets.token_hex(16))")
+echo -n "$KEY" > "public/$KEY.txt"
+echo "key = $KEY"
+```
+
+把 key 记进 `.env`（不提交）以及本任务报告里。
+
+- [ ] **Step 4: 部署后推送脚本**
+
+`scripts/indexnow.sh`：
+
+```bash
+#!/usr/bin/env bash
+# 部署后通知 Bing / Yandex 重新抓取。Google 不支持 IndexNow，跳过它是正确的。
+set -euo pipefail
+KEY="${INDEXNOW_KEY:?先设置 INDEXNOW_KEY，值见 .env}"
+curl -sS -X POST https://api.indexnow.org/indexnow \
+  -H "Content-Type: application/json" \
+  -d "{\"host\":\"longsizhuo.com\",\"key\":\"$KEY\",\"keyLocation\":\"https://longsizhuo.com/$KEY.txt\",\"urlList\":[\"https://longsizhuo.com/\",\"https://longsizhuo.com/zh\",\"https://longsizhuo.com/en\",\"https://longsizhuo.com/tools\"]}" \
+  -w "\nHTTP %{http_code}\n"
+```
+
+预期 `HTTP 200` 或 `HTTP 202`。**上线前不要跑**——key 文件必须先能通过 `https://longsizhuo.com/<key>.txt` 访问到，否则 IndexNow 会拒绝。
+
+- [ ] **Step 5: JSON-LD 转义函数**
+
+`src/lib/json-ld.ts`，从 involutionhell-project 的 `frontend/lib/json-ld.ts` 移植：
+
+```typescript
+/**
+ * 把对象序列化成可安全放进 <script type="application/ld+json"> 的字符串。
+ * 转义 < > & 防止提前闭合 script 标签，转义 U+2028/U+2029 因为它们
+ * 在 JSON 里合法但在 JavaScript 字符串字面量里会断行。
+ *
+ * 现在 index.html 的 JSON-LD 是构建期硬编码的，没有注入面；
+ * 第二期内容改从 KV 动态来之后，这个函数是必须的。
+ */
+export function safeJsonLdString(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/ /g, "\\u2028")
+    .replace(/ /g, "\\u2029");
+}
+```
+
+留一个自检 `test/json-ld.test.mjs`：断言 `safeJsonLdString({ n: '</script><script>alert(1)</script>' })` 的结果里不含字面量 `</script>`。
+
+**注意**：`index.html` 里的 JSON-LD 是静态 HTML，用不上这个函数——本步骤只是把工具就位并测好。**不要**为了"用上它"去把静态 JSON-LD 改成运行时注入，那会让爬虫看不到结构化数据，与 Task 9 的目的直接冲突。
+
+- [ ] **Step 6: 验证**
+
+```bash
+pnpm build
+grep -c "龙思卓" dist/llms.txt          # 预期 ≥ 1
+ls dist/*.txt                            # 预期看到 robots.txt 和 <key>.txt
+node --test test/json-ld.test.mjs
+pnpm lint && pnpm tsc
+```
+
+- [ ] **Step 7: 提交**
+
+```bash
+git add -A
+git commit -m "seo: llms.txt, IndexNow key, JSON-LD escaping helper
+
+llms.txt is a site index for AI agents, not an SEO lever — no major AI
+provider has committed to reading it in production. Cursor/Continue/Cline
+and Perplexity do. It costs 30 lines.
+
+IndexNow reaches Bing and Yandex only; Google supports neither IndexNow
+nor sitemap pings any more.
+
+The escaping helper is unused today because the JSON-LD is static HTML.
+Phase 2 serves content from KV, and that is when it becomes required."
+```
+
+---
+
 ## 自查
 
 **Spec 覆盖检查**
@@ -1928,6 +2074,7 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
 | SPA fallback | Caddy 已有，Task 13 Step 2 仅确认 |
 | 构建不打断 bind mount | Task 0 ✅ 已实测通过（dist inode 未变，站点 200） |
 | 百度站长 / Bot Fight Mode 手动项 | Task 13 Step 6 |
+| llms.txt / IndexNow / JSON-LD 转义 | Task 14（Task 10 之后）|
 | pnpm 11 迁移 + 安全 overrides 复位 | 已完成，commit 6c4a76d |
 | tsc 清零 | Task 11 |
 | Tailwind 4 升级 | Task 12 |
