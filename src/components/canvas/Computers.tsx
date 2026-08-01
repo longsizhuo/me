@@ -8,7 +8,7 @@ import CanvasLoader from "../Loader";
 import type { ComputersProps } from "./TYPE";
 
 const Computers = ({ isMobile }: ComputersProps) => {
-  const computer = useGLTF("./desktop_pc/scene.gltf");
+  const computer = useGLTF("https://cdn.longsizhuo.com/models/desktop_pc/scene.gltf");
 
   return (
     <mesh>
