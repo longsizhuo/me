@@ -177,7 +177,7 @@
         "id": "hello-algo",
         "name": "Hello-algo",
         "description": "通过可视化动画和交互式学习材料简化数据结构与算法。GitHub 89K+ stars。",
-        "image": "https://www.hello-algo.com/assets/images/logo.svg",
+        "image": "https://cdn.longsizhuo.com/logos/hello-algo.svg",
         "tags": [
           { "name": "python", "color": "blue-text-gradient" },
           { "name": "visualization", "color": "green-text-gradient" },

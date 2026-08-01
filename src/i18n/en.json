@@ -177,7 +177,7 @@
         "id": "hello-algo",
         "name": "Hello-algo",
         "description": "Simplifying data structures and algorithms through visual animations and interactive learning materials.",
-        "image": "https://www.hello-algo.com/assets/images/logo.svg",
+        "image": "https://cdn.longsizhuo.com/logos/hello-algo.svg",
         "tags": [
           { "name": "python", "color": "blue-text-gradient" },
           { "name": "visualization", "color": "green-text-gradient" },
