@@ -161,9 +161,42 @@
     "openSource": "开源项目",
     "githubPinned": "GitHub 精选",
     "staticItems": [
-      { "name": "Spot Finder", "description": "一个停车位分时租赁系统，解决城市停车难题，增加车位拥有者收入。USYD 编程节冠军项目。" },
-      { "name": "Hello-algo", "description": "通过可视化动画和交互式学习材料简化数据结构与算法。GitHub 89K+ stars。" },
-      { "name": "降维聚类可视化工具", "description": "一个基于 Web 的工具，通过直观的可视化技术简化单细胞 RNA-seq 数据分析。已获软件著作权。" }
+      {
+        "id": "spotfinder",
+        "name": "Spot Finder",
+        "description": "一个停车位分时租赁系统，解决城市停车难题，增加车位拥有者收入。USYD 编程节冠军项目。",
+        "image": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
+        "tags": [
+          { "name": "golang", "color": "blue-text-gradient" },
+          { "name": "docker", "color": "green-text-gradient" },
+          { "name": "mysql", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://longsizhuo.com"
+      },
+      {
+        "id": "hello-algo",
+        "name": "Hello-algo",
+        "description": "通过可视化动画和交互式学习材料简化数据结构与算法。GitHub 89K+ stars。",
+        "image": "https://www.hello-algo.com/assets/images/logo.svg",
+        "tags": [
+          { "name": "python", "color": "blue-text-gradient" },
+          { "name": "visualization", "color": "green-text-gradient" },
+          { "name": "open-source", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://github.com/krahets/hello-algo"
+      },
+      {
+        "id": "drcvt",
+        "name": "降维聚类可视化工具",
+        "description": "一个基于 Web 的工具，通过直观的可视化技术简化单细胞 RNA-seq 数据分析。已获软件著作权。",
+        "image": "https://cdn.longsizhuo.com/logos/1234.webp",
+        "tags": [
+          { "name": "r", "color": "blue-text-gradient" },
+          { "name": "data-visualization", "color": "green-text-gradient" },
+          { "name": "bioinformatics", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://longsizhuo.shinyapps.io/long/"
+      }
     ]
   },
   "writing": {

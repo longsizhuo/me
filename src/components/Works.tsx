@@ -42,7 +42,6 @@ const langColorMap: Record<string, string> = {
   CSS: "pink-text-gradient",
 };
 
-// Card for hardcoded projects (e.g. closed-source graduation projects)
 // Card for GitHub pinned repos
 const GitHubProjectCard = ({
   index,
@@ -91,6 +90,50 @@ const GitHubProjectCard = ({
     </motion.div>
   );
 };
+
+// Card for hand-maintained projects that aren't a pinned GitHub repo
+// (e.g. closed-source or external projects)
+interface StaticProject {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  tags: { name: string; color: string }[];
+  source_code_link: string;
+}
+
+const StaticProjectCard = ({ index, project }: { index: number; project: StaticProject }) => (
+  <motion.div variants={fadeIn("up", "", index * 0.5, 0.75)}>
+    <Tilt
+      options={{ max: 45, scale: 0.9, speed: 450 }}
+      className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full"
+    >
+      <a href={project.source_code_link} target="_blank" rel="noopener noreferrer">
+        <div className="relative w-full h-[230px] flex items-center justify-center bg-black-100 rounded-2xl">
+          <img
+            src={project.image}
+            alt={project.name}
+            className="max-w-[70%] max-h-[70%] object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+            }}
+          />
+        </div>
+        <div className="mt-5">
+          <h3 className="text-white font-bold text-[24px]">{project.name}</h3>
+          <p className="mt-2 text-secondary text-[14px] line-clamp-3">{project.description}</p>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <p key={tag.name} className={`text-[14px] ${tag.color}`}>
+              #{tag.name}
+            </p>
+          ))}
+        </div>
+      </a>
+    </Tilt>
+  </motion.div>
+);
 
 const Works = () => {
   const { t } = useTranslation();
@@ -190,6 +233,16 @@ const Works = () => {
           </div>
         </>
       )}
+
+      {/* Hand-maintained projects: not pinned on GitHub */}
+      <div className="mt-10 flex flex-wrap gap-7">
+        {(Array.isArray(t("projects.staticItems", { returnObjects: true }))
+          ? (t("projects.staticItems", { returnObjects: true }) as StaticProject[])
+          : []
+        ).map((project, index) => (
+          <StaticProjectCard key={project.id} index={index} project={project} />
+        ))}
+      </div>
 
       {selectedOverlay && (
         <ProjectOverlay

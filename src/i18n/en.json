@@ -161,9 +161,42 @@
     "openSource": "Open Source",
     "githubPinned": "GitHub Pinned.",
     "staticItems": [
-      { "name": "Spot Finder", "description": "A parking space time-sharing rental system, addressing urban parking challenges and increasing income for parking space owners." },
-      { "name": "Hello-algo", "description": "Simplifying data structures and algorithms through visual animations and interactive learning materials." },
-      { "name": "Dimensionality Reduction Clustering Visualization Tool", "description": "A web-based tool designed to simplify the analysis of single-cell RNA-seq data through intuitive visualization techniques." }
+      {
+        "id": "spotfinder",
+        "name": "Spot Finder",
+        "description": "A parking space time-sharing rental system, addressing urban parking challenges and increasing income for parking space owners.",
+        "image": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
+        "tags": [
+          { "name": "golang", "color": "blue-text-gradient" },
+          { "name": "docker", "color": "green-text-gradient" },
+          { "name": "mysql", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://longsizhuo.com"
+      },
+      {
+        "id": "hello-algo",
+        "name": "Hello-algo",
+        "description": "Simplifying data structures and algorithms through visual animations and interactive learning materials.",
+        "image": "https://www.hello-algo.com/assets/images/logo.svg",
+        "tags": [
+          { "name": "python", "color": "blue-text-gradient" },
+          { "name": "visualization", "color": "green-text-gradient" },
+          { "name": "open-source", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://github.com/krahets/hello-algo"
+      },
+      {
+        "id": "drcvt",
+        "name": "Dimensionality Reduction Clustering Visualization Tool",
+        "description": "A web-based tool designed to simplify the analysis of single-cell RNA-seq data through intuitive visualization techniques.",
+        "image": "https://cdn.longsizhuo.com/logos/1234.webp",
+        "tags": [
+          { "name": "r", "color": "blue-text-gradient" },
+          { "name": "data-visualization", "color": "green-text-gradient" },
+          { "name": "bioinformatics", "color": "pink-text-gradient" }
+        ],
+        "source_code_link": "https://longsizhuo.shinyapps.io/long/"
+      }
     ]
   },
   "writing": {
