@@ -1,0 +1,49 @@
+[
+  {
+    "id": "2025-kwai",
+    "folder": "2025-Kwai",
+    "photos": [
+      {
+        "key": "album/2025-Kwai/image (2).jpg",
+        "w": 2665,
+        "h": 3996
+      },
+      {
+        "key": "album/2025-Kwai/image (3).jpg",
+        "w": 3520,
+        "h": 1980
+      },
+      {
+        "key": "album/2025-Kwai/image (4).jpg",
+        "w": 3999,
+        "h": 2667
+      },
+      {
+        "key": "album/2025-Kwai/image (5).jpg",
+        "w": 3997,
+        "h": 2664
+      },
+      {
+        "key": "album/2025-Kwai/image (6).jpg",
+        "w": 3998,
+        "h": 2664
+      },
+      {
+        "key": "album/2025-Kwai/image (7).jpg",
+        "w": 3997,
+        "h": 2663
+      }
+    ]
+  },
+  {
+    "id": "2025-unsw",
+    "folder": "2025-UNSW",
+    "photos": [
+      {
+        "key": "album/2025-UNSW/IMG_5846.webp",
+        "w": 4032,
+        "h": 3024
+      }
+    ]
+  }
+]
