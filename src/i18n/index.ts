@@ -3,15 +3,37 @@ import { initReactI18next } from "react-i18next";
 import en from "./en.json";
 import zh from "./zh.json";
 
-const savedLang = typeof window !== "undefined" ? localStorage.getItem("lang") : null;
+export type Lang = "zh" | "en";
+
+/** URL 首段是 /zh 或 /en 时返回对应语言，否则 null */
+export function langFromPath(pathname: string): Lang | null {
+  const seg = pathname.split("/")[1];
+  return seg === "zh" || seg === "en" ? seg : null;
+}
+
+/** 优先级：URL > localStorage > 浏览器语言 > 中文 */
+function resolveLang(): Lang {
+  if (typeof window === "undefined") {
+    return "zh";
+  }
+  const fromPath = langFromPath(window.location.pathname);
+  if (fromPath) {
+    return fromPath;
+  }
+  const saved = localStorage.getItem("lang");
+  if (saved === "zh" || saved === "en") {
+    return saved;
+  }
+  return navigator.language?.startsWith("zh") ? "zh" : "en";
+}
 
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     zh: { translation: zh },
   },
-  lng: savedLang || "en",
-  fallbackLng: "en",
+  lng: resolveLang(),
+  fallbackLng: "zh",
   interpolation: { escapeValue: false },
   returnObjects: true,
 });

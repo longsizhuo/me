@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import i18n, { type Lang } from "./i18n";
 import {
   About,
   Album,
@@ -50,6 +51,20 @@ function Analytics() {
   return null;
 }
 
+function LangRoute({ lang }: { lang: Lang }) {
+  useEffect(() => {
+    if (i18n.language !== lang) {
+      i18n.changeLanguage(lang);
+      localStorage.setItem("lang", lang);
+    }
+  }, [lang]);
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+      <HomePage />
+    </motion.div>
+  );
+}
+
 function HomePage() {
   return (
     <div className="relative z-0 bg-primary">
@@ -92,6 +107,8 @@ function App() {
                 <HomePage />
               </motion.div>
             } />
+            <Route path="/zh" element={<LangRoute lang="zh" />} />
+            <Route path="/en" element={<LangRoute lang="en" />} />
             <Route path="/tools" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <Tools />
