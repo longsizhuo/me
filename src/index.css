@@ -19,19 +19,12 @@
   display: block;
 }
 
-.black-gradient {
-  background: #fff; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-          to right,
-          #434343,
-          #fff
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-          to right,
-          #434343,
-          #fff
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-}
+/*
+ * .black-gradient 已删除。它名叫「黑色渐变」，编译出来却是 #434343 → #fff，
+ * 也就是渐变到纯白。唯一的使用处是手机版导航下拉面板，配 text-secondary
+ * (#aaa6c3) 的文字，对比度约 2.2:1 —— WCAG AA 要求 4.5:1，手机上几乎读不出来。
+ * 改用站点自己的深色 token，配与滚动态导航栏一致的玻璃拟态。
+ */
 
 .violet-gradient {
   background: #804dee;
