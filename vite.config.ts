@@ -1,8 +1,10 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+// @ts-expect-error scripts/ 是纯 ESM，没有类型声明；只在构建期跑。
+import { geo } from "./scripts/geo.mjs";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), geo()],
   assetsInclude: ["**/*.HEIC", "**/*.heic"],
   server: {
     host: "0.0.0.0",
