@@ -28,7 +28,14 @@
   "album": {
     "subtitle": "影集",
     "title": "照片墙",
-    "description": "工作、旅行和生活中的瞬间 —— 按场合整理。"
+    "description": "工作、旅行和生活中的瞬间 —— 按场合整理。",
+    "empty": "暂无相册。",
+    "photoCount": "{{count}} 张照片",
+    "loadError": "相册暂时无法加载。",
+    "notFoundTitle": "相册不存在",
+    "notFoundMessage": "这个相册可能已被删除，或者链接有误。",
+    "backToList": "← 返回相册列表",
+    "loadingMore": "加载中…"
   },
   "experience": {
     "subtitle": "我的职业经历",

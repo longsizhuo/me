@@ -28,7 +28,15 @@
   "album": {
     "subtitle": "Gallery",
     "title": "Photo Album.",
-    "description": "Moments from work, travel, and life — organized by occasion."
+    "description": "Moments from work, travel, and life — organized by occasion.",
+    "empty": "No albums yet.",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_other": "{{count}} photos",
+    "loadError": "The album is temporarily unavailable.",
+    "notFoundTitle": "Album not found",
+    "notFoundMessage": "This album may have been removed, or the link is incorrect.",
+    "backToList": "← Back to albums",
+    "loadingMore": "Loading more…"
   },
   "experience": {
     "subtitle": "What I have done so far",

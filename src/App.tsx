@@ -23,6 +23,8 @@ import LazyVisible from "./components/LazyVisible";
 
 const Tools = lazy(() => import("./pages/Tools"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AlbumList = lazy(() => import("./pages/AlbumList"));
+const AlbumDetail = lazy(() => import("./pages/AlbumDetail"));
 // 单独指向具体模块，绝不能经过 ./canvas 或 ./components 这两个 barrel —— 否则
 // three.js 又会被拖回入口图（见 src/components/index.ts 顶部的注释）。
 const StarsCanvas = lazy(() => import("./components/canvas/Stars"));
@@ -76,6 +78,18 @@ function PageErrorFallback() {
   return (
     <div className="min-h-screen bg-primary flex items-center justify-center text-secondary">
       页面加载出错，请刷新重试。
+    </div>
+  );
+}
+
+// AlbumList/AlbumDetail throw during render when the API call fails (see
+// those files) so this catches it instead of the generic PageErrorFallback —
+// same idea, album-specific copy.
+function AlbumErrorFallback() {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen bg-primary flex items-center justify-center text-secondary">
+      {t("album.loadError")}
     </div>
   );
 }
@@ -155,6 +169,20 @@ function App() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <ErrorBoundary label="page" fallback={<PageErrorFallback />}>
                   <Tools />
+                </ErrorBoundary>
+              </motion.div>
+            } />
+            <Route path="/album" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <ErrorBoundary label="album-list" fallback={<AlbumErrorFallback />}>
+                  <AlbumList />
+                </ErrorBoundary>
+              </motion.div>
+            } />
+            <Route path="/album/:slug" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <ErrorBoundary label="album-detail" fallback={<AlbumErrorFallback />}>
+                  <AlbumDetail />
                 </ErrorBoundary>
               </motion.div>
             } />
