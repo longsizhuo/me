@@ -42,32 +42,9 @@ async function uploadAll(files, stripPrefix, keyPrefix) {
 }
 
 const GROUPS = {
-  album: async () => {
-    const root = "src/assets/album";
-    const folders = (await readdir(root, { withFileTypes: true }))
-      .filter((e) => e.isDirectory())
-      .map((e) => e.name)
-      .sort();
-
-    const manifest = [];
-    for (const folder of folders) {
-      const files = (await walk(join(root, folder))).sort();
-      const keys = await uploadAll(files, root, "album");
-      manifest.push({
-        id: folder.toLowerCase(),
-        folder,
-        photos: files.map((f, i) => {
-          const dim = dimensions(f);
-          if (!dim) console.error(`宽高读取失败，将写入 w:0 h:0：${f}`);
-          return { key: keys[i], ...(dim ?? { w: 0, h: 0 }) };
-        }),
-      });
-    }
-    await mkdir("src/content", { recursive: true });
-    await writeFile("src/content/album.json", JSON.stringify(manifest, null, 2) + "\n");
-    console.log(`\n写入 src/content/album.json：${manifest.length} 个相册，` +
-                `${manifest.reduce((n, a) => n + a.photos.length, 0)} 张照片`);
-  },
+  // album 分组已退休：照片元数据现在存 D1，上传走 /album/admin，
+  // 不再有 src/content/album.json 这个清单文件。
+  // logos / models / archive 三组仍然可用，用于一次性批量上传。
 
   models: async () => {
     for (const d of ["desktop_pc", "planet"]) {

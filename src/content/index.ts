@@ -1,21 +1,6 @@
 // src/content/index.ts
-import albumManifest from "./album.json";
 
 export const CDN_BASE = "https://cdn.longsizhuo.com";
-
-export interface AlbumPhoto {
-  key: string;
-  w: number;
-  h: number;
-}
-
-export interface AlbumGroup {
-  id: string;
-  folder: string;
-  photos: AlbumPhoto[];
-}
-
-export const album = albumManifest as AlbumGroup[];
 
 /**
  * R2 key → 可访问 URL。key 里的空格等字符必须转义，
