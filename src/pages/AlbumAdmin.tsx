@@ -78,7 +78,7 @@ function PhotoRow({
 
   return (
     <div className="flex flex-wrap items-center gap-3 bg-tertiary rounded-xl p-3">
-      <div className="w-16 h-16 rounded-lg overflow-hidden bg-black-100/60 flex-shrink-0">
+      <div className="w-16 h-16 rounded-lg overflow-hidden bg-black-100/60 shrink-0">
         <img
           src={imageUrl(photo.key, { width: 160, height: 160, fit: "cover" })}
           alt=""
@@ -103,7 +103,7 @@ function PhotoRow({
           type="number"
           value={sortValue}
           onChange={(e) => setSortValue(Number(e.target.value))}
-          className="w-16 bg-black-100 text-white rounded px-2 py-1 outline-none"
+          className="w-16 bg-black-100 text-white rounded-sm px-2 py-1 outline-hidden"
           disabled={busy}
         />
       </label>
@@ -433,7 +433,7 @@ const AlbumAdmin = () => {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 placeholder="2026-example-trip"
-                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium text-[14px]"
+                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium text-[14px]"
                 disabled={creating}
               />
             </label>
@@ -442,7 +442,7 @@ const AlbumAdmin = () => {
               <input
                 value={nameZh}
                 onChange={(e) => setNameZh(e.target.value)}
-                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium text-[14px]"
+                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium text-[14px]"
                 disabled={creating}
               />
             </label>
@@ -451,7 +451,7 @@ const AlbumAdmin = () => {
               <input
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
-                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium text-[14px]"
+                className="bg-tertiary py-2.5 px-4 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium text-[14px]"
                 disabled={creating}
               />
             </label>
@@ -459,7 +459,7 @@ const AlbumAdmin = () => {
             <button
               type="submit"
               disabled={creating}
-              className="bg-tertiary py-2.5 px-6 rounded-xl outline-none w-fit text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary/80 transition-colors text-[14px]"
+              className="bg-tertiary py-2.5 px-6 rounded-xl outline-hidden w-fit text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary/80 transition-colors text-[14px]"
             >
               {creating ? "Creating…" : "Create album"}
             </button>

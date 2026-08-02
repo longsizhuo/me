@@ -1,8 +1,67 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap')
+layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/*
+ * Migrated by hand from tailwind.config.ts (Tailwind 3 -> 4). @source entries
+ * for ./packages/video-to-ascii and ./packages/charAnime were dropped, not
+ * carried forward: neither directory exists in this repo (dead globs that
+ * matched nothing even under v3). node_modules/char-anime/dist was also
+ * dropped — the handful of Tailwind-looking class strings inside it
+ * (h-auto, text-center, text-sm, w-full) are already used elsewhere in src/,
+ * so v4's automatic content detection generates them regardless.
+ */
+@theme {
+  --color-primary: #050816;
+  --color-secondary: #aaa6c3;
+  --color-tertiary: #151030;
+  --color-black-100: #100d25;
+  --color-black-200: #090325;
+  --color-white-100: #f3f3f3;
+  --color-lightPrimary: #ffffff;
+  --color-lightSecondary: #f3f3f3;
+  --color-lightTertiary: #e5e5e5;
+
+  --breakpoint-xs: 450px;
+
+  --shadow-card: 0px 35px 120px -15px #211e35;
+}
+
+/*
+ * v4 has no --background-image-* theme namespace (that was v3-only), so
+ * named background-image utilities are now defined directly via @utility.
+ * Same two classes as the old `backgroundImage` theme extension, same
+ * pre-existing situation: bg-hero-pattern-light points at herobg-light.png,
+ * which doesn't exist in src/assets, and bg-hero-pattern-dark/-light are
+ * never referenced anywhere in src/ (App.tsx uses the never-defined
+ * `bg-hero-pattern`, so herobg.png has never actually rendered — see
+ * App.tsx). Not fixing either; carrying the same dead config across.
+ */
+@utility bg-hero-pattern-dark {
+  background-image: url('/src/assets/herobg.png');
+}
+@utility bg-hero-pattern-light {
+  background-image: url('/src/assets/herobg-light.png');
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 * {
   margin: 0;

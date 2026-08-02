@@ -30,7 +30,7 @@ const Education = () => {
             className="bg-black-200 p-8 rounded-3xl w-full flex flex-col sm:flex-row gap-6"
           >
             {/* University icon */}
-            <div className="flex-shrink-0 flex items-start justify-center">
+            <div className="shrink-0 flex items-start justify-center">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center"
                 style={{ background: edu.iconBg || "#1a237e" }}

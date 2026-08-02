@@ -184,8 +184,8 @@ const About = () => {
                 key={i}
                 className="bg-tertiary px-6 py-4 rounded-xl text-center min-w-[140px] animate-pulse"
               >
-                <div className="h-8 w-12 bg-white/10 rounded mx-auto mb-2" />
-                <div className="h-4 w-20 bg-white/5 rounded mx-auto" />
+                <div className="h-8 w-12 bg-white/10 rounded-sm mx-auto mb-2" />
+                <div className="h-4 w-20 bg-white/5 rounded-sm mx-auto" />
               </div>
             ))}
       </motion.div>

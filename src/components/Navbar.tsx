@@ -57,7 +57,7 @@ const Navbar = () => {
           </Link>
           <button
             onClick={toggleLang}
-            className="text-secondary hover:text-white text-[13px] font-medium border border-secondary/30 hover:border-white/50 px-2 py-0.5 rounded transition-colors"
+            className="text-secondary hover:text-white text-[13px] font-medium border border-secondary/30 hover:border-white/50 px-2 py-0.5 rounded-sm transition-colors"
             title={i18n.language === "en" ? "切换到中文" : "Switch to English"}
           >
             {i18n.language === "en" ? "中文" : "EN"}

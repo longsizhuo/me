@@ -26,7 +26,7 @@ function CoverImage({ album }: { album: AlbumSummary }) {
         // No `fallback` prop here on purpose: antd's `fallback` would swap
         // in the raw R2 original (up to 10MB, never meant to be served
         // directly) whenever the Images transform fails. Hide the broken
-        // <img> instead and let the aspect-[4/3] bg-black-100/60 box behind
+        // <img> instead and let the aspect-4/3 bg-black-100/60 box behind
         // it show through — a blank cover is the correct failure mode, a
         // 10MB download is not.
         e.currentTarget.style.display = "none";
@@ -40,10 +40,10 @@ function CoverSkeleton() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="bg-tertiary rounded-2xl overflow-hidden animate-pulse">
-          <div className="aspect-[4/3] bg-black-100/60" />
+          <div className="aspect-4/3 bg-black-100/60" />
           <div className="p-4">
-            <div className="h-4 w-2/3 bg-black-100/60 rounded" />
-            <div className="h-3 w-1/3 bg-black-100/60 rounded mt-3" />
+            <div className="h-4 w-2/3 bg-black-100/60 rounded-sm" />
+            <div className="h-3 w-1/3 bg-black-100/60 rounded-sm mt-3" />
           </div>
         </div>
       ))}
@@ -116,7 +116,7 @@ const AlbumList = () => {
                   to={`/album/${album.slug}`}
                   className="group block bg-tertiary rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-200"
                 >
-                  <div className="aspect-[4/3] bg-black-100/60 overflow-hidden">
+                  <div className="aspect-4/3 bg-black-100/60 overflow-hidden">
                     <CoverImage album={album} />
                   </div>
                   <div className="p-4">

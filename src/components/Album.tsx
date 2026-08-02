@@ -14,7 +14,7 @@ import { fetchLatest, type LatestPhoto } from "../api/album";
 // class additionally clips via CSS in case a transform ever returns
 // something oddly shaped).
 const TILE_CLASS =
-  "flex-shrink-0 w-[200px] sm:w-[240px] aspect-[4/3] rounded-2xl overflow-hidden bg-tertiary";
+  "shrink-0 w-[200px] sm:w-[240px] aspect-4/3 rounded-2xl overflow-hidden bg-tertiary";
 
 function PhotoTile({ photo }: { photo: LatestPhoto }) {
   return (

@@ -25,7 +25,7 @@ const HonorCard = ({
     variants={fadeIn("up", "spring", index * 0.3, 0.75)}
     className="bg-tertiary p-6 rounded-2xl w-full sm:w-[360px] flex gap-4"
   >
-    <div className="flex-shrink-0 mt-1">
+    <div className="shrink-0 mt-1">
       <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
         <img
           src={icon}

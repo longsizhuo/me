@@ -191,7 +191,7 @@ const ContactAdvanced = () => {
               value={form.name}
               onChange={handleChange}
               placeholder={t("contact.name_placeholder")}
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
               required
               disabled={loading}
             />
@@ -204,7 +204,7 @@ const ContactAdvanced = () => {
               value={form.email}
               onChange={handleChange}
               placeholder={t("contact.email_placeholder")}
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
               required
               disabled={loading}
             />
@@ -217,7 +217,7 @@ const ContactAdvanced = () => {
               value={form.message}
               onChange={handleChange}
               placeholder={t("contact.message_placeholder")}
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-none border-none font-medium'
+              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outline-hidden border-none font-medium'
               required
               disabled={loading}
             />
@@ -226,7 +226,7 @@ const ContactAdvanced = () => {
           <button
             type='submit'
             disabled={loading}
-            className='bg-tertiary py-3 px-8 rounded-xl outline-none w-fit text-white font-bold shadow-md shadow-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary/80 transition-colors'
+            className='bg-tertiary py-3 px-8 rounded-xl outline-hidden w-fit text-white font-bold shadow-md shadow-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-tertiary/80 transition-colors'
           >
             {loading ? (
               <div className="flex items-center gap-2">
