@@ -50,76 +50,14 @@
     gtag('config', 'G-LWL6MY0GF4');
   </script>
 
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "龙思卓",
-    "alternateName": ["Sizhuo Long", "Siz Long", "Long Sizhuo", "Loong Loong"],
-    "url": "https://longsizhuo.com",
-    "image": "https://longsizhuo.com/avatar.png",
-    "jobTitle": "Frontend Engineer",
-    "worksFor": {
-      "@type": "Organization",
-      "name": "快手科技",
-      "alternateName": ["Kuaishou Technology", "Kwai"]
-    },
-    "alumniOf": [
-      {
-        "@type": "EducationalOrganization",
-        "name": "新南威尔士大学",
-        "alternateName": "University of New South Wales"
-      },
-      {
-        "@type": "EducationalOrganization",
-        "name": "成都信息工程大学",
-        "alternateName": "Chengdu University of Information Technology"
-      }
-    ],
-    "knowsAbout": ["React", "TypeScript", "Python", "Golang", "Three.js", "Animation", "Frontend Development"],
-    "sameAs": [
-      "https://github.com/longsizhuo",
-      "https://linkedin.com/in/longsizhuo",
-      "https://steamcommunity.com/id/longsizhuo/",
-      "https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809"
-    ]
-  }
-  </script>
+  <!-- Structured Data —— 由 scripts/geo.mjs 从 src/i18n 生成，别手写 -->
+  <!--geo-jsonld-->
 </head>
 <body>
-<noscript>
-  <div style="max-width:720px;margin:0 auto;padding:3rem 2rem;background:#050816;color:#f7f8f8;font-family:Inter,sans-serif;min-height:100vh">
-    <h1>龙思卓 (Sizhuo Long)</h1>
-    <p style="color:#915EFF;font-size:1.1rem">快手科技 前端工程师 · 北京</p>
-    <h2>关于</h2>
-    <p style="color:#aaa6c3;line-height:1.8">
-      龙思卓，前端工程师，现就职于快手科技，专注于构建大规模高性能用户体验，
-      主攻动画基础设施与渲染性能优化。新南威尔士大学（UNSW）信息技术硕士，
-      成绩优等（Distinction）；成都信息工程大学数字媒体技术学士。
-    </p>
-    <h2>荣誉</h2>
-    <ul style="color:#aaa6c3;line-height:1.8">
-      <li>第15届蓝桥杯国际赛 Python 算法研究生 A 类 第一名</li>
-      <li>悉尼大学编程节（USYD Coding Fest）冠军 —— Spot Finder 项目</li>
-      <li>单细胞 RNA-seq 降维聚类可视化工具 软件著作权</li>
-      <li>新南威尔士大学 COMP9021 / COMP3900 助教</li>
-    </ul>
-    <h2>联系</h2>
-    <p style="color:#aaa6c3;line-height:1.8">
-      邮箱：longsizhuo@gmail.com<br>
-      GitHub：<a href="https://github.com/longsizhuo" style="color:#915EFF">github.com/longsizhuo</a><br>
-      小红书：<a href="https://www.xiaohongshu.com/user/profile/5c0b8cc2000000000601e809" style="color:#915EFF">龙思卓</a>
-    </p>
-    <p style="color:#666;margin-top:2rem;font-size:0.9rem">本站完整内容需要 JavaScript，请启用后刷新。</p>
-  </div>
-</noscript>
-<div id="root">
-  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#050816">
-    <div style="width:40px;height:40px;border:3px solid #915EFF;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite"></div>
-  </div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-</div>
+<!-- #root 的初始内容由 scripts/geo.mjs 从 src/i18n 生成：React 挂载前是首屏
+     加载态，挂载后被整体替换，关掉 JS 就一直是它。原来那段手写的 noscript
+     简介删了 —— 正文提取器会把 noscript 整段丢掉，AI 爬虫因此只读得到标题。 -->
+<div id="root"><!--geo--></div>
 <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

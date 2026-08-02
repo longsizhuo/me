@@ -6,9 +6,13 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default [
-  {
+    // 全局忽略：flat config 里，只含 ignores 的配置对象才是全局的；
+  // 和 languageOptions 写在一起只对那个对象生效。
+  { ignores: ['**/.claude/worktrees/**'] },
+{
     files: ['**/*.{ts,tsx}'],
-    ignores: ['**/.git/**', '**/node_modules/**', '**/dist/**'],
+    ignores: ['**/.git/**', '**/node_modules/**', '**/dist/**',
+    ],
     languageOptions: {
       parser: tsParser,
       ecmaVersion: 'latest',
