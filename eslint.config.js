@@ -6,6 +6,10 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default [
+  // Cloudflare Worker: separate runtime (D1Database/R2Bucket globals, no DOM
+  // lib), no @cloudflare/workers-types dep here — keep it out of the main
+  // project's lint/tsc entirely rather than special-casing its globals.
+  { ignores: ['**/worker/**'] },
   {
     files: ['**/*.{ts,tsx}'],
     ignores: ['**/.git/**', '**/node_modules/**', '**/dist/**'],

@@ -1,0 +1,19 @@
+{
+  "name": "me-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-01",
+  "account_id": "e604afaf71a0dab4d6beb8f7ec2eca66",
+  // Only /api/* — the site itself is served by Caddy from dist/. A route of
+  // "longsizhuo.com/*" here would make this Worker intercept every request
+  // and take the whole site down.
+  "routes": [
+    { "pattern": "longsizhuo.com/api/*", "zone_name": "longsizhuo.com" }
+  ],
+  "d1_databases": [
+    { "binding": "DB", "database_name": "me-db", "database_id": "d3adac81-915c-4fde-95ea-4ac62758fd3a" }
+  ],
+  "r2_buckets": [
+    { "binding": "BUCKET", "bucket_name": "me-assets" }
+  ],
+  "observability": { "enabled": true }
+}
