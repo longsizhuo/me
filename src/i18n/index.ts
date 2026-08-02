@@ -11,10 +11,19 @@ export function langFromPath(pathname: string): Lang | null {
   return seg === "zh" || seg === "en" ? seg : null;
 }
 
-/** 优先级：URL > localStorage > 浏览器语言 > 中文 */
+/**
+ * 优先级：URL > localStorage > 英文。
+ *
+ * 刻意不看 navigator.language：默认英文是站点定位选择，不是技术妥协 ——
+ * 中文访客走 /zh 或按一次语言切换（会记进 localStorage）。
+ *
+ * 这只影响渲染语言。index.html 的静态 title / description / noscript
+ * 保持中文优先不变 —— 那是百度唯一抓得到的内容，也是「龙思卓」能被
+ * 搜到的前提。两件事互不冲突。
+ */
 function resolveLang(): Lang {
   if (typeof window === "undefined") {
-    return "zh";
+    return "en";
   }
   const fromPath = langFromPath(window.location.pathname);
   if (fromPath) {
@@ -24,7 +33,7 @@ function resolveLang(): Lang {
   if (saved === "zh" || saved === "en") {
     return saved;
   }
-  return navigator.language?.startsWith("zh") ? "zh" : "en";
+  return "en";
 }
 
 i18n.use(initReactI18next).init({
