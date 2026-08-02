@@ -2,6 +2,7 @@ import About from "./About";
 import Album from "./Album";
 import { EarthCanvas, StarsCanvas } from "./canvas";
 import ContactAdvanced from "./ContactAdvanced";
+import { ErrorBoundary } from "./ErrorBoundary";
 import Experience from "./Experience";
 import { GlobalLottieBackground } from "./GlobalLottieBackground";
 import Hero from "./Hero";
@@ -13,6 +14,7 @@ export {
   Album,
   ContactAdvanced,
   EarthCanvas,
+  ErrorBoundary,
   Experience,
   GlobalLottieBackground,
   Hero,

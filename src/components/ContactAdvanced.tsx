@@ -5,6 +5,7 @@ import emailjs from '@emailjs/browser';
 
 import { styles } from "../styles";
 import { EarthCanvas } from "./canvas";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { SectionWrapper } from "../hoc";
 import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
@@ -233,7 +234,9 @@ const ContactAdvanced = () => {
         variants={slideIn("right", "tween", 0.2, 1)}
         className='xl:flex-1 xl:h-auto md:h-[550px] h-[350px]'
       >
-        <EarthCanvas />
+        <ErrorBoundary label="earth-canvas">
+          <EarthCanvas />
+        </ErrorBoundary>
       </motion.div>
     </div>
   );

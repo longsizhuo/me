@@ -7,6 +7,7 @@ import {
   About,
   Album,
   ContactAdvanced,
+  ErrorBoundary,
   Experience,
   GlobalLottieBackground,
   Hero,
@@ -66,6 +67,16 @@ function Analytics() {
   return null;
 }
 
+// 页面级兜底：区块级 boundary（canvas、Lottie）没接住的错误最终会冒泡到这里，
+// 渲染一段可读文字而不是让整个 React root 被卸载、页面全黑。
+function PageErrorFallback() {
+  return (
+    <div className="min-h-screen bg-primary flex items-center justify-center text-secondary">
+      页面加载出错，请刷新重试。
+    </div>
+  );
+}
+
 function LangRoute({ lang }: { lang: Lang }) {
   useEffect(() => {
     if (i18n.language !== lang) {
@@ -75,7 +86,9 @@ function LangRoute({ lang }: { lang: Lang }) {
   }, [lang]);
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-      <HomePage />
+      <ErrorBoundary label="page" fallback={<PageErrorFallback />}>
+        <HomePage />
+      </ErrorBoundary>
     </motion.div>
   );
 }
@@ -86,7 +99,9 @@ function HomePage() {
       <a href="#about" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-tertiary focus:text-white focus:rounded-lg">
         Skip to content
       </a>
-      <GlobalLottieBackground />
+      <ErrorBoundary label="lottie-background">
+        <GlobalLottieBackground />
+      </ErrorBoundary>
       <div className="bg-hero-pattern bg-cover bg-no-repeat bg-center">
         <Navbar />
         <Hero />
@@ -100,7 +115,9 @@ function HomePage() {
       <Writing />
       <div className="relative z-0">
         <ContactAdvanced />
-        <StarsCanvas />
+        <ErrorBoundary label="stars-canvas">
+          <StarsCanvas />
+        </ErrorBoundary>
       </div>
       <Footer />
       <ScrollToTopButton />
@@ -120,17 +137,25 @@ function App() {
           <Routes>
             <Route path="/" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <HomePage />
+                <ErrorBoundary label="page" fallback={<PageErrorFallback />}>
+                  <HomePage />
+                </ErrorBoundary>
               </motion.div>
             } />
             <Route path="/zh" element={<LangRoute lang="zh" />} />
             <Route path="/en" element={<LangRoute lang="en" />} />
             <Route path="/tools" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <Tools />
+                <ErrorBoundary label="page" fallback={<PageErrorFallback />}>
+                  <Tools />
+                </ErrorBoundary>
               </motion.div>
             } />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={
+              <ErrorBoundary label="page" fallback={<PageErrorFallback />}>
+                <NotFound />
+              </ErrorBoundary>
+            } />
           </Routes>
         </Suspense>
       </AnimatePresence>
