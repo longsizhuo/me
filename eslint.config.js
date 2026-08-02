@@ -6,10 +6,6 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 export default [
-  // Cloudflare Worker: separate runtime (D1Database/R2Bucket globals, no DOM
-  // lib), no @cloudflare/workers-types dep here — keep it out of the main
-  // project's lint/tsc entirely rather than special-casing its globals.
-  { ignores: ['**/worker/**'] },
   {
     files: ['**/*.{ts,tsx}'],
     ignores: ['**/.git/**', '**/node_modules/**', '**/dist/**'],
@@ -56,6 +52,22 @@ export default [
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    // Cloudflare Worker runtime globals (declared ambiently in worker/env.d.ts,
+    // no @cloudflare/workers-types dep). Core `no-undef` only sees plain JS
+    // scope, not TS ambient type declarations, so these need registering here
+    // or every reference to them reads as "undefined" outside worker/.
+    files: ['worker/**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        D1Database: 'readonly',
+        D1PreparedStatement: 'readonly',
+        D1Result: 'readonly',
+        R2Bucket: 'readonly',
+        R2Object: 'readonly',
+      },
     },
   },
 ];

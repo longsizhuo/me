@@ -35,7 +35,9 @@ interface PhotoRow {
 // limit=0 or limit=99999 still gets a usable response, not a 400.
 function parseLimit(raw: string | null): number {
   const n = raw === null ? DEFAULT_LIMIT : Number(raw);
-  if (!Number.isFinite(n)) return DEFAULT_LIMIT;
+  if (!Number.isFinite(n)) {
+    return DEFAULT_LIMIT;
+  }
   return Math.min(Math.max(Math.trunc(n), 1), MAX_LIMIT);
 }
 
@@ -43,8 +45,12 @@ function parseLimit(raw: string | null): number {
 // exposes name_zh/name_en both — the client gets one "name" field.
 export function pickLang(url: URL, request: Request): Lang {
   const q = url.searchParams.get("lang");
-  if (q === "zh" || q === "en") return q;
-  const accept = (request.headers.get("Accept-Language") || "").trim().toLowerCase();
+  if (q === "zh" || q === "en") {
+    return q;
+  }
+  const accept = (request.headers.get("Accept-Language") || "")
+    .trim()
+    .toLowerCase();
   return accept.startsWith("zh") ? "zh" : "en";
 }
 
@@ -56,8 +62,12 @@ export function encodeCursor(sort: number, id: number): string {
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export function decodeCursor(raw: string | null): { sort: number; id: number } | null {
-  if (!raw) return null;
+export function decodeCursor(
+  raw: string | null,
+): { sort: number; id: number } | null {
+  if (!raw) {
+    return null;
+  }
   let decoded: string;
   try {
     const b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
@@ -86,25 +96,29 @@ function foldPhoto(row: PhotoRow) {
   return { id: row.id, key: row.key, w: row.w, h: row.h };
 }
 
+// Reads are edge-cacheable; errors are not — a 404 from a mistyped slug or a
+// 405 from a bad method must not get pinned at the edge for 60s.
 export function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=60",
+      "Cache-Control": status < 400 ? "public, max-age=60" : "no-store",
     },
   });
 }
 
 export async function listAlbums(env: Env, lang: Lang): Promise<Response> {
   const { results } = await env.DB.prepare(
-    "SELECT * FROM albums ORDER BY sort_order, id"
+    "SELECT * FROM albums ORDER BY sort_order, id",
   ).all<AlbumRow>();
-  return jsonResponse(results.map((r) => foldAlbum(r, lang)));
+  return jsonResponse(results.map((r: AlbumRow) => foldAlbum(r, lang)));
 }
 
 async function getAlbumRow(env: Env, slug: string): Promise<AlbumRow | null> {
-  const row = await env.DB.prepare("SELECT * FROM albums WHERE slug = ?").bind(slug).first<AlbumRow>();
+  const row = await env.DB.prepare("SELECT * FROM albums WHERE slug = ?")
+    .bind(slug)
+    .first<AlbumRow>();
   return row ?? null;
 }
 
@@ -115,31 +129,42 @@ async function pagePhotos(
   env: Env,
   albumId: number,
   cursor: { sort: number; id: number } | null,
-  limit: number
-): Promise<{ photos: ReturnType<typeof foldPhoto>[]; nextCursor: string | null }> {
+  limit: number,
+): Promise<{
+  photos: ReturnType<typeof foldPhoto>[];
+  nextCursor: string | null;
+}> {
   const stmt = cursor
     ? env.DB.prepare(
         `SELECT id, key, w, h, sort_order FROM photos
          WHERE album_id = ? AND (sort_order > ? OR (sort_order = ? AND id > ?))
-         ORDER BY sort_order, id LIMIT ?`
+         ORDER BY sort_order, id LIMIT ?`,
       ).bind(albumId, cursor.sort, cursor.sort, cursor.id, limit + 1)
     : env.DB.prepare(
         `SELECT id, key, w, h, sort_order FROM photos
          WHERE album_id = ?
-         ORDER BY sort_order, id LIMIT ?`
+         ORDER BY sort_order, id LIMIT ?`,
       ).bind(albumId, limit + 1);
 
   const { results } = await stmt.all<PhotoRow>();
   const hasMore = results.length > limit;
   const page = hasMore ? results.slice(0, limit) : results;
   const last = page[page.length - 1];
-  const nextCursor = hasMore && last ? encodeCursor(last.sort_order, last.id) : null;
+  const nextCursor =
+    hasMore && last ? encodeCursor(last.sort_order, last.id) : null;
   return { photos: page.map(foldPhoto), nextCursor };
 }
 
-export async function getAlbum(env: Env, slug: string, lang: Lang, limit: number): Promise<Response> {
+export async function getAlbum(
+  env: Env,
+  slug: string,
+  lang: Lang,
+  limit: number,
+): Promise<Response> {
   const album = await getAlbumRow(env, slug);
-  if (!album) return jsonResponse({ error: "album not found" }, 404);
+  if (!album) {
+    return jsonResponse({ error: "album not found" }, 404);
+  }
   const { photos, nextCursor } = await pagePhotos(env, album.id, null, limit);
   return jsonResponse({ ...foldAlbum(album, lang), photos, nextCursor });
 }
@@ -148,10 +173,12 @@ export async function getAlbumPhotos(
   env: Env,
   slug: string,
   cursorRaw: string | null,
-  limit: number
+  limit: number,
 ): Promise<Response> {
   const album = await getAlbumRow(env, slug);
-  if (!album) return jsonResponse({ error: "album not found" }, 404);
+  if (!album) {
+    return jsonResponse({ error: "album not found" }, 404);
+  }
   // A garbage cursor decodes to null and is treated as "start from page 1"
   // rather than a 400/500 — visitors hand-edit URLs.
   const cursor = decodeCursor(cursorRaw);
@@ -164,12 +191,18 @@ export async function latestPhotos(env: Env, limit: number): Promise<Response> {
     `SELECT photos.id, photos.key, photos.w, photos.h, albums.slug AS album_slug
      FROM photos JOIN albums ON albums.id = photos.album_id
      ORDER BY photos.created_at DESC, photos.id DESC
-     LIMIT ?`
+     LIMIT ?`,
   )
     .bind(limit)
     .all<PhotoRow & { album_slug: string }>();
   return jsonResponse(
-    results.map((r) => ({ id: r.id, key: r.key, w: r.w, h: r.h, albumSlug: r.album_slug }))
+    results.map((r: PhotoRow & { album_slug: string }) => ({
+      id: r.id,
+      key: r.key,
+      w: r.w,
+      h: r.h,
+      albumSlug: r.album_slug,
+    })),
   );
 }
 
