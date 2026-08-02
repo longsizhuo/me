@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import i18n, { type Lang } from "./i18n";
+import i18n, { type Lang, langFromPath } from "./i18n";
 import {
   About,
   Album,
@@ -36,6 +36,21 @@ function HtmlLangSync() {
   useEffect(() => {
     document.documentElement.lang = i18n.language === "zh" ? "zh-CN" : "en";
   }, [i18n.language]);
+  return null;
+}
+
+// ponytail: only /zh and /en need a self-referencing canonical (the crawler-folding
+// risk this exists for); everything else keeps the static shell's default of "/".
+function CanonicalSync() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      return;
+    }
+    const lang = langFromPath(pathname);
+    canonical.setAttribute("href", `https://longsizhuo.com${lang ? pathname : "/"}`);
+  }, [pathname]);
   return null;
 }
 
@@ -98,6 +113,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <HtmlLangSync />
+      <CanonicalSync />
       <Analytics />
       <AnimatePresence mode="wait">
         <Suspense fallback={<div className="bg-primary min-h-screen" />}>

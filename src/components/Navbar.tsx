@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { navLinks } from "../constants";
 import { menu, close } from "../assets";
+import { langFromPath } from "../i18n";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -12,12 +13,17 @@ const Navbar = () => {
   const [toggle, setToggle] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
 
   const toggleLang = () => {
     const newLang = i18n.language === "en" ? "zh" : "en";
     i18n.changeLanguage(newLang);
     localStorage.setItem("lang", newLang);
+    // URL wins over localStorage on reload, so a same-URL toggle must move the URL too.
+    if (langFromPath(location.pathname)) {
+      navigate(`/${newLang}`);
+    }
   };
 
   useEffect(() => {
