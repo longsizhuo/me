@@ -334,18 +334,29 @@ const AlbumAdmin = () => {
     const rowIndexOf: number[] = [];
 
     for (let i = 0; i < files.length; i++) {
+      // Switching albums clears uploadRows, so a write keyed by the original
+      // index would land in a now-empty array and punch a hole in it — earlier
+      // rows silently disappear from the status list. Same guard the
+      // post-upload reload below already uses.
+      const stillCurrent = () => activeSlugRef.current === targetSlug;
       try {
         const { w, h } = await readDimensions(files[i]);
         okFiles.push(files[i]);
         okWidths.push(w);
         okHeights.push(h);
         rowIndexOf.push(i);
+        if (!stillCurrent()) {
+          continue;
+        }
         setUploadRows((prev) => {
           const next = [...prev];
           next[i] = { ...next[i], status: "uploading", w, h };
           return next;
         });
       } catch {
+        if (!stillCurrent()) {
+          continue;
+        }
         setUploadRows((prev) => {
           const next = [...prev];
           next[i] = { ...next[i], status: "error", error: "could not read image dimensions" };
