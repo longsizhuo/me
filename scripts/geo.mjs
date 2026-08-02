@@ -17,6 +17,8 @@
  */
 import { readFileSync } from "node:fs";
 
+import { safeJsonLdString } from "./json-ld.mjs";
+
 const SITE = "https://longsizhuo.com";
 const EMAIL = "longsizhuo@gmail.com";
 
@@ -229,7 +231,7 @@ export function geo() {
       order: "pre",
       handler(html) {
         const locales = loadLocales();
-        const jsonLd = JSON.stringify(renderJsonLd(locales), null, 2).replace(/</g, "\\u003c");
+        const jsonLd = safeJsonLdString(renderJsonLd(locales));
         return html
           .replace("<!--geo-jsonld-->", `<script type="application/ld+json">\n${jsonLd}\n</script>`)
           .replace("<!--geo-->", `<style>${SHELL_STYLE}</style>${renderShell(locales)}`);
