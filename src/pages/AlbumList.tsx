@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Image } from "antd";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -8,37 +8,28 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { fadeIn } from "../utils/motion";
 import { imageUrl } from "../content/images";
-import { cdnUrl } from "../content";
 import { fetchAlbums, type AlbumSummary, type Lang } from "../api/album";
 
-/**
- * antd's `fallback` prop swaps in the raw R2 URL when the Cloudflare Images
- * transform fails (quota exceeded, transform disabled, etc.) — that case
- * should still render fine. Only hide the tile if the fallback ALSO fails
- * (the object is genuinely gone), which shows up as a second onError call
- * on the same <img> once rc-image has swapped its src to the fallback.
- */
 function CoverImage({ album }: { album: AlbumSummary }) {
-  const failCount = useRef(0);
-  const [broken, setBroken] = useState(false);
-
-  if (!album.coverKey || broken) {
+  if (!album.coverKey) {
     return null;
   }
 
   return (
     <Image
       src={imageUrl(album.coverKey, { width: 600, fit: "cover" })}
-      fallback={cdnUrl(album.coverKey)}
       alt={album.name}
       preview={false}
       wrapperStyle={{ width: "100%", height: "100%", display: "block" }}
       style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      onError={() => {
-        failCount.current += 1;
-        if (failCount.current >= 2) {
-          setBroken(true);
-        }
+      onError={(e) => {
+        // No `fallback` prop here on purpose: antd's `fallback` would swap
+        // in the raw R2 original (up to 10MB, never meant to be served
+        // directly) whenever the Images transform fails. Hide the broken
+        // <img> instead and let the aspect-[4/3] bg-black-100/60 box behind
+        // it show through — a blank cover is the correct failure mode, a
+        // 10MB download is not.
+        e.currentTarget.style.display = "none";
       }}
     />
   );

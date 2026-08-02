@@ -13,7 +13,11 @@ import {
 import { requireAccess, unauthorized } from "./access.ts";
 import { handleAdmin } from "./admin.ts";
 
-const ALLOWED_ORIGINS = ["https://longsizhuo.com", "http://localhost:5173"];
+const ALLOWED_ORIGINS = [
+  "https://longsizhuo.com",
+  "http://localhost:5173",
+  "http://localhost:4173", // vite preview's default port
+];
 
 function corsHeaders(origin: string | null): Record<string, string> {
   const allowOrigin =

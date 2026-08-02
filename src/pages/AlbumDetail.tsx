@@ -8,7 +8,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { fadeIn } from "../utils/motion";
 import { imageUrl } from "../content/images";
-import { cdnUrl } from "../content";
 import { ApiError, fetchAlbum, fetchPhotos, type Lang, type Photo } from "../api/album";
 
 const PAGE_SIZE = 12;
@@ -28,8 +27,6 @@ function toError(err: unknown): Error {
 function PhotoTile({ photo, alt }: { photo: Photo; alt: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const [broken, setBroken] = useState(false);
-  const failCount = useRef(0);
 
   useEffect(() => {
     const node = ref.current;
@@ -63,26 +60,24 @@ function PhotoTile({ photo, alt }: { photo: Photo; alt: string }) {
       }}
       className="bg-tertiary"
     >
-      {visible && !broken && (
+      {visible && (
         <Image
           src={imageUrl(photo.key, { width: 600 })}
           preview={{ src: imageUrl(photo.key, { width: 1600 }) }}
-          fallback={cdnUrl(photo.key)}
           alt={alt}
           loading="lazy"
           width="100%"
           style={{ display: "block", width: "100%", objectFit: "cover" }}
           placeholder
-          onError={() => {
-            // antd's `fallback` swaps in the raw R2 URL when the Images
-            // transform fails; that's the common case (quota exceeded) and
-            // should still render. Only the SECOND onError — the fallback
-            // also failing — means the object is genuinely gone, so hide
-            // the tile instead of showing rc-image's broken-image icon.
-            failCount.current += 1;
-            if (failCount.current >= 2) {
-              setBroken(true);
-            }
+          onError={(e) => {
+            // No `fallback` prop here on purpose: antd's `fallback` would
+            // swap in the raw R2 original (up to 10MB, never meant to be
+            // served directly) whenever the Images transform fails —
+            // quota exhausted, transforms toggled off, a transient 524.
+            // Hide the broken <img> instead and let the tile's own
+            // bg-tertiary placeholder box show through; a blank tile is
+            // the correct failure mode, a 10MB download is not.
+            e.currentTarget.style.display = "none";
           }}
         />
       )}
@@ -120,8 +115,16 @@ const AlbumDetail = () => {
 
   const cursorRef = useRef<string | null>(null);
   const loadingRef = useRef(false);
+  // Tracks which slug is currently "live". `loadMore` below is a
+  // long-lived useCallback (recreated only when `slug` changes), so a
+  // response landing after the user has already navigated to a different
+  // album can't rely on a per-effect `cancelled` closure the way the fetch
+  // below does — this ref is the equivalent guard, readable from that
+  // outer-lived callback.
+  const activeSlugRef = useRef<string | undefined>(slug);
 
   useEffect(() => {
+    activeSlugRef.current = slug;
     if (!slug) {
       return;
     }
@@ -165,10 +168,19 @@ const AlbumDetail = () => {
     if (!slug || loadingRef.current || !cursorRef.current) {
       return;
     }
+    const requestSlug = slug;
     loadingRef.current = true;
     setLoadingMore(true);
     fetchPhotos(slug, cursorRef.current, PAGE_SIZE)
       .then((page) => {
+        // The user may have navigated to a different album while this
+        // request was in flight. Applying it anyway would append album A's
+        // photos into album B's list and clobber B's cursor with A's token
+        // — discard it the same way the fetchAlbum effect above discards a
+        // late response via its `cancelled` flag.
+        if (activeSlugRef.current !== requestSlug) {
+          return;
+        }
         setPhotos((prev) => {
           const seen = new Set(prev.map((p) => p.id));
           return [...prev, ...page.photos.filter((p) => !seen.has(p.id))];
@@ -176,12 +188,20 @@ const AlbumDetail = () => {
         cursorRef.current = page.nextCursor;
       })
       .catch((err: unknown) => {
+        if (activeSlugRef.current !== requestSlug) {
+          return;
+        }
         // A hiccup fetching page N doesn't invalidate the N-1 photos
         // already on screen — log it and let the next scroll-into-view
         // retry, rather than throwing away a working page for a boundary.
         console.error("[AlbumDetail] loadMore failed", err);
       })
       .finally(() => {
+        if (activeSlugRef.current !== requestSlug) {
+          // The new album's own effect already reset loadingRef/loadingMore
+          // when it mounted; touching them here would race that reset.
+          return;
+        }
         loadingRef.current = false;
         setLoadingMore(false);
       });
@@ -268,7 +288,20 @@ const AlbumDetail = () => {
           {!meta && <MasonrySkeleton />}
 
           {meta && (
-            <Image.PreviewGroup>
+            // `items` is passed explicitly rather than relying on rc-image's
+            // default mount-order registration: tiles mount lazily behind a
+            // one-shot IntersectionObserver, and the page can't scroll while
+            // the lightbox is open, so whatever had registered by the time
+            // it opened would otherwise be frozen for that whole session —
+            // the "next" arrow disables long before the real last photo on
+            // any album taller than one viewport. Building `items` straight
+            // from `photos` makes count/range come from the data instead.
+            // Each `src` must exactly match the corresponding tile's
+            // `preview.src` below — PreviewGroup matches the clicked image
+            // back to its index in `items` by string equality.
+            <Image.PreviewGroup
+              items={photos.map((photo) => ({ src: imageUrl(photo.key, { width: 1600 }) }))}
+            >
               <div style={{ columnWidth: `${COLUMN_WIDTH}px`, columnGap: GAP }}>
                 {photos.map((photo, idx) => (
                   <PhotoTile key={photo.id} photo={photo} alt={`${meta.name}-${idx}`} />
