@@ -35,7 +35,8 @@
     "notFoundTitle": "相册不存在",
     "notFoundMessage": "这个相册可能已被删除，或者链接有误。",
     "backToList": "← 返回相册列表",
-    "loadingMore": "加载中…"
+    "loadingMore": "加载中…",
+    "viewAll": "查看全部 →"
   },
   "experience": {
     "subtitle": "我的职业经历",

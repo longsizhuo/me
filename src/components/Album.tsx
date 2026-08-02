@@ -1,64 +1,91 @@
-import { Image } from "antd";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionWrapper } from "../hoc";
 import { styles } from "../styles";
-import { album, cdnUrl, type AlbumPhoto } from "../content";
 import { fadeIn, textVariant } from "../utils/motion";
+import { imageUrl } from "../content/images";
+import { fetchLatest, type LatestPhoto } from "../api/album";
 
-const LazyImage = ({ photo, alt, gap }: { photo: AlbumPhoto; alt: string; gap: number }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+// Fixed-size tile shared by photos and the trailing "view all" card, so the
+// strip reads as one uniform row regardless of each source photo's real
+// aspect ratio (imageUrl's fit:"cover" crops the transform itself; this
+// class additionally clips via CSS in case a transform ever returns
+// something oddly shaped).
+const TILE_CLASS =
+  "flex-shrink-0 w-[200px] sm:w-[240px] aspect-[4/3] rounded-2xl overflow-hidden bg-tertiary";
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) {
-      return;
-    }
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      });
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
+function PhotoTile({ photo }: { photo: LatestPhoto }) {
   return (
-    <div
-      ref={ref}
-      style={{
-        breakInside: "avoid",
-        marginBottom: `${gap}px`,
-        borderRadius: 12,
-        overflow: "hidden",
-        // 加载前先按真实比例占位，消除瀑布流抖动
-        aspectRatio: `${photo.w} / ${photo.h}`,
-        background: "#151030",
-      }}
-    >
-      {visible && (
-        <Image
-          src={cdnUrl(photo.key)}
-          alt={alt}
-          loading="lazy"
-          width="100%"
-          style={{ display: "block", borderRadius: 12, objectFit: "cover" }}
-          placeholder
-        />
-      )}
+    <div className={TILE_CLASS}>
+      <img
+        src={imageUrl(photo.key, { width: 400, fit: "cover" })}
+        alt=""
+        loading="lazy"
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          // No raw-R2 fallback on purpose (see src/content/images.ts's
+          // docblock and AlbumList/AlbumDetail's identical convention): a
+          // failed transform hides the broken <img> and lets the
+          // bg-tertiary placeholder show through instead of ever falling
+          // back to a multi-MB original.
+          e.currentTarget.style.display = "none";
+        }}
+      />
     </div>
   );
-};
+}
+
+function ViewAllCard() {
+  const { t } = useTranslation();
+  return (
+    <Link
+      to="/album"
+      className={`${TILE_CLASS} flex items-center justify-center text-center px-4 text-white font-semibold hover:-translate-y-1 hover:bg-black-100/60 transition-all duration-200`}
+    >
+      {t("album.viewAll")}
+    </Link>
+  );
+}
+
+function StripSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-x-hidden mt-10">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className={`${TILE_CLASS} animate-pulse`} />
+      ))}
+    </div>
+  );
+}
 
 const Album = () => {
   const { t } = useTranslation();
-  const gap = 16;
-  const columnWidth = 250;
+  const [photos, setPhotos] = useState<LatestPhoto[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchLatest(12)
+      .then((data) => {
+        if (!cancelled) {
+          setPhotos(data);
+        }
+      })
+      .catch((err: unknown) => {
+        // This section sits inside HomePage's page-level ErrorBoundary,
+        // which would blank the ENTIRE homepage on an uncaught throw — too
+        // costly for one preview strip. Log and degrade to empty instead,
+        // unlike AlbumList/AlbumDetail (whole-page routes, where throwing
+        // to the boundary is the right call).
+        console.error("[Album] fetchLatest failed", err);
+        if (!cancelled) {
+          setPhotos([]);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="relative w-full">
@@ -74,31 +101,16 @@ const Album = () => {
         {t("album.description")}
       </motion.p>
 
-      <div
-        id="album-scroll"
-        className="p-4 mt-10 bg-black-100/50 shadow-inner overflow-y-scroll border border-gray-700 rounded-2xl"
-        style={{ maxHeight: "520px", width: "100%" }}
-      >
-        <Image.PreviewGroup>
-          {album.map((group) => (
-            <div key={group.id} style={{ marginBottom: 40 }}>
-              <h2 className="text-white text-[20px] font-semibold my-4 pb-2 border-b border-gray-600">
-                {group.folder}
-              </h2>
-              <div style={{ columnWidth: `${columnWidth}px`, columnGap: gap }}>
-                {group.photos.map((photo, idx) => (
-                  <LazyImage
-                    key={photo.key}
-                    photo={photo}
-                    alt={`${group.folder}-${idx}`}
-                    gap={gap}
-                  />
-                ))}
-              </div>
-            </div>
+      {photos === null && <StripSkeleton />}
+
+      {photos !== null && photos.length > 0 && (
+        <div className="flex gap-4 overflow-x-auto mt-10 pb-2">
+          {photos.map((photo) => (
+            <PhotoTile key={photo.id} photo={photo} />
           ))}
-        </Image.PreviewGroup>
-      </div>
+          <ViewAllCard />
+        </div>
+      )}
     </div>
   );
 };

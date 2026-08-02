@@ -36,7 +36,8 @@
     "notFoundTitle": "Album not found",
     "notFoundMessage": "This album may have been removed, or the link is incorrect.",
     "backToList": "← Back to albums",
-    "loadingMore": "Loading more…"
+    "loadingMore": "Loading more…",
+    "viewAll": "View all →"
   },
   "experience": {
     "subtitle": "What I have done so far",

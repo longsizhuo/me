@@ -89,3 +89,109 @@ export function fetchPhotos(
 export function fetchLatest(limit?: number): Promise<LatestPhoto[]> {
   return get<LatestPhoto[]>("/api/photos/latest", { limit });
 }
+
+// ---------------------------------------------------------------------
+// Admin (write) API — worker/src/admin.ts, gated by Cloudflare Access.
+// Nothing here does auth: the browser carries the Access session for
+// same-origin requests automatically, and worker/src/access.ts verifies the
+// Cf-Access-Jwt-Assertion signature server-side. This file only needs to
+// send requests with the field names admin.ts actually expects (confirmed
+// against the deployed Worker — camelCase, not the snake_case sketched in
+// the design doc, same gap as the public API noted at the top of this file).
+// ---------------------------------------------------------------------
+
+export interface UploadOutcome {
+  file: string;
+  id?: number;
+  key?: string;
+  w?: number;
+  h?: number;
+  error?: string;
+}
+
+export interface UploadResult {
+  uploaded: UploadOutcome[];
+  failed: UploadOutcome[];
+}
+
+// `fetch`'s own second-parameter type, derived rather than naming RequestInit
+// directly — RequestInit is a type-only DOM global with no runtime value
+// backing it, which trips this config's plain (non-type-aware) `no-undef`.
+type FetchInit = NonNullable<Parameters<typeof fetch>[1]>;
+
+async function adminRequest<T>(path: string, init: FetchInit): Promise<T> {
+  const res = await fetch(BASE + path, init);
+  if (!res.ok) {
+    let message = `${init.method ?? "GET"} ${path} -> ${res.status}`;
+    try {
+      const body = (await res.json()) as { error?: string };
+      if (body && typeof body.error === "string") {
+        message = body.error;
+      }
+    } catch {
+      // Body wasn't JSON (or empty) — keep the generic status message.
+    }
+    throw new ApiError(res.status, message);
+  }
+  return res.json() as Promise<T>;
+}
+
+export function createAlbum(input: {
+  slug: string;
+  nameZh: string;
+  nameEn: string;
+}): Promise<{ slug: string }> {
+  return adminRequest("/api/admin/albums", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+/**
+ * Uploads a batch of photos to `slug` in a single multipart request. `files`,
+ * `widths`, `heights` must be the same length and in the same order — the
+ * Worker rejects the whole batch otherwise (see worker/src/admin.ts:
+ * "widths/heights must have one entry per file, same order"). Callers are
+ * expected to have already read each file's dimensions client-side (the
+ * Worker has no image library to do it server-side).
+ */
+export function uploadPhotos(
+  slug: string,
+  files: File[],
+  widths: number[],
+  heights: number[],
+): Promise<UploadResult> {
+  const form = new FormData();
+  files.forEach((file, i) => {
+    form.append("files", file);
+    form.append("widths", String(widths[i]));
+    form.append("heights", String(heights[i]));
+  });
+  // No Content-Type header set here on purpose — the browser fills in the
+  // multipart boundary itself; setting it manually would drop the boundary.
+  return adminRequest(`/api/admin/albums/${encodeURIComponent(slug)}/photos`, {
+    method: "POST",
+    body: form,
+  });
+}
+
+export function updatePhotoSortOrder(id: number, sortOrder: number): Promise<unknown> {
+  return adminRequest(`/api/admin/photos/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sortOrder }),
+  });
+}
+
+export function deletePhoto(id: number): Promise<unknown> {
+  return adminRequest(`/api/admin/photos/${id}`, { method: "DELETE" });
+}
+
+export function setAlbumCover(slug: string, coverKey: string): Promise<unknown> {
+  return adminRequest(`/api/admin/albums/${encodeURIComponent(slug)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ coverKey }),
+  });
+}

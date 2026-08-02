@@ -25,6 +25,7 @@ const Tools = lazy(() => import("./pages/Tools"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AlbumList = lazy(() => import("./pages/AlbumList"));
 const AlbumDetail = lazy(() => import("./pages/AlbumDetail"));
+const AlbumAdmin = lazy(() => import("./pages/AlbumAdmin"));
 // 单独指向具体模块，绝不能经过 ./canvas 或 ./components 这两个 barrel —— 否则
 // three.js 又会被拖回入口图（见 src/components/index.ts 顶部的注释）。
 const StarsCanvas = lazy(() => import("./components/canvas/Stars"));
@@ -176,6 +177,13 @@ function App() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <ErrorBoundary label="album-list" fallback={<AlbumErrorFallback />}>
                   <AlbumList />
+                </ErrorBoundary>
+              </motion.div>
+            } />
+            <Route path="/album/admin" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <ErrorBoundary label="album-admin" fallback={<PageErrorFallback />}>
+                  <AlbumAdmin />
                 </ErrorBoundary>
               </motion.div>
             } />
