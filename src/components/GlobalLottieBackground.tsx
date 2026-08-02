@@ -1,10 +1,10 @@
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { DotLottieReact, type DotLottie } from "@lottiefiles/dotlottie-react";
 import { useEffect, useRef, useState } from "react";
 
 export const GlobalLottieBackground = () => {
-  const [dotLottie, setDotLottie] = useState(null);
+  const [dotLottie, setDotLottie] = useState<DotLottie | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown>(null);
   const lastScrollY = useRef(0);
   const currentFrame = useRef(0);
   const scrollPerFrame = 20;
@@ -58,7 +58,7 @@ export const GlobalLottieBackground = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isReady, dotLottie]);
 
-  const handleLottieRef = (ref) => {
+  const handleLottieRef = (ref: DotLottie | null) => {
     if (ref && typeof ref === "object") {
       setDotLottie(ref);
     }

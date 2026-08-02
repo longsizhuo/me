@@ -12,6 +12,27 @@ import type { ServiceCardProps } from "./TYPE";
 
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
 
+// Shape of the GraphQL query below — only the fields it actually selects.
+interface GithubProfileQuery {
+  user: {
+    followers: { totalCount: number };
+    repositories: { totalCount: number };
+    contributionsCollection: {
+      contributionCalendar: { totalContributions: number };
+    };
+    pinnedItems: {
+      nodes: Array<{
+        id: string;
+        name: string;
+        description: string | null;
+        stargazerCount: number;
+        forkCount: number;
+        owner: { login: string; avatarUrl: string };
+      }>;
+    };
+  };
+}
+
 const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceCardProps) => (
   <Tilt
     className="xs:w-[250px] w-full"
@@ -57,7 +78,7 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceC
 
 const About = () => {
   const { t } = useTranslation();
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState<ServiceCardProps[]>([]);
   const [ghStats, setGhStats] = useState<{
     followers: number;
     repos: number;
@@ -75,7 +96,7 @@ const About = () => {
       });
 
       try {
-        const { user } = await graphqlWithAuth(`
+        const { user } = await graphqlWithAuth<GithubProfileQuery>(`
           {
             user(login: "longsizhuo") {
               followers { totalCount }
@@ -111,7 +132,8 @@ const About = () => {
         const dynamicServices = user.pinnedItems.nodes.map((repo, index) => ({
           title: repo.name,
           icon: repo.owner.avatarUrl,
-          description: repo.description,
+          // GitHub allows a repo with no description; ServiceCardProps wants a string.
+          description: repo.description ?? "",
           stars: repo.stargazerCount,
           forks: repo.forkCount,
           index,
@@ -169,8 +191,8 @@ const About = () => {
       </motion.div>
 
       <div className="mt-20 flex flex-wrap gap-10">
-        {services.map((service, index) => (
-          <ServiceCard key={service.title} index={index} {...service} />
+        {services.map((service) => (
+          <ServiceCard key={service.title} {...service} />
         ))}
       </div>
     </>

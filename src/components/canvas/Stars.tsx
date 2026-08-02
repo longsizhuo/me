@@ -2,13 +2,17 @@
 import { PointMaterial, Points, Preload } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as random from "maath/random/dist/maath-random.esm";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useRef, useState, type ComponentRef } from "react";
 import type { StarsProps } from "./TYPE";
 
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 const Stars = (props: StarsProps) => {
-  const ref = useRef();
+  // Derived from drei's <Points> rather than importing THREE.Points directly:
+  // "three" ships no types of its own and @types/three is only reachable
+  // through drei's/fiber's own dependency tree, not this project's root
+  // node_modules — ComponentRef sidesteps needing to resolve it ourselves.
+  const ref = useRef<ComponentRef<typeof Points>>(null);
   const [sphere] = useState(() => {
     const count = isMobile ? 3000 : 15000;
     const positions = random.inSphere(new Float32Array(count), { radius: 1.2 });
@@ -22,6 +26,9 @@ const Stars = (props: StarsProps) => {
   });
 
   useFrame((state, delta) => {
+    if (!ref.current) {
+      return;
+    }
     ref.current.rotation.x -= delta / 10;
     ref.current.rotation.y -= delta / 15;
   });

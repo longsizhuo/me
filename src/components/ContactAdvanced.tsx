@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import emailjs from '@emailjs/browser';
@@ -13,9 +13,11 @@ import { getEmailjsConfig } from "../config/emailjs";
 // 指向具体模块而不是 ./canvas barrel —— 后者会把 Ball/Computers 也一起拖进来。
 const EarthCanvas = lazy(() => import("./canvas/Earth"));
 
+type StatusType = '' | 'success' | 'error' | 'warning';
+
 const ContactAdvanced = () => {
   const { t, i18n } = useTranslation();
-  const formRef = useRef();
+  const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -23,13 +25,17 @@ const ContactAdvanced = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({
+  const [status, setStatus] = useState<{
+    type: StatusType;
+    message: string;
+    details: Record<string, unknown>;
+  }>({
     type: '', // 'success', 'error', 'warning'
     message: '',
     details: {}
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { target } = e;
     const { name, value } = target;
 
@@ -44,7 +50,7 @@ const ContactAdvanced = () => {
     }
   };
 
-  const showStatus = (type, message, details = {}) => {
+  const showStatus = (type: StatusType, message: string, details: Record<string, unknown> = {}) => {
     setStatus({ type, message, details });
     
     // 自动清除成功消息
@@ -79,7 +85,7 @@ const ContactAdvanced = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -110,7 +116,8 @@ const ContactAdvanced = () => {
 
     } catch (error) {
       console.error('Contact form error:', error);
-      showStatus('error', t('contact.error'), { error: error.message });
+      const message = error instanceof Error ? error.message : String(error);
+      showStatus('error', t('contact.error'), { error: message });
     } finally {
       setLoading(false);
     }
