@@ -9,9 +9,9 @@ import {
   latestPhotos,
   pickLang,
   parseLimit,
-} from "./albums";
-import { requireAccess } from "./access";
-import { handleAdmin } from "./admin";
+} from "./albums.ts";
+import { requireAccess, unauthorized } from "./access.ts";
+import { handleAdmin } from "./admin.ts";
 
 const ALLOWED_ORIGINS = ["https://longsizhuo.com", "http://localhost:5173"];
 
@@ -50,6 +50,20 @@ export default {
     // point — Access sitting in front of the route is not itself a check
     // the Worker can rely on if it's ever reached another way.
     if (pathname.startsWith("/api/admin/")) {
+      // POST to these endpoints is a CORS-simple request (readJsonBody
+      // doesn't require a JSON content-type, and the upload endpoint is
+      // multipart/form-data — both are simple-request content types), so no
+      // preflight ever runs and CORS itself does not stop a cross-site POST.
+      // The Access session cookie defends against that today only via its
+      // browser-default SameSite=Lax; that's a Cloudflare/browser property,
+      // not something this code guarantees, and Access sets SameSite=None
+      // when CORS is enabled on the application. Check Origin ourselves as
+      // a second, independent gate — PATCH/DELETE are already preflighted
+      // and don't need this, but it's cheap and correct to apply it to the
+      // whole branch rather than carve out an exception per method.
+      if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+        return withCors(unauthorized(), origin);
+      }
       const denied = await requireAccess(request, env);
       if (denied) {
         return withCors(denied, origin);

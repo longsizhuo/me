@@ -10,7 +10,7 @@
 // of whether Access actually ran. This is exactly the check the sibling
 // `sylvia-photo-api` Worker skips — it hardcodes an `ADMIN_SECRET` string
 // instead, which is not an acceptable substitute.
-import type { Env } from "./albums";
+import type { Env } from "./albums.ts";
 
 interface Jwk {
   kid: string;
@@ -51,6 +51,12 @@ async function getJwks(env: Env): Promise<Jwk[]> {
     throw new AccessJwtError(`JWKS fetch failed: ${res.status}`);
   }
   const data = (await res.json()) as Jwks;
+  // A 200 whose body doesn't actually have a usable `keys` array must not be
+  // cached — that would turn one transient upstream glitch into every admin
+  // request being rejected for the next JWKS_TTL_MS instead of just this one.
+  if (!Array.isArray(data.keys) || data.keys.length === 0) {
+    throw new AccessJwtError("JWKS response missing keys");
+  }
   jwksCache = { keys: data.keys, fetchedAt: now };
   return data.keys;
 }
@@ -136,7 +142,10 @@ export async function verifyAccessJwt(
   return payload;
 }
 
-function unauthorized(): Response {
+// Exported so index.ts's Origin check (a separate gate on the same
+// /api/admin/* branch, see the CSRF note there) answers with the identical
+// 401 shape rather than inventing a second one.
+export function unauthorized(): Response {
   return new Response(JSON.stringify({ error: "unauthorized" }), {
     status: 401,
     headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },

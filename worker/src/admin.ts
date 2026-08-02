@@ -1,7 +1,7 @@
 // Access-protected write endpoints (routing only — auth already happened in
 // index.ts via access.ts's requireAccess before handleAdmin is ever called).
-import type { Env, AlbumRow, PhotoRow } from "./albums";
-import { jsonResponse, getAlbumRow } from "./albums";
+import type { Env, AlbumRow, PhotoRow } from "./albums.ts";
+import { jsonResponse, getAlbumRow } from "./albums.ts";
 
 const MIME: Record<string, string> = {
   jpg: "image/jpeg",
@@ -295,7 +295,12 @@ async function uploadPhotos(
       continue;
     }
     const ext = extOf(file.name);
-    if (!ext || !(ext in MIME)) {
+    // Hoisted lookup + typeof check rather than `ext in MIME` — `in` walks
+    // the prototype chain, so a file literally named "x.constructor" (or
+    // ".toString"/".valueOf") would pass an `in`-based whitelist and then
+    // hand `Object`'s constructor function to put()'s contentType.
+    const mime = ext ? MIME[ext] : undefined;
+    if (!ext || typeof mime !== "string") {
       failed.push({
         file: file.name,
         error: `unsupported file type: ${ext ?? "(none)"}`,
@@ -316,7 +321,7 @@ async function uploadPhotos(
 
     try {
       await env.BUCKET.put(key, buffer, {
-        httpMetadata: { contentType: MIME[ext] },
+        httpMetadata: { contentType: mime },
         sha256: digest,
       });
     } catch (err) {
