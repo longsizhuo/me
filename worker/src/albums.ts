@@ -4,6 +4,10 @@
 export interface Env {
   DB: D1Database;
   BUCKET: R2Bucket;
+  // Public identifiers (not secrets) for Cloudflare Access JWT verification —
+  // see access.ts. Set in wrangler.jsonc's `vars`.
+  ACCESS_TEAM_DOMAIN: string;
+  ACCESS_AUD: string;
 }
 
 const DEFAULT_LIMIT = 30;
@@ -11,7 +15,7 @@ const MAX_LIMIT = 100;
 
 type Lang = "zh" | "en";
 
-interface AlbumRow {
+export interface AlbumRow {
   id: number;
   slug: string;
   name_zh: string;
@@ -23,7 +27,7 @@ interface AlbumRow {
   photo_count: number;
 }
 
-interface PhotoRow {
+export interface PhotoRow {
   id: number;
   key: string;
   w: number;
@@ -115,7 +119,10 @@ export async function listAlbums(env: Env, lang: Lang): Promise<Response> {
   return jsonResponse(results.map((r: AlbumRow) => foldAlbum(r, lang)));
 }
 
-async function getAlbumRow(env: Env, slug: string): Promise<AlbumRow | null> {
+// Exported for admin.ts — the write endpoints need the same "does this
+// slug exist" lookup (existence check before create, 404 before
+// update/delete/upload).
+export async function getAlbumRow(env: Env, slug: string): Promise<AlbumRow | null> {
   const row = await env.DB.prepare("SELECT * FROM albums WHERE slug = ?")
     .bind(slug)
     .first<AlbumRow>();

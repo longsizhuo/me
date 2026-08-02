@@ -15,5 +15,14 @@
   "r2_buckets": [
     { "binding": "BUCKET", "bucket_name": "me-assets" }
   ],
+  // Public identifiers for Cloudflare Access, not secrets — used by
+  // src/access.ts to verify the Cf-Access-Jwt-Assertion signature against
+  // Access's own JWKS. Application "Album Admin", id
+  // f8e3a903-ecf9-49b6-8d14-54af69458de3, destinations
+  // longsizhuo.com/album/admin and longsizhuo.com/api/admin.
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "involutionhell.cloudflareaccess.com",
+    "ACCESS_AUD": "58915fbecc45ec929a4871815c3d2fd1ddc1035dc65fd79beedb0d75a32eacaa"
+  },
   "observability": { "enabled": true }
 }
