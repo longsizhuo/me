@@ -1,14 +1,17 @@
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 import emailjs from '@emailjs/browser';
 
 import { styles } from "../styles";
-import { EarthCanvas } from "./canvas";
 import { ErrorBoundary } from "./ErrorBoundary";
+import LazyVisible from "./LazyVisible";
 import { SectionWrapper } from "../hoc";
 import { slideIn } from "../utils/motion.ts";
 import { getEmailjsConfig } from "../config/emailjs";
+
+// 指向具体模块而不是 ./canvas barrel —— 后者会把 Ball/Computers 也一起拖进来。
+const EarthCanvas = lazy(() => import("./canvas/Earth"));
 
 const ContactAdvanced = () => {
   const { t, i18n } = useTranslation();
@@ -235,7 +238,11 @@ const ContactAdvanced = () => {
         className='xl:flex-1 xl:h-auto md:h-[550px] h-[350px]'
       >
         <ErrorBoundary label="earth-canvas">
-          <EarthCanvas />
+          <LazyVisible className="w-full h-full">
+            <Suspense fallback={null}>
+              <EarthCanvas />
+            </Suspense>
+          </LazyVisible>
         </ErrorBoundary>
       </motion.div>
     </div>
