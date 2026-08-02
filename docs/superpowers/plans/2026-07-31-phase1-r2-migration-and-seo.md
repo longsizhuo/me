@@ -1909,6 +1909,139 @@ curl -s -X DELETE -H "Authorization: Bearer $TOKEN" \
 
 ---
 
+### Task 15: ErrorBoundary —— 别让一个 3D 模型拖垮整站
+
+**Task 7 之后立刻做。** 这不是锦上添花，是本次迁移带出来的真实风险。
+
+Task 7 期间 R2 缺 CORS 策略，`useGLTF` 抛出未捕获的 rejection，结果**整个 React root 被卸载**——导航、Hero、所有内容消失，只剩全黑页面。不是"少个 3D 模型"，是整站白屏。
+
+`App.tsx` 已有 `<Suspense fallback>`，但 Suspense 只处理 *pending*，不处理 *rejected*。这是 React 里两套不同机制，ErrorBoundary 那套本项目一直没有（全仓库零个）。
+
+改造前这个风险低——模型和页面同源同部署，要么都在要么都不在。迁到 CDN 之后，R2 抖动、CORS 配错、DNS 故障，任何一个都会让主页变成黑屏。Task 7 那次 CORS 缺失就是活的演示。
+
+**Files:**
+- Create: `src/components/ErrorBoundary.tsx`, `test/error-boundary.test.mjs`
+- Modify: `src/App.tsx`, `src/components/Hero.tsx`（若挂载了 canvas）, `src/components/ContactAdvanced.tsx` 或 canvas 的挂载处
+
+- [ ] **Step 1: 写 ErrorBoundary**
+
+React 至今只支持 class 形式的 error boundary，函数组件没有等价 hook。
+
+```tsx
+// src/components/ErrorBoundary.tsx
+import { Component, type ErrorInfo, type ReactNode } from "react";
+
+interface Props {
+  children: ReactNode;
+  /** 出错时渲染什么。省略则渲染 null —— 适合纯装饰性区块 */
+  fallback?: ReactNode;
+  /** 出现在日志里，方便定位是哪一块塌了 */
+  label: string;
+}
+
+interface State {
+  failed: boolean;
+}
+
+/**
+ * 隔离渲染错误，防止一个区块把整棵 React 树带走。
+ *
+ * 存在的原因：3D 模型和背景动画现在从 cdn.longsizhuo.com 加载，
+ * 网络故障会让 useGLTF 抛出。没有这层的话，整个页面变黑屏。
+ */
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { failed: false };
+
+  static getDerivedStateFromError(): State {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error(`[ErrorBoundary:${this.props.label}]`, error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.failed) {
+      return this.props.fallback ?? null;
+    }
+    return this.props.children;
+  }
+}
+```
+
+- [ ] **Step 2: 包住会失败的区块**
+
+三个来源都可能因网络失败：3D canvas（CDN 上的 GLTF）、Lottie 背景（第三方 lottie.host，**当前已经 403**）、懒加载路由。
+
+在 `App.tsx` 里：
+
+```tsx
+<ErrorBoundary label="lottie-background"><GlobalLottieBackground /></ErrorBoundary>
+```
+
+以及包住 `StarsCanvas`、地球 canvas 的挂载处。装饰性区块不给 `fallback`（渲染 null，静默降级即可）；整页级别的包裹给一个有意义的 fallback：
+
+```tsx
+<ErrorBoundary label="page" fallback={
+  <div className="min-h-screen bg-primary flex items-center justify-center text-secondary">
+    页面加载出错，请刷新重试。
+  </div>
+}>
+  <HomePage />
+</ErrorBoundary>
+```
+
+**注意嵌套顺序**：区块级 boundary 必须在页面级*内层*，否则一个装饰性 canvas 出错仍然会冒泡到页面级、触发整页 fallback——那就没起到隔离作用。
+
+- [ ] **Step 3: 写会真失败的测试**
+
+这个项目已经出过三次"测试永远通过"的事故，所以本测试必须先被观察到失败。
+
+用 Playwright 注入一个必然抛出的错误：临时把某个 canvas 的 GLTF URL 指向一个 404，构建，加载页面，断言 —— 页面**其余部分仍然渲染**（能找到 Hero 的姓名文本和导航），且控制台出现 `[ErrorBoundary:` 前缀的日志。
+
+```
+# 大意，具体按 test/icon-binding.spec.py 的模式写
+1. 备份 Earth.tsx，把 useGLTF 的 URL 改成 https://cdn.longsizhuo.com/models/DOES-NOT-EXIST.gltf
+2. pnpm build，起 preview，加载页面
+3. 断言 body 文本里仍有 "龙思卓" 或 "Sizhuo Long"（页面没塌）
+4. 断言 console 里有 "[ErrorBoundary:" 
+5. finally 恢复 Earth.tsx 并重新构建
+```
+
+沿用 `test/icon-binding.spec.py` 已经建立的安全模式：**改动前先 `git status --porcelain <文件>` 预检**，恢复放在 `finally` 且在重建之前。
+
+**必须验证它会失败**：把 ErrorBoundary 包裹临时去掉再跑一次，应该看到页面塌成黑屏、断言 3 失败。没做这步不算完成。
+
+- [ ] **Step 4: 验证**
+
+```bash
+pnpm lint && pnpm tsc && pnpm test
+pnpm build
+nohup pnpm preview --port 4173 >/tmp/prev.log 2>&1 &
+sleep 4
+python3 scripts/verify-page.py http://localhost:4173/ /tmp/after-task15.png
+```
+
+Expected: 失败请求仍为基线 3 条，页面正常。**顺带的收益**：`lottie.host` 那个 403 现在会被 boundary 兜住，控制台会多一条 `[ErrorBoundary:lottie-background]` 日志——这是预期的，说明它在工作。
+
+- [ ] **Step 5: 提交**
+
+```bash
+git add -A
+git commit -m "fix: isolate render failures so one canvas cannot black out the site
+
+During task 7 a missing R2 CORS policy made useGLTF reject, and with no
+ErrorBoundary anywhere the uncaught rejection unmounted the whole React
+root — nav, hero and every section vanished. Suspense handles pending,
+not rejected; those are separate mechanisms and only one was present.
+
+Moving assets to a CDN turns that from a theoretical risk into a real
+one, so the boundaries go in around the 3D canvases, the Lottie
+background (whose third-party URL already 403s) and the lazy routes."
+```
+
+---
+
 ### Task 14: llms.txt、IndexNow、JSON-LD 转义
 
 **在 Task 10 之后做**（依赖 `/zh` `/en` 路由已存在，llms.txt 和 sitemap 要指向它们）。
@@ -2075,6 +2208,7 @@ Phase 2 serves content from KV, and that is when it becomes required."
 | 构建不打断 bind mount | Task 0 ✅ 已实测通过（dist inode 未变，站点 200） |
 | 百度站长 / Bot Fight Mode 手动项 | Task 13 Step 6 |
 | llms.txt / IndexNow / JSON-LD 转义 | Task 14（Task 10 之后）|
+| ErrorBoundary 隔离渲染失败 | Task 15（Task 7 之后，风险由本次迁移带出）|
 | pnpm 11 迁移 + 安全 overrides 复位 | 已完成，commit 6c4a76d |
 | tsc 清零 | Task 11 |
 | Tailwind 4 升级 | Task 12 |
