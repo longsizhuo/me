@@ -54,8 +54,9 @@ export async function putObject(key, filePath, contentType = mimeOf(filePath)) {
   }
 }
 
-export async function listObjects(prefix) {
-  const keys = [];
+/** 完整对象元信息（含 R2 权威的 size），listObjects 内部也走这里 */
+export async function listObjectsMeta(prefix) {
+  const out = [];
   let cursor;
   do {
     const url = new URL(`${API}/objects`);
@@ -67,8 +68,35 @@ export async function listObjects(prefix) {
     });
     const data = await res.json();
     if (!data.success) throw new Error(JSON.stringify(data.errors));
-    keys.push(...data.result.map((o) => o.key));
+    out.push(...data.result.map((o) => ({ key: o.key, size: o.size })));
     cursor = data.result_info?.cursor || undefined;
   } while (cursor);
-  return keys;
+  return out;
+}
+
+export async function listObjects(prefix) {
+  return (await listObjectsMeta(prefix)).map((o) => o.key);
+}
+
+/** 下载对象内容，返回 Buffer */
+export async function getObject(key) {
+  const encoded = key.split("/").map(encodeURIComponent).join("/");
+  const res = await fetch(`${API}/objects/${encoded}`, {
+    headers: { Authorization: `Bearer ${await token()}` },
+  });
+  if (!res.ok) {
+    throw new Error(`GET ${key} failed: ${res.status} ${await res.text()}`);
+  }
+  return Buffer.from(await res.arrayBuffer());
+}
+
+export async function deleteObject(key) {
+  const encoded = key.split("/").map(encodeURIComponent).join("/");
+  const res = await fetch(`${API}/objects/${encoded}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${await token()}` },
+  });
+  if (!res.ok) {
+    throw new Error(`DELETE ${key} failed: ${res.status} ${await res.text()}`);
+  }
 }
