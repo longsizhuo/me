@@ -201,3 +201,40 @@ export function setAlbumCover(slug: string, coverKey: string): Promise<unknown> 
     body: JSON.stringify({ coverKey }),
   });
 }
+
+// ---------------------------------------------------------------------
+// 站点文案（worker/src/content.ts）。这里读写的是 D1 里的副本，不是线上
+// 页面：真正上线由服务器上的 scripts/content-sync.mjs 轮询后重新构建完成，
+// 所以保存成功不等于已经生效，管理页要如实告诉用户还要等一会儿。
+// ---------------------------------------------------------------------
+
+/** 一份文案就是 src/i18n/<lang>.json 的整棵树，结构随内容变化，不做类型约束。 */
+export type ContentTree = Record<string, unknown>;
+
+export interface ContentPayload {
+  zh: ContentTree;
+  en: ContentTree;
+  version: number;
+}
+
+export function fetchContent(): Promise<ContentPayload> {
+  // 必须绕过缓存：读接口本身没有 max-age，但保存后紧接着重新拉取正是最容易
+  // 命中浏览器缓存、读到旧副本的时刻（同 get() 里 fresh 参数的理由）。
+  return adminRequest<ContentPayload>("/api/admin/content", { cache: "no-store" });
+}
+
+/**
+ * 保存文案。`baseVersion` 是这次编辑所基于的版本号，服务端对不上会返回 409，
+ * 避免两个标签页互相无声覆盖。
+ */
+export function saveContent(input: {
+  zh: ContentTree;
+  en: ContentTree;
+  baseVersion: number;
+}): Promise<{ ok: true; version: number }> {
+  return adminRequest("/api/admin/content", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}

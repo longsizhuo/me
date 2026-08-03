@@ -176,7 +176,7 @@ function PhotoRow({
   );
 }
 
-const AlbumAdmin = () => {
+const AlbumAdmin = ({ embedded = false }: { embedded?: boolean }) => {
   const [albums, setAlbums] = useState<AlbumSummary[] | null>(null);
   const [albumsError, setAlbumsError] = useState<string | null>(null);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -448,19 +448,29 @@ const AlbumAdmin = () => {
     }
   }
 
+  // embedded：由 /admin 的「相册」标签页内嵌时，外层已经有导航栏、页脚和标题，
+  // 这里再渲染一套就会出现两个导航栏。
   return (
-    <div className="relative z-0 bg-primary min-h-screen flex flex-col">
-      <Navbar />
-      <div className="px-4 sm:px-8 pt-28 pb-16 max-w-[1000px] mx-auto flex-1 w-full">
-        <Link to="/" className="text-secondary hover:text-white text-[14px] transition-colors">
-          ← Back to site
-        </Link>
+    <div className={embedded ? "" : "relative z-0 bg-primary min-h-screen flex flex-col"}>
+      {!embedded && <Navbar />}
+      <div
+        className={
+          embedded ? "" : "px-4 sm:px-8 pt-28 pb-16 max-w-[1000px] mx-auto flex-1 w-full"
+        }
+      >
+        {!embedded && (
+          <>
+            <Link to="/" className="text-secondary hover:text-white text-[14px] transition-colors">
+              ← Back to site
+            </Link>
 
-        <h1 className={`${styles.sectionHeadText} text-white mt-4`}>Album admin</h1>
-        <p className="mt-2 text-secondary text-[14px]">
-          {"Create albums, upload photos, and manage covers / order. Every write here goes to " +
-            "/api/admin/*, which Cloudflare Access + the Worker's own JWT check protect."}
-        </p>
+            <h1 className={`${styles.sectionHeadText} text-white mt-4`}>Album admin</h1>
+            <p className="mt-2 text-secondary text-[14px]">
+              {"Create albums, upload photos, and manage covers / order. Every write here goes to " +
+                "/api/admin/*, which Cloudflare Access + the Worker's own JWT check protect."}
+            </p>
+          </>
+        )}
 
         <section className="mt-10 bg-black-100 rounded-2xl p-6">
           <h2 className="text-white font-semibold text-[18px] mb-4">New album</h2>
@@ -620,7 +630,7 @@ const AlbumAdmin = () => {
           </>
         )}
       </div>
-      <Footer />
+      {!embedded && <Footer />}
     </div>
   );
 };

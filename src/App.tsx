@@ -26,6 +26,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AlbumList = lazy(() => import("./pages/AlbumList"));
 const AlbumDetail = lazy(() => import("./pages/AlbumDetail"));
 const AlbumAdmin = lazy(() => import("./pages/AlbumAdmin"));
+const Admin = lazy(() => import("./pages/Admin"));
 // 单独指向具体模块，绝不能经过 ./canvas 或 ./components 这两个 barrel —— 否则
 // three.js 又会被拖回入口图（见 src/components/index.ts 顶部的注释）。
 const StarsCanvas = lazy(() => import("./components/canvas/Stars"));
@@ -194,6 +195,15 @@ function App() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
                 <ErrorBoundary label="album-list" fallback={<AlbumErrorFallback />}>
                   <AlbumList />
+                </ErrorBoundary>
+              </motion.div>
+            } />
+            {/* 后台总入口。/album/admin 是它的前身，只管相册；保留是因为
+                Cloudflare Access 的保护路径里写着它，而且旧书签还在用。 */}
+            <Route path="/admin" element={
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+                <ErrorBoundary label="admin" fallback={<PageErrorFallback />}>
+                  <Admin />
                 </ErrorBoundary>
               </motion.div>
             } />

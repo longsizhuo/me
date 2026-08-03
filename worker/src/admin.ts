@@ -2,6 +2,7 @@
 // index.ts via access.ts's requireAccess before handleAdmin is ever called).
 import type { Env, AlbumRow, PhotoRow } from "./albums.ts";
 import { jsonResponse, getAlbumRow } from "./albums.ts";
+import { handleContent } from "./content.ts";
 
 const MIME: Record<string, string> = {
   jpg: "image/jpeg",
@@ -538,6 +539,10 @@ export async function handleAdmin(
   request: Request,
   env: Env,
 ): Promise<Response> {
+  if (pathname === "/api/admin/content") {
+    return handleContent(method, request, env);
+  }
+
   if (pathname === "/api/admin/albums") {
     if (method === "POST") {
       return createAlbum(env, request);
