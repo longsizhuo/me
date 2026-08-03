@@ -62,6 +62,13 @@ export default function ContentEditor() {
     [mutate],
   );
 
+  const onChangeBoth = useCallback(
+    (path: Path, value: unknown) => {
+      mutate((d) => ({ ...d, zh: setAt(d.zh, path, value), en: setAt(d.en, path, value) }));
+    },
+    [mutate],
+  );
+
   // 增删和排序一律同时作用在中英文两棵树上。只改一边会让两边条目数对不上，
   // 后端会直接拒绝发布（worker/src/content.ts 的 validate），而用户在界面上
   // 看不出哪里错了。
@@ -195,6 +202,7 @@ export default function ContentEditor() {
                   label=""
                   depth={1}
                   onChange={onChange}
+                  onChangeBoth={onChangeBoth}
                   onAdd={onAdd}
                   onRemove={onRemove}
                   onMove={onMove}

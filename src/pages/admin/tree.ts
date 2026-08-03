@@ -105,3 +105,13 @@ export function looksLikeImage(v: unknown): v is string {
     /\.(png|jpe?g|webp|avif|gif|svg)(\?|$)/i.test(v)
   );
 }
+
+// 按字段名判断这是不是一个放图片的位置。光看当前值不行：新增一条经历时
+// icon 是空字符串，那正是最需要上传按钮的时刻。
+const IMAGE_KEYS = new Set(["icon", "image", "logo", "avatar", "cover", "img", "photo", "src"]);
+
+/** path 末段的键名像图片字段，或者当前值已经是一个图片地址。 */
+export function isImageField(path: Path, value: unknown): boolean {
+  const last = path[path.length - 1];
+  return (typeof last === "string" && IMAGE_KEYS.has(last)) || looksLikeImage(value);
+}

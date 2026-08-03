@@ -2,8 +2,10 @@
 // 输入框。中英文并排编辑而不是分两个标签页切换 —— 数组的增删和排序必须同时
 // 作用在两棵树上，分开编辑迟早会让两边条目数对不上，而那正好是后端拒绝发布
 // 的条件（见 worker/src/content.ts 的 validate）。
+import { useState } from "react";
 import type { Path } from "./tree";
-import { getAt, looksLikeImage, unionKeys, unionLength } from "./tree";
+import { getAt, isImageField, looksLikeImage, unionKeys, unionLength } from "./tree";
+import { uploadAsset } from "../../api/album";
 import { sectionLabel } from "./labels";
 
 // 这个页面是只有站主自己能进的工具（Cloudflare Access 挡着），和 AlbumAdmin
@@ -11,6 +13,8 @@ import { sectionLabel } from "./labels";
 
 export interface NodeHandlers {
   onChange: (lang: "zh" | "en", path: Path, value: unknown) => void;
+  /** 同时写进中英文两棵树。图片地址这类不需要翻译的值用它。 */
+  onChangeBoth: (path: Path, value: unknown) => void;
   onAdd: (path: Path) => void;
   onRemove: (path: Path) => void;
   onMove: (path: Path, from: number, to: number) => void;
@@ -117,8 +121,56 @@ function LeafInput({
   );
 }
 
+function ImageUpload({
+  path,
+  onUploaded,
+}: {
+  path: Path;
+  onUploaded: NodeHandlers["onChangeBoth"];
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <div className="mt-2 flex items-center gap-3 flex-wrap">
+      <label
+        className={`px-3 py-1.5 text-[12px] rounded-lg cursor-pointer ${
+          busy ? "bg-tertiary text-secondary" : "bg-tertiary text-white hover:bg-white/10"
+        }`}
+      >
+        {busy ? "上传中…" : "上传图片"}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={busy}
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            // 先把 input 清空，否则连着选同一个文件第二次不会触发 change。
+            e.target.value = "";
+            if (!file) {return;}
+            setBusy(true);
+            setError(null);
+            try {
+              const { url } = await uploadAsset(file);
+              onUploaded(path, url);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            } finally {
+              setBusy(false);
+            }
+          }}
+        />
+      </label>
+      <span className="text-secondary text-[11px]">上传后自动填入中英文两栏</span>
+      {error && <span className="text-red-400 text-[11px]">{error}</span>}
+    </div>
+  );
+}
+
 export function ContentNode(props: Props) {
-  const { zhRoot, enRoot, path, label, depth, onChange, onAdd, onRemove, onMove } = props;
+  const { zhRoot, enRoot, path, label, depth, onChange, onChangeBoth, onAdd, onRemove, onMove } =
+    props;
   const zv = getAt(zhRoot, path);
   const ev = getAt(enRoot, path);
   const ref = zv !== undefined ? zv : ev;
@@ -203,6 +255,9 @@ export function ContentNode(props: Props) {
         <LeafInput lang="zh" value={zv} path={path} onChange={onChange} />
         <LeafInput lang="en" value={ev} path={path} onChange={onChange} />
       </div>
+      {/* 上传按钮只出现一次、同时写进中英文：图片地址不是需要翻译的东西，
+          分成两个按钮迟早会出现中文版换了 logo、英文版还是旧的。 */}
+      {isImageField(path, zv ?? ev) && <ImageUpload path={path} onUploaded={onChangeBoth} />}
     </div>
   );
 }

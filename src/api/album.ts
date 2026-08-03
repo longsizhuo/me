@@ -208,6 +208,17 @@ export function setAlbumCover(slug: string, coverKey: string): Promise<unknown> 
 // 所以保存成功不等于已经生效，管理页要如实告诉用户还要等一会儿。
 // ---------------------------------------------------------------------
 
+/**
+ * 上传一张图片到 R2，返回可以直接填进文案的 CDN 地址。
+ * 不写 D1 —— 文案本身就是这些对象的唯一索引（见 worker/src/assets.ts）。
+ */
+export function uploadAsset(file: File): Promise<{ key: string; url: string }> {
+  const form = new FormData();
+  form.append("file", file);
+  // 不手动设 Content-Type：浏览器要自己补 multipart 的 boundary。
+  return adminRequest("/api/admin/assets", { method: "POST", body: form });
+}
+
 /** 一份文案就是 src/i18n/<lang>.json 的整棵树，结构随内容变化，不做类型约束。 */
 export type ContentTree = Record<string, unknown>;
 

@@ -3,6 +3,7 @@
 import type { Env, AlbumRow, PhotoRow } from "./albums.ts";
 import { jsonResponse, getAlbumRow } from "./albums.ts";
 import { handleContent } from "./content.ts";
+import { handleAssets } from "./assets.ts";
 
 const MIME: Record<string, string> = {
   jpg: "image/jpeg",
@@ -541,6 +542,10 @@ export async function handleAdmin(
 ): Promise<Response> {
   if (pathname === "/api/admin/content") {
     return handleContent(method, request, env);
+  }
+
+  if (pathname === "/api/admin/assets") {
+    return handleAssets(method, request, env);
   }
 
   if (pathname === "/api/admin/albums") {

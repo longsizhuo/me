@@ -36,6 +36,9 @@ interface R2Object {
 
 interface R2HTTPMetadata {
   contentType?: string;
+  // R2 会把它原样写进对象的响应头。content/ 下的图片名字自带随机后缀、换图
+  // 就是换 key，所以那条上传路径给它设了 immutable 的长缓存。
+  cacheControl?: string;
 }
 
 interface R2PutOptions {
