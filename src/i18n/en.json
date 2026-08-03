@@ -37,7 +37,8 @@
     "notFoundMessage": "This album may have been removed, or the link is incorrect.",
     "backToList": "← Back to albums",
     "loadingMore": "Loading more…",
-    "viewAll": "View all →"
+    "viewAll": "View all →",
+    "photoCount": "{{count}} photos"
   },
   "experience": {
     "subtitle": "What I have done so far",
@@ -176,9 +177,18 @@
         "description": "A parking space time-sharing rental system, addressing urban parking challenges and increasing income for parking space owners.",
         "image": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
         "tags": [
-          { "name": "golang", "color": "blue-text-gradient" },
-          { "name": "docker", "color": "green-text-gradient" },
-          { "name": "mysql", "color": "pink-text-gradient" }
+          {
+            "name": "golang",
+            "color": "blue-text-gradient"
+          },
+          {
+            "name": "docker",
+            "color": "green-text-gradient"
+          },
+          {
+            "name": "mysql",
+            "color": "pink-text-gradient"
+          }
         ],
         "source_code_link": "https://longsizhuo.com"
       },
@@ -188,9 +198,18 @@
         "description": "Simplifying data structures and algorithms through visual animations and interactive learning materials.",
         "image": "https://cdn.longsizhuo.com/logos/hello-algo.svg",
         "tags": [
-          { "name": "python", "color": "blue-text-gradient" },
-          { "name": "visualization", "color": "green-text-gradient" },
-          { "name": "open-source", "color": "pink-text-gradient" }
+          {
+            "name": "python",
+            "color": "blue-text-gradient"
+          },
+          {
+            "name": "visualization",
+            "color": "green-text-gradient"
+          },
+          {
+            "name": "open-source",
+            "color": "pink-text-gradient"
+          }
         ],
         "source_code_link": "https://github.com/krahets/hello-algo"
       },
@@ -200,9 +219,18 @@
         "description": "A web-based tool designed to simplify the analysis of single-cell RNA-seq data through intuitive visualization techniques.",
         "image": "https://cdn.longsizhuo.com/logos/1234.webp",
         "tags": [
-          { "name": "r", "color": "blue-text-gradient" },
-          { "name": "data-visualization", "color": "green-text-gradient" },
-          { "name": "bioinformatics", "color": "pink-text-gradient" }
+          {
+            "name": "r",
+            "color": "blue-text-gradient"
+          },
+          {
+            "name": "data-visualization",
+            "color": "green-text-gradient"
+          },
+          {
+            "name": "bioinformatics",
+            "color": "pink-text-gradient"
+          }
         ],
         "source_code_link": "https://longsizhuo.shinyapps.io/long/"
       }
