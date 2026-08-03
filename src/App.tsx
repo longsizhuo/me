@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, useLocation, useParams } from "react-router-dom";
@@ -20,16 +20,17 @@ import Writing from "./components/Writing";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTop";
 import LazyVisible from "./components/LazyVisible";
+import { lazyWithReload } from "./lazyWithReload";
 
-const Tools = lazy(() => import("./pages/Tools"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const AlbumList = lazy(() => import("./pages/AlbumList"));
-const AlbumDetail = lazy(() => import("./pages/AlbumDetail"));
-const AlbumAdmin = lazy(() => import("./pages/AlbumAdmin"));
-const Admin = lazy(() => import("./pages/Admin"));
+const Tools = lazyWithReload("Tools", () => import("./pages/Tools"));
+const NotFound = lazyWithReload("NotFound", () => import("./pages/NotFound"));
+const AlbumList = lazyWithReload("AlbumList", () => import("./pages/AlbumList"));
+const AlbumDetail = lazyWithReload("AlbumDetail", () => import("./pages/AlbumDetail"));
+const AlbumAdmin = lazyWithReload("AlbumAdmin", () => import("./pages/AlbumAdmin"));
+const Admin = lazyWithReload("Admin", () => import("./pages/Admin"));
 // 单独指向具体模块，绝不能经过 ./canvas 或 ./components 这两个 barrel —— 否则
 // three.js 又会被拖回入口图（见 src/components/index.ts 顶部的注释）。
-const StarsCanvas = lazy(() => import("./components/canvas/Stars"));
+const StarsCanvas = lazyWithReload("Stars", () => import("./components/canvas/Stars"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();

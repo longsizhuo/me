@@ -11,7 +11,8 @@
     "tsc": "tsc --noEmit",
     "preview": "vite preview",
     "test": "node --test test/*.test.mjs",
-    "test:icons": "bash test/run-icon-check.sh"
+    "test:icons": "bash test/run-icon-check.sh",
+    "test:chunk-reload": "python3 test/chunk-reload.spec.py"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

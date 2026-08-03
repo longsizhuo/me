@@ -1,14 +1,15 @@
-import { lazy, Suspense, useState } from "react";
-import { Link } from "react-router-dom";
+import { Suspense } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { styles } from "../styles";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import ContentEditor from "./admin/ContentEditor";
+import { lazyWithReload } from "../lazyWithReload";
 
 // 相册管理是这个页面里最重的一块（要拉相册列表、缩略图、上传逻辑），
 // 而多数时候进后台是来改文案的，所以按标签页懒加载。
-const AlbumAdmin = lazy(() => import("./AlbumAdmin"));
+const AlbumAdmin = lazyWithReload("AlbumAdmin", () => import("./AlbumAdmin"));
 
 type Tab = "content" | "album";
 
@@ -18,7 +19,15 @@ const TABS: { key: Tab; label: string; hint: string }[] = [
 ];
 
 export default function Admin() {
-  const [tab, setTab] = useState<Tab>("content");
+  // 标签页放在 URL 里而不是组件 state：分片加载失败时 lazyWithReload 会刷新
+  // 页面，state 会丢，用户得重新点一次才回到刚才那一栏。顺带让它可以收藏。
+  const [params, setParams] = useSearchParams();
+  const raw = params.get("tab");
+  const tab: Tab = raw === "album" ? "album" : "content";
+  const setTab = (next: Tab) => {
+    // replace: 切标签不该在浏览器历史里堆一层，否则「后退」得点好几次才离开后台。
+    setParams(next === "content" ? {} : { tab: next }, { replace: true });
+  };
 
   return (
     <div className="relative z-0 bg-primary min-h-screen flex flex-col">
