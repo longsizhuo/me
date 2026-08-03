@@ -63,13 +63,19 @@ layer(base);
   }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", "Poppins", sans-serif;
-  scroll-behavior: smooth;
-  color-scheme: dark;
+/*
+ * 必须待在 @layer base 里。v4 的工具类全在 @layer utilities，而无层规则一律
+ * 压过有层规则（跟优先级无关），所以这条 `*` 放在层外会把 px-16 / mt-2 / p-2
+ * 这类间距工具全部归零 —— v3 时代 @tailwind utilities 输出的是无层 CSS，
+ * .px-16(0,1,0) 自然赢过 *(0,0,0)，所以升级前看不出问题。
+ * margin / padding / box-sizing 三行已删：preflight 对 * 做过同样的归零。
+ */
+@layer base {
+  * {
+    font-family: "Inter", "Poppins", sans-serif;
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
 }
 
 .hash-span {
