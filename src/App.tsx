@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useParams } from "react-router-dom";
 import i18n, { type Lang } from "./i18n";
 import {
   About,
@@ -95,6 +95,20 @@ function AlbumErrorFallback() {
     <div className="min-h-screen bg-primary flex items-center justify-center text-secondary">
       {t("album.loadError")}
     </div>
+  );
+}
+
+// /album/:slug is one Route, so navigating from album A straight to album B
+// reuses the same ErrorBoundary instance instead of remounting it — if A's
+// fetch had thrown, B would still render A's stale fallback until a full
+// reload. Keying the boundary on the slug forces a remount on every route
+// change, same as any other per-item state that must reset on navigation.
+function AlbumDetailRoute() {
+  const { slug } = useParams<{ slug: string }>();
+  return (
+    <ErrorBoundary key={slug} label="album-detail" fallback={<AlbumErrorFallback />}>
+      <AlbumDetail />
+    </ErrorBoundary>
   );
 }
 
@@ -192,9 +206,7 @@ function App() {
             } />
             <Route path="/album/:slug" element={
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-                <ErrorBoundary label="album-detail" fallback={<AlbumErrorFallback />}>
-                  <AlbumDetail />
-                </ErrorBoundary>
+                <AlbumDetailRoute />
               </motion.div>
             } />
             <Route path="*" element={

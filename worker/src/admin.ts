@@ -21,6 +21,14 @@ function isSlug(s: unknown): s is string {
   return typeof s === "string" && s.length > 0 && /^[a-z0-9-]+$/.test(s);
 }
 
+// src/App.tsx has exactly one static path segment under /album/ — /album/admin
+// — and react-router ranks a literal segment above a :slug param regardless
+// of route declaration order. An album using this slug would show up in the
+// list, but its own card would open the admin tool instead of the album,
+// and it could never be reached any other way. Check this at creation time,
+// not just document it, since the slug is otherwise unrestricted.
+const RESERVED_SLUGS = new Set(["admin"]);
+
 async function readJsonBody(
   request: Request,
 ): Promise<Record<string, unknown> | null> {
@@ -116,6 +124,14 @@ async function createAlbum(env: Env, request: Request): Promise<Response> {
       {
         error:
           "slug (lowercase letters/digits/hyphens), nameZh, nameEn are required",
+      },
+      400,
+    );
+  }
+  if (RESERVED_SLUGS.has(slug)) {
+    return jsonResponse(
+      {
+        error: `slug "${slug}" is reserved (shadowed by a static /album/* route) and cannot be used`,
       },
       400,
     );
@@ -411,37 +427,75 @@ async function updatePhoto(
     targetAlbumId = target.id;
   }
   const sortOrder = hasSortOrder ? (body.sortOrder as number) : photo.sort_order;
+  const isCrossAlbumMove = hasMove && targetAlbumId !== photo.album_id;
 
-  await env.DB.prepare(
-    "UPDATE photos SET album_id = ?, sort_order = ? WHERE id = ?",
-  )
-    .bind(targetAlbumId, sortOrder, id)
-    .run();
-
-  if (hasMove && targetAlbumId !== photo.album_id) {
+  if (!isCrossAlbumMove) {
     await env.DB.prepare(
-      "UPDATE albums SET photo_count = photo_count - 1 WHERE id = ?",
+      "UPDATE photos SET album_id = ?, sort_order = ? WHERE id = ?",
+    )
+      .bind(targetAlbumId, sortOrder, id)
+      .run();
+  } else {
+    // A cross-album move is the photo UPDATE plus four more D1 writes
+    // (source/target photo_count, source cover reassignment, target cover
+    // fill-in). Run unbatched, a D1 blip partway through used to leave the
+    // photo moved with the counts and covers permanently wrong on both
+    // albums, with nothing to retry. Reads that decide *which* writes are
+    // needed happen first, against the still-unmoved photo, then every
+    // write — including the move itself — lands in one batch() so D1
+    // commits all of it or none of it (see uploadPhotos above for this
+    // file's rollback convention on the R2+D1 boundary; this is the
+    // equivalent for a request that never leaves D1).
+    const sourceAlbum = await env.DB.prepare(
+      "SELECT cover_key FROM albums WHERE id = ?",
     )
       .bind(photo.album_id)
-      .run();
-    await env.DB.prepare(
-      "UPDATE albums SET photo_count = photo_count + 1 WHERE id = ?",
-    )
-      .bind(targetAlbumId)
-      .run();
-    // Old album may lose its cover (photo just moved out of it); new album
-    // gets one if it didn't already have one.
-    await reassignCoverIfNeeded(env, photo.album_id, photo.key);
+      .first<{ cover_key: string | null }>();
     const targetAlbum = await env.DB.prepare(
       "SELECT cover_key FROM albums WHERE id = ?",
     )
       .bind(targetAlbumId)
       .first<{ cover_key: string | null }>();
-    if (targetAlbum && !targetAlbum.cover_key) {
-      await env.DB.prepare("UPDATE albums SET cover_key = ? WHERE id = ?")
-        .bind(photo.key, targetAlbumId)
-        .run();
+
+    const statements = [
+      env.DB.prepare(
+        "UPDATE photos SET album_id = ?, sort_order = ? WHERE id = ?",
+      ).bind(targetAlbumId, sortOrder, id),
+      env.DB.prepare(
+        "UPDATE albums SET photo_count = photo_count - 1 WHERE id = ?",
+      ).bind(photo.album_id),
+      env.DB.prepare(
+        "UPDATE albums SET photo_count = photo_count + 1 WHERE id = ?",
+      ).bind(targetAlbumId),
+    ];
+
+    if (sourceAlbum?.cover_key === photo.key) {
+      // Old album is about to lose its cover photo. `id != ?` excludes the
+      // moving photo itself — its album_id hasn't changed yet at read time,
+      // so without this it would pick itself right back as the "next" cover.
+      const next = await env.DB.prepare(
+        "SELECT key FROM photos WHERE album_id = ? AND id != ? ORDER BY sort_order, id LIMIT 1",
+      )
+        .bind(photo.album_id, id)
+        .first<{ key: string }>();
+      statements.push(
+        env.DB.prepare("UPDATE albums SET cover_key = ? WHERE id = ?").bind(
+          next ? next.key : null,
+          photo.album_id,
+        ),
+      );
     }
+
+    if (targetAlbum && !targetAlbum.cover_key) {
+      statements.push(
+        env.DB.prepare("UPDATE albums SET cover_key = ? WHERE id = ?").bind(
+          photo.key,
+          targetAlbumId,
+        ),
+      );
+    }
+
+    await env.DB.batch(statements);
   }
 
   const updated = await getPhotoRow(env, id);

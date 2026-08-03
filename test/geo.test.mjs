@@ -98,3 +98,63 @@ test("renderJsonLd 不把中文键名写死成英文岗位", () => {
   assert.equal(ld.jobTitle, locales.en.experience.items[0].title);
   assert.equal(ld.description, locales.en.hero.bio);
 });
+
+// Emptying an array (deliberately, or because someone deleted the last
+// entry) used to crash indexing items[0] or throw nothing at all from
+// .map() — but that first case brought down the entire build. It must
+// degrade to "skip that section", not take pnpm build down with it.
+test("数组被清空时跳过对应内容，而不是抛异常拖垮整个构建", () => {
+  const empty = {
+    zh: {
+      ...zh,
+      experience: { ...zh.experience, items: [] },
+      education: { ...zh.education, items: [] },
+      honors: { ...zh.honors, items: [] },
+      projects: { ...zh.projects, staticItems: [] },
+    },
+    en: {
+      ...locales.en,
+      experience: { ...locales.en.experience, items: [] },
+      education: { ...locales.en.education, items: [] },
+      honors: { ...locales.en.honors, items: [] },
+    },
+  };
+
+  assert.doesNotThrow(() => renderShell(empty), "renderShell 不该在空数组上抛异常");
+  assert.doesNotThrow(() => renderJsonLd(empty), "renderJsonLd 不该在空数组上抛异常");
+  assert.doesNotThrow(() => renderLlmsTxt(empty), "renderLlmsTxt 不该在空数组上抛异常");
+
+  const shell = renderShell(empty);
+  assert.ok(!shell.includes('class="geo-role"'), "experience 为空时不该渲染当前职位那一行");
+  assert.ok(!shell.includes(esc(zh.honors.title)), "honors 为空数组时标题不该出现在正文里");
+  assert.ok(!shell.includes(esc(zh.education.title)), "education 为空数组时标题不该出现在正文里");
+
+  const ld = renderJsonLd(empty);
+  assert.equal(ld.jobTitle, undefined, "experience 为空时 jobTitle 应省略而不是抛异常");
+  assert.deepEqual(ld.award, [], "honors 为空数组时 award 应是空数组，不是抛异常");
+  assert.deepEqual(ld.alumniOf, [], "education 为空数组时 alumniOf 应是空数组");
+
+  const txt = renderLlmsTxt(empty);
+  assert.ok(!txt.includes("现职"), "experience 为空时不该出现现职行");
+  assert.ok(!txt.includes(`## ${zh.honors.title}`), "honors 为空数组时不该出现该 section 标题");
+});
+
+// 数组字段整体缺失（不是空，是这个 key 根本不存在）是另一类失败：那是
+// i18n 文件本身坏了（比如自动翻译 CI 漏生成了某个键），必须报错，且报错
+// 要点名是哪个字段、哪个文件 —— 不能是三层调用之后一句无关的
+// "Cannot read properties of undefined"。
+test("数组字段整体缺失（而非空）时报错，且点名字段和文件", () => {
+  const broken = {
+    zh: { ...zh, honors: { ...zh.honors, items: undefined } },
+    en: locales.en,
+  };
+  assert.throws(() => renderJsonLd(broken), /honors\.items/, "报错要点名缺失的字段");
+  assert.throws(() => renderJsonLd(broken), /zh\.json/, "报错要点名是哪个文件");
+
+  const brokenShell = {
+    zh: { ...zh, education: { ...zh.education, items: undefined } },
+    en: locales.en,
+  };
+  assert.throws(() => renderShell(brokenShell), /education\.items/);
+  assert.throws(() => renderShell(brokenShell), /zh\.json/);
+});

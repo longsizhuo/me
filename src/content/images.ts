@@ -20,10 +20,23 @@ export interface ImageUrlOptions {
 export function imageUrl(key: string, opts: ImageUrlOptions = {}): string {
   const enc = key.split("/").map(encodeURIComponent).join("/");
   const parts: string[] = [];
-  if (opts.width) {
+  // `if (opts.width)` used to treat a computed 0 the same as "not passed" —
+  // that silently drops the size constraint and Cloudflare returns
+  // something close to the uncompressed original, exactly what this
+  // function exists to prevent. Check presence explicitly, and a present
+  // but non-positive value (0, negative, NaN) is a caller bug, not a
+  // request for "no constraint" — throw instead of dropping it, so it's
+  // caught where it's introduced rather than served silently.
+  if (opts.width !== undefined) {
+    if (!(opts.width > 0)) {
+      throw new Error(`imageUrl: width must be a positive number, got ${opts.width}`);
+    }
     parts.push(`width=${opts.width}`);
   }
-  if (opts.height) {
+  if (opts.height !== undefined) {
+    if (!(opts.height > 0)) {
+      throw new Error(`imageUrl: height must be a positive number, got ${opts.height}`);
+    }
     parts.push(`height=${opts.height}`);
   }
   if (opts.fit) {

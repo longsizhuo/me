@@ -66,6 +66,16 @@ export function encodeCursor(sort: number, id: number): string {
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+// base64url -> base64 (restore the alphabet, restore the "=" padding atob
+// needs). Shared with access.ts's JWT verification, which decodes the same
+// alphabet for an unrelated payload — one copy of the padding math so an
+// RFC-edge-case fix can't land in one call site and not the other.
+export function base64urlToBase64(b64url: string): string {
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
+  return b64 + pad;
+}
+
 export function decodeCursor(
   raw: string | null,
 ): { sort: number; id: number } | null {
@@ -74,9 +84,7 @@ export function decodeCursor(
   }
   let decoded: string;
   try {
-    const b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
-    const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
-    decoded = atob(b64 + pad);
+    decoded = atob(base64urlToBase64(raw));
   } catch {
     return null;
   }

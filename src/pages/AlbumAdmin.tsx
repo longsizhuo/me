@@ -74,15 +74,20 @@ function PhotoRow({
   // by sort_order, but it is NOT the literal stored integer. Add a Worker
   // admin list endpoint that returns sort_order if this ever needs to be exact.
   const [sortValue, setSortValue] = useState(index);
+  const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
 
   // key 是 photo.id，所以删除或重排后组件实例被复用、不会重新挂载，
   // useState(index) 的初始值就此定格在旧位置。不同步的话，管理员看到的
   // 是过期下标，照它点 Save order 会把错误的 sort_order 写进库，而且
-  // 界面上看不出来。index 变了就跟上。
+  // 界面上看不出来。index 变了就跟上——但前提是这一行没有未保存的编辑：
+  // 删除/换封面/上传都会触发 loadPhotos 重排列表，如果不加 dirty 这层
+  // 判断，管理员刚打的还没点 Save 的值会被别的行触发的这次重排悄悄冲掉。
   useEffect(() => {
-    setSortValue(index);
-  }, [index]);
+    if (!dirty) {
+      setSortValue(index);
+    }
+  }, [index, dirty]);
 
   return (
     <div className="flex flex-wrap items-center gap-3 bg-tertiary rounded-xl p-3">
@@ -110,7 +115,10 @@ function PhotoRow({
         <input
           type="number"
           value={sortValue}
-          onChange={(e) => setSortValue(Number(e.target.value))}
+          onChange={(e) => {
+            setSortValue(Number(e.target.value));
+            setDirty(true);
+          }}
           className="w-16 bg-black-100 text-white rounded-sm px-2 py-1 outline-hidden"
           disabled={busy}
         />
@@ -123,6 +131,7 @@ function PhotoRow({
           try {
             await onSaveSort(photo.id, sortValue);
           } finally {
+            setDirty(false);
             setBusy(false);
           }
         }}
@@ -402,30 +411,40 @@ const AlbumAdmin = () => {
 
     try {
       const result: UploadResult = await uploadPhotos(targetSlug, okFiles, okWidths, okHeights);
-      setUploadRows((prev) => {
-        const next = [...prev];
-        result.uploaded.forEach((u) => {
-          const idx = takeRow(u.file);
-          if (idx !== undefined) {
-            next[idx] = { ...next[idx], status: "done" };
-          }
+      // Same guard as the dimension-reading loop above, and for the same
+      // reason: a second batch dropped into this album before this POST
+      // resolved has already replaced uploadRows with a shorter array, so
+      // writing back by this batch's own rowIndexOf positions can land past
+      // the end of the new array — next[idx] then reads as {status:'done'}
+      // with no `file`, and rendering row.file.name throws.
+      if (stillCurrent()) {
+        setUploadRows((prev) => {
+          const next = [...prev];
+          result.uploaded.forEach((u) => {
+            const idx = takeRow(u.file);
+            if (idx !== undefined) {
+              next[idx] = { ...next[idx], status: "done" };
+            }
+          });
+          result.failed.forEach((f) => {
+            const idx = takeRow(f.file);
+            if (idx !== undefined) {
+              next[idx] = { ...next[idx], status: "error", error: f.error ?? "upload failed" };
+            }
+          });
+          return next;
         });
-        result.failed.forEach((f) => {
-          const idx = takeRow(f.file);
-          if (idx !== undefined) {
-            next[idx] = { ...next[idx], status: "error", error: f.error ?? "upload failed" };
-          }
-        });
-        return next;
-      });
+      }
       if (activeSlugRef.current === targetSlug) {
         await Promise.all([loadPhotos(targetSlug), loadAlbums()]);
       }
     } catch (err) {
       const message = toMessage(err);
-      setUploadRows((prev) =>
-        prev.map((row) => (row.status === "uploading" ? { ...row, status: "error", error: message } : row)),
-      );
+      if (stillCurrent()) {
+        setUploadRows((prev) =>
+          prev.map((row) => (row.status === "uploading" ? { ...row, status: "error", error: message } : row)),
+        );
+      }
     }
   }
 

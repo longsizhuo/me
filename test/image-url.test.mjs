@@ -8,8 +8,14 @@ const CDN = "https://cdn.longsizhuo.com";
 function imageUrl(key, opts = {}) {
   const enc = key.split("/").map(encodeURIComponent).join("/");
   const parts = [];
-  if (opts.width) parts.push(`width=${opts.width}`);
-  if (opts.height) parts.push(`height=${opts.height}`);
+  if (opts.width !== undefined) {
+    if (!(opts.width > 0)) throw new Error(`imageUrl: width must be a positive number, got ${opts.width}`);
+    parts.push(`width=${opts.width}`);
+  }
+  if (opts.height !== undefined) {
+    if (!(opts.height > 0)) throw new Error(`imageUrl: height must be a positive number, got ${opts.height}`);
+    parts.push(`height=${opts.height}`);
+  }
   if (opts.fit) parts.push(`fit=${opts.fit}`);
   parts.push("format=auto");
   return `${CDN}/cdn-cgi/image/${parts.join(",")}/${enc}`;
@@ -37,4 +43,11 @@ test("format=auto 总是存在 —— 少了它就发不出 AVIF/WebP", () => {
 test("不传选项时也是合法的变换 URL，不会退化成原图地址", () => {
   const u = imageUrl("album/x/y.jpg");
   assert.ok(u.includes("/cdn-cgi/image/"), `退化成了原图: ${u}`);
+});
+
+test("width/height 为 0 或负数必须报错，不能被当成「没传」悄悄丢掉尺寸约束", () => {
+  assert.throws(() => imageUrl("a/b.jpg", { width: 0 }), /width/);
+  assert.throws(() => imageUrl("a/b.jpg", { width: -100 }), /width/);
+  assert.throws(() => imageUrl("a/b.jpg", { height: 0 }), /height/);
+  assert.throws(() => imageUrl("a/b.jpg", { height: -1 }), /height/);
 });

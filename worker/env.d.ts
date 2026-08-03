@@ -24,6 +24,10 @@ interface D1PreparedStatement {
 
 interface D1Database {
   prepare(query: string): D1PreparedStatement;
+  // Runs every statement sequentially inside one implicit transaction —
+  // all commit or none do. Added for admin.ts's cross-album photo move,
+  // which needs several dependent writes to land atomically.
+  batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
 }
 
 interface R2Object {

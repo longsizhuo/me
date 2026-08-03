@@ -10,7 +10,7 @@
 // of whether Access actually ran. This is exactly the check the sibling
 // `sylvia-photo-api` Worker skips — it hardcodes an `ADMIN_SECRET` string
 // instead, which is not an acceptable substitute.
-import type { Env } from "./albums.ts";
+import { base64urlToBase64, type Env } from "./albums.ts";
 
 interface Jwk {
   kid: string;
@@ -39,9 +39,15 @@ export class AccessJwtError extends Error {}
 const JWKS_TTL_MS = 60 * 60 * 1000;
 let jwksCache: { keys: Jwk[]; fetchedAt: number } | null = null;
 
-async function getJwks(env: Env): Promise<Jwk[]> {
+// Derived CryptoKey per kid — importKey is pure CPU work repeated on every
+// single admin request otherwise. Keyed by kid (not a single slot) and
+// wiped every time jwksCache is replaced (see getJwks), so a rotated key can
+// never be verified against a stale CryptoKey left over from the old one.
+let importedKeys = new Map<string, CryptoKey>();
+
+async function getJwks(env: Env, forceRefresh = false): Promise<Jwk[]> {
   const now = Date.now();
-  if (jwksCache && now - jwksCache.fetchedAt < JWKS_TTL_MS) {
+  if (!forceRefresh && jwksCache && now - jwksCache.fetchedAt < JWKS_TTL_MS) {
     return jwksCache.keys;
   }
   const res = await fetch(
@@ -58,13 +64,51 @@ async function getJwks(env: Env): Promise<Jwk[]> {
     throw new AccessJwtError("JWKS response missing keys");
   }
   jwksCache = { keys: data.keys, fetchedAt: now };
+  importedKeys = new Map();
   return data.keys;
 }
 
+// A forged token can name any kid it likes, so "kid not found" alone can't
+// force a refetch on every miss — that turns a flood of bogus kids into a
+// certs-endpoint fetch per request. This remembers the last forced refetch
+// and allows at most one per KID_MISS_REFETCH_MIN_INTERVAL_MS; a real
+// Cloudflare key rotation only has to wait out that window once (instead of
+// the full JWKS_TTL_MS) before admins are unblocked again.
+const KID_MISS_REFETCH_MIN_INTERVAL_MS = 30 * 1000;
+let lastForcedRefetchAt = 0;
+
+async function getVerifyKey(env: Env, kid: string): Promise<CryptoKey | null> {
+  const cached = importedKeys.get(kid);
+  if (cached) {
+    return cached;
+  }
+  let keys = await getJwks(env);
+  let jwk = keys.find((k) => k.kid === kid);
+  if (!jwk) {
+    const now = Date.now();
+    if (now - lastForcedRefetchAt < KID_MISS_REFETCH_MIN_INTERVAL_MS) {
+      return null;
+    }
+    lastForcedRefetchAt = now;
+    keys = await getJwks(env, true);
+    jwk = keys.find((k) => k.kid === kid);
+    if (!jwk) {
+      return null;
+    }
+  }
+  const cryptoKey = await crypto.subtle.importKey(
+    "jwk",
+    { kty: jwk.kty, n: jwk.n, e: jwk.e, alg: "RS256", ext: true },
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["verify"],
+  );
+  importedKeys.set(kid, cryptoKey);
+  return cryptoKey;
+}
+
 function base64urlToBytes(b64url: string): Uint8Array<ArrayBuffer> {
-  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
-  const bin = atob(b64 + pad);
+  const bin = atob(base64urlToBase64(b64url));
   const bytes = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) {
     bytes[i] = bin.charCodeAt(i);
@@ -97,19 +141,10 @@ export async function verifyAccessJwt(
     throw new AccessJwtError(`unsupported alg: ${header.alg}`);
   }
 
-  const keys = await getJwks(env);
-  const jwk = keys.find((k) => k.kid === header.kid);
-  if (!jwk) {
+  const cryptoKey = await getVerifyKey(env, header.kid);
+  if (!cryptoKey) {
     throw new AccessJwtError("no matching JWK for kid");
   }
-
-  const cryptoKey = await crypto.subtle.importKey(
-    "jwk",
-    { kty: jwk.kty, n: jwk.n, e: jwk.e, alg: "RS256", ext: true },
-    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-    false,
-    ["verify"],
-  );
 
   const signedInput = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
   const signature = base64urlToBytes(sigB64);
