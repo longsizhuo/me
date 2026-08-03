@@ -30,7 +30,10 @@
   <meta property="twitter:image" content="https://longsizhuo.com/avatar.png">
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://longsizhuo.com/">
+  <!-- 没有静态 canonical：Caddy 把同一份 index.html 回落给所有路由，写死
+       指向 / 会让 /album、相册页和 /tools 全部自我 canonical 掉，永远进不了
+       索引。缺省时搜索引擎以 URL 自身为 canonical，正是我们要的；执行 JS 的
+       客户端由 App.tsx 的 CanonicalSync 补上自引用的那条。 -->
   <link rel="alternate" hreflang="zh-CN" href="https://longsizhuo.com/zh">
   <link rel="alternate" hreflang="en" href="https://longsizhuo.com/en">
   <link rel="alternate" hreflang="x-default" href="https://longsizhuo.com/">

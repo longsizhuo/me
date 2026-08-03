@@ -76,6 +76,14 @@ function PhotoRow({
   const [sortValue, setSortValue] = useState(index);
   const [busy, setBusy] = useState(false);
 
+  // key 是 photo.id，所以删除或重排后组件实例被复用、不会重新挂载，
+  // useState(index) 的初始值就此定格在旧位置。不同步的话，管理员看到的
+  // 是过期下标，照它点 Save order 会把错误的 sort_order 写进库，而且
+  // 界面上看不出来。index 变了就跟上。
+  useEffect(() => {
+    setSortValue(index);
+  }, [index]);
+
   return (
     <div className="flex flex-wrap items-center gap-3 bg-tertiary rounded-xl p-3">
       <div className="w-16 h-16 rounded-lg overflow-hidden bg-black-100/60 shrink-0">
@@ -182,9 +190,14 @@ const AlbumAdmin = () => {
   // already clicked into album B — same idiom as AlbumDetail's activeSlugRef.
   const activeSlugRef = useRef<string | null>(null);
 
+  // 标记「当前这一批上传」。见 handleFiles 里的说明。
+  const activeBatchRef = useRef<symbol | null>(null);
+
   const loadAlbums = useCallback(async () => {
     try {
-      const data = await fetchAlbums();
+      // fresh: 绕过 HTTP 缓存。写完立刻用同一个 URL 重拉，命中 max-age=60
+      // 的缓存就会读到写之前的状态。
+      const data = await fetchAlbums(undefined, { fresh: true });
       setAlbums(data);
       setAlbumsError(null);
     } catch (err) {
@@ -200,7 +213,7 @@ const AlbumAdmin = () => {
     setPhotosLoading(true);
     setPhotosError(null);
     try {
-      const data = await fetchAlbum(targetSlug, { limit: 60 });
+      const data = await fetchAlbum(targetSlug, { limit: 60, fresh: true });
       if (activeSlugRef.current !== targetSlug) {
         return;
       }
@@ -326,6 +339,13 @@ const AlbumAdmin = () => {
     }
 
     const rows: UploadRow[] = files.map((file) => ({ file, status: "reading" }));
+    // 每批一个身份标记。只比对 slug 不够：在同一个相册里连续拖两次，
+    // 后一批会把 uploadRows 整体换成更短的数组，而前一批仍在 await
+    // readDimensions 的循环会按自己的原始下标写回，越界展开 undefined
+    // 得到没有 file 字段的行，渲染 row.file.name 时抛 TypeError，
+    // ErrorBoundary 会把整个管理页换成错误提示——上传却还在后台继续。
+    const batch = Symbol("upload-batch");
+    activeBatchRef.current = batch;
     setUploadRows(rows);
 
     const okFiles: File[] = [];
@@ -333,12 +353,11 @@ const AlbumAdmin = () => {
     const okHeights: number[] = [];
     const rowIndexOf: number[] = [];
 
+    // 这一批仍然是当前批次，且相册没被切走，写回才安全。
+    const stillCurrent = () =>
+      activeBatchRef.current === batch && activeSlugRef.current === targetSlug;
+
     for (let i = 0; i < files.length; i++) {
-      // Switching albums clears uploadRows, so a write keyed by the original
-      // index would land in a now-empty array and punch a hole in it — earlier
-      // rows silently disappear from the status list. Same guard the
-      // post-upload reload below already uses.
-      const stillCurrent = () => activeSlugRef.current === targetSlug;
       try {
         const { w, h } = await readDimensions(files[i]);
         okFiles.push(files[i]);

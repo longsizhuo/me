@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useTranslation } from "react-i18next";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import i18n, { type Lang, langFromPath } from "./i18n";
+import i18n, { type Lang } from "./i18n";
 import {
   About,
   Album,
@@ -47,16 +47,19 @@ function HtmlLangSync() {
 }
 
 // ponytail: only /zh and /en need a self-referencing canonical (the crawler-folding
-// risk this exists for); everything else keeps the static shell's default of "/".
 function CanonicalSync() {
   const { pathname } = useLocation();
   useEffect(() => {
-    const canonical = document.querySelector('link[rel="canonical"]');
+    // 每条路由都写自引用 canonical，不只是语言路由。/album 和 /album/:slug
+    // 也在 sitemap 里，指向 / 会让它们被判为首页重复内容而永不收录。
+    // 静态壳里没有这个标签（见 index.html），所以缺省时要创建。
+    let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {
-      return;
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
     }
-    const lang = langFromPath(pathname);
-    canonical.setAttribute("href", `https://longsizhuo.com${lang ? pathname : "/"}`);
+    canonical.setAttribute("href", `https://longsizhuo.com${pathname}`);
   }, [pathname]);
   return null;
 }

@@ -103,7 +103,10 @@ const Album = () => {
 
       {photos === null && <StripSkeleton />}
 
-      {photos !== null && photos.length > 0 && (
+      {/* ViewAllCard 不放在 photos.length > 0 里面：接口失败或相册为空时，
+          它是全站唯一通往 /album 的入口（导航栏的 Album 是页内锚点 #album，
+          页脚也没有相册链接），藏起来等于让访客只能手敲 URL。 */}
+      {photos !== null && (
         <div className="flex gap-4 overflow-x-auto mt-10 pb-2">
           {photos.map((photo) => (
             <PhotoTile key={photo.id} photo={photo} />

@@ -14,7 +14,10 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const isHome = location.pathname === "/";
+  // /zh 与 /en 渲染的就是 HomePage，锚点导航同样适用；只判断 "/" 会让这两条
+  // 语言路由（正是中文 SEO 的落地页）整组栏目导航消失。
+  const isHome =
+    location.pathname === "/" || langFromPath(location.pathname) !== null;
 
   const toggleLang = () => {
     const newLang = i18n.language === "en" ? "zh" : "en";

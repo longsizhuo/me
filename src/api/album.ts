@@ -50,6 +50,7 @@ export class ApiError extends Error {
 async function get<T>(
   path: string,
   params: Record<string, string | number | null | undefined> = {},
+  { fresh = false }: { fresh?: boolean } = {},
 ): Promise<T> {
   const url = new URL(BASE + path);
   for (const [k, v] of Object.entries(params)) {
@@ -57,22 +58,27 @@ async function get<T>(
       url.searchParams.set(k, String(v));
     }
   }
-  const res = await fetch(url.toString());
+  // 读接口带 Cache-Control: public, max-age=60，对公开页面是对的。
+  // 但管理页写完之后正是用同一个 URL 重新拉取，命中浏览器缓存就会读到
+  // 写之前的副本——删掉的照片还在、刚传的照片不见，管理员会重复操作。
+  // 写请求打的是 /api/admin/* 另一个 URL，不会让这些缓存失效，所以只能
+  // 由调用方显式要求绕过。
+  const res = await fetch(url.toString(), fresh ? { cache: "no-store" } : undefined);
   if (!res.ok) {
     throw new ApiError(res.status, `GET ${path} -> ${res.status}`);
   }
   return res.json() as Promise<T>;
 }
 
-export function fetchAlbums(lang?: Lang): Promise<AlbumSummary[]> {
-  return get<AlbumSummary[]>("/api/albums", { lang });
+export function fetchAlbums(lang?: Lang, opts: { fresh?: boolean } = {}): Promise<AlbumSummary[]> {
+  return get<AlbumSummary[]>("/api/albums", { lang }, opts);
 }
 
 export function fetchAlbum(
   slug: string,
-  opts: { lang?: Lang; limit?: number } = {},
+  { fresh, ...params }: { lang?: Lang; limit?: number; fresh?: boolean } = {},
 ): Promise<AlbumDetail> {
-  return get<AlbumDetail>(`/api/albums/${encodeURIComponent(slug)}`, opts);
+  return get<AlbumDetail>(`/api/albums/${encodeURIComponent(slug)}`, params, { fresh });
 }
 
 export function fetchPhotos(

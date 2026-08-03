@@ -233,8 +233,10 @@ export function geo() {
         const locales = loadLocales();
         const jsonLd = safeJsonLdString(renderJsonLd(locales));
         return html
-          .replace("<!--geo-jsonld-->", `<script type="application/ld+json">\n${jsonLd}\n</script>`)
-          .replace("<!--geo-->", `<style>${SHELL_STYLE}</style>${renderShell(locales)}`);
+          // 用替换函数而不是替换字符串：替换内容由 i18n 文案生成，其中的
+            // $& / $` / $\u0027 / $$ 在字符串形式下会被当成替换模式展开。
+            .replace("<!--geo-jsonld-->", () => `<script type="application/ld+json">\n${jsonLd}\n</script>`)
+          .replace("<!--geo-->", () => `<style>${SHELL_STYLE}</style>${renderShell(locales)}`);
       },
     },
     generateBundle() {
