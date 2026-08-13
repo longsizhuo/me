@@ -280,5 +280,10 @@
   "notFound": {
     "message": "This page doesn't exist — maybe it wandered off to find some hot cocoa.",
     "goHome": "Go Home"
+  },
+  "friends": {
+    "subtitle": "Friend Links",
+    "title": "Friends.",
+    "description": "Some interesting blogs and sites"
   }
 }

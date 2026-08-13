@@ -278,5 +278,10 @@
   "notFound": {
     "message": "这个页面不存在 —— 也许它跑去找热可可了。",
     "goHome": "回到首页"
+  },
+  "friends": {
+    "subtitle": "友情链接",
+    "title": "朋友们",
+    "description": "一些有趣的博客和站点"
   }
 }

@@ -17,6 +17,7 @@ import {
 import Education from "./components/Education";
 import Honors from "./components/Honors";
 import Writing from "./components/Writing";
+import Friends from "./components/Friends";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTop";
 import LazyVisible from "./components/LazyVisible";
@@ -150,6 +151,7 @@ function HomePage() {
       <Honors />
       <Works />
       <Writing />
+      <Friends />
       <div className="relative z-0">
         <ContactAdvanced />
         <ErrorBoundary label="stars-canvas">
