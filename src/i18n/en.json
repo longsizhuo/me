@@ -73,20 +73,6 @@
         ]
       },
       {
-        "id": "spotfinder",
-        "title": "Scrum Master & Backend Developer",
-        "company": "Spot Finder",
-        "date": "Jan 2024 - Present",
-        "icon": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
-        "iconBg": "#000",
-        "points": [
-          "Led the development of a parking space time-sharing rental system using Golang and MySQL.",
-          "Managed the deployment of the backend using Docker, Cloudflare, Redis, and Nginx.",
-          "Supervised team tasks, ensuring milestone achievement and project quality.",
-          "Implemented WebSocket for real-time communication and offline messaging."
-        ]
-      },
-      {
         "id": "gemflower",
         "title": "Research & Development Intern",
         "company": "Gem Flower Healthcare Information Technology Ltd.",
@@ -280,10 +266,5 @@
   "notFound": {
     "message": "This page doesn't exist — maybe it wandered off to find some hot cocoa.",
     "goHome": "Go Home"
-  },
-  "friends": {
-    "subtitle": "Friend Links",
-    "title": "Friends.",
-    "description": "Some interesting blogs and sites"
   }
 }

@@ -71,20 +71,6 @@
         ]
       },
       {
-        "id": "spotfinder",
-        "title": "Scrum Master & 后端开发",
-        "company": "Spot Finder",
-        "date": "2024年1月 - 至今",
-        "icon": "https://cdn.longsizhuo.com/logos/SpotFinder/logo.svg",
-        "iconBg": "#000",
-        "points": [
-          "使用 Golang 和 MySQL 主导开发停车位分时租赁系统。",
-          "使用 Docker、Cloudflare、Redis 和 Nginx 管理后端部署。",
-          "监督团队任务，确保里程碑达成和项目质量。",
-          "实现 WebSocket 实时通信和离线消息功能。"
-        ]
-      },
-      {
         "id": "gemflower",
         "title": "研发实习生",
         "company": "百事花健康信息技术有限公司",
@@ -278,10 +264,5 @@
   "notFound": {
     "message": "这个页面不存在 —— 也许它跑去找热可可了。",
     "goHome": "回到首页"
-  },
-  "friends": {
-    "subtitle": "友情链接",
-    "title": "朋友们",
-    "description": "一些有趣的博客和站点"
   }
 }
