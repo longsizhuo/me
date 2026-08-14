@@ -5,17 +5,19 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import ContentEditor from "./admin/ContentEditor";
+import FriendsAdmin from "./admin/FriendsAdmin";
 import { lazyWithReload } from "../lazyWithReload";
 
 // 相册管理是这个页面里最重的一块（要拉相册列表、缩略图、上传逻辑），
 // 而多数时候进后台是来改文案的，所以按标签页懒加载。
 const AlbumAdmin = lazyWithReload("AlbumAdmin", () => import("./AlbumAdmin"));
 
-type Tab = "content" | "album";
+type Tab = "content" | "album" | "friends";
 
 const TABS: { key: Tab; label: string; hint: string }[] = [
   { key: "content", label: "站点文案", hint: "首屏、经历、荣誉、项目等全部文字" },
   { key: "album", label: "相册", hint: "上传照片、排序、设封面" },
+  { key: "friends", label: "友链", hint: "增删改友链，存 D1，主页即时生效" },
 ];
 
 export default function Admin() {
@@ -23,7 +25,8 @@ export default function Admin() {
   // 页面，state 会丢，用户得重新点一次才回到刚才那一栏。顺带让它可以收藏。
   const [params, setParams] = useSearchParams();
   const raw = params.get("tab");
-  const tab: Tab = raw === "album" ? "album" : "content";
+  const tab: Tab =
+    raw === "album" ? "album" : raw === "friends" ? "friends" : "content";
   const setTab = (next: Tab) => {
     // replace: 切标签不该在浏览器历史里堆一层，否则「后退」得点好几次才离开后台。
     setParams(next === "content" ? {} : { tab: next }, { replace: true });
@@ -66,6 +69,8 @@ export default function Admin() {
           <ErrorBoundary key={tab} label={`admin-${tab}`} fallback={<p className="text-secondary">这个面板加载出错了，刷新重试。</p>}>
             {tab === "content" ? (
               <ContentEditor />
+            ) : tab === "friends" ? (
+              <FriendsAdmin />
             ) : (
               <Suspense fallback={<p className="text-secondary">加载中…</p>}>
                 <AlbumAdmin embedded />

@@ -125,7 +125,7 @@ export interface UploadResult {
 // backing it, which trips this config's plain (non-type-aware) `no-undef`.
 type FetchInit = NonNullable<Parameters<typeof fetch>[1]>;
 
-async function adminRequest<T>(path: string, init: FetchInit): Promise<T> {
+export async function adminRequest<T>(path: string, init: FetchInit): Promise<T> {
   const res = await fetch(BASE + path, init);
   if (!res.ok) {
     let message = `${init.method ?? "GET"} ${path} -> ${res.status}`;

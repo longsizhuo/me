@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
 import { fadeIn, textVariant } from "../utils/motion.ts";
+import { fetchFriends, type Friend } from "../api/friends";
 
 interface FriendLink {
   name: string;
@@ -13,7 +14,9 @@ interface FriendLink {
   description: string;
 }
 
-const friendLinks: FriendLink[] = [
+// SSR 兜底：如果 /api/friends 拉取失败（Worker 挂、网络抖动等），
+// 站点仍然显示这份内置友链，不会整个区块空白。
+const FALLBACK_LINKS: FriendLink[] = [
   {
     name: "吉吉博客",
     url: "https://mmdjiji.com",
@@ -24,6 +27,28 @@ const friendLinks: FriendLink[] = [
 
 const Friends = () => {
   const { t } = useTranslation();
+  const [links, setLinks] = useState<FriendLink[] | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetchFriends()
+      .then((list) => {
+        if (alive && list.length > 0) {
+          setLinks(list);
+        }
+      })
+      .catch(() => {
+        // 保持 null → 走兜底
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // links === null 时用内置兜底（首次渲染也是兜底，避免闪空），
+  // API 返回空数组时同样回退到兜底。
+  const shown: FriendLink[] = links && links.length > 0 ? links : FALLBACK_LINKS;
+
   return (
     <>
       <motion.div variants={textVariant()}>
@@ -39,7 +64,7 @@ const Friends = () => {
       </motion.p>
 
       <div className="mt-10 flex flex-wrap gap-5">
-        {friendLinks.map((link, index) => (
+        {shown.map((link, index) => (
           <motion.a
             key={link.url}
             href={link.url}
