@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {BrowserRouter as Router, useLocation} from "react-router-dom";
 import Education from './components/Education';
-import { About, ContactAdvanced, Experience, Hero, Navbar, Works, StarsCanvas, GlobalLottieBackground } from "./components";
+import { About, ContactAdvanced, Experience, Hero, Navbar, Works, StarsCanvas, GlobalLottieBackground, LegendList } from "./components";
 function AppContent() {
     const location = useLocation();
 
@@ -26,7 +26,7 @@ function AppContent() {
                 <Education />
                 {/* <Tech /> */}
                 <Works />
-                {/* <Feedbacks /> */}
+                <LegendList />
                 <div className={"relative z-0"}>
                     <ContactAdvanced />
                     <StarsCanvas />
