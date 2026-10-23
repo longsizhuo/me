@@ -1,10 +1,20 @@
 # pnpm 11 起，overrides 等设置从 package.json 的 "pnpm" 字段迁到这里。
-# 这两条是安全 pin，别删 —— 放回 package.json 会被 pnpm 11 静默忽略：
+# 这些都是安全 pin，别删 —— 放回 package.json 会被 pnpm 11 静默忽略：
 #   yaml             — 见 commit fd2c575
-#   follow-redirects — 见 commit e76a5d0
+#   follow-redirects — 见 commit e76a5d0（2026-10 Dependabot 告警再提到 1.16.1）
+#   其余几条 — 2026-10 Dependabot 告警，都是间接依赖，上游还没升到修复版本。
+#   左边「包名@旧版本范围」只匹配有漏洞的那一段，右边限定在同一个大版本里，不会把用 1.x 的包强行升到 5.x
 overrides:
   yaml: '>=2.8.3'
-  follow-redirects: '>=1.16.0'
+  follow-redirects: '>=1.16.1'
+  source-map-js@<1.2.2: '^1.2.2'
+  fflate@<0.6.11: '^0.6.11'
+  fflate@>=0.7.0 <0.8.3: '^0.8.3'
+  esbuild@<0.28.1: '^0.28.1'
+  brace-expansion@<1.1.21: '^1.1.21'
+  brace-expansion@>=5.0.0 <5.0.12: '^5.0.12'
+  js-yaml@>=4.0.0 <4.3.2: '^4.3.2'
+  '@humanfs/node@<0.16.8': '^0.16.8'
 
 # esbuild 的 postinstall 只是下载对应平台的二进制，放行。
 allowBuilds:
