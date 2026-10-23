@@ -4,7 +4,13 @@ import { styles } from "../styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import profilePicture from "../assets/IMG_2862.webp";
+import { imageUrl } from "../content/images";
+
+// 头像原图（912×1269）已经在 R2 上，交给 Cloudflare 按显示尺寸压成 AVIF/WebP：
+// 原来直接发 101KB 的 webp，现在 500 宽约 35KB。912 是原图宽度，再大也没有更清楚
+const PROFILE_KEY = "logos/IMG_2862.webp";
+const profileSmall = imageUrl(PROFILE_KEY, { width: 500 });
+const profileLarge = imageUrl(PROFILE_KEY, { width: 912 });
 
 const Hero = () => {
   const { t } = useTranslation();
@@ -102,8 +108,14 @@ const Hero = () => {
           className="flex justify-center items-center"
         >
           <img
-            src={profilePicture}
+            src={profileSmall}
+            srcSet={`${profileSmall} 500w, ${profileLarge} 912w`}
+            // 卡片宽度：xl 640px / lg 500px / 其他 400px（和上面 Card 的 width 对应）
+            sizes="(min-width: 1536px) 640px, (min-width: 1200px) 500px, 400px"
+            width={912}
+            height={1269}
             alt="Sizhuo Long"
+            fetchPriority="high"
             style={{ width: "100%", height: "auto", objectFit: "cover" }}
           />
         </Card>

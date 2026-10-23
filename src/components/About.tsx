@@ -55,6 +55,7 @@ const ServiceCard = ({ index, title, icon, description, stars, forks }: ServiceC
         <img
           src={icon}
           alt={title}
+          loading="lazy"
           className="w-20 h-20 object-contain" // 调整图片大小
         />
 
@@ -114,7 +115,8 @@ const About = () => {
                     forkCount
                     owner {
                       login
-                      avatarUrl
+                      # 卡片上只显示 80px，要 160px 的就够（不带 size 是原图，200KB+）
+                      avatarUrl(size: 160)
                     }
                   }
                 }

@@ -64,9 +64,11 @@ const GitHubProjectCard = ({
         className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full cursor-pointer"
       >
         <div className="relative w-full h-[230px]">
+          {/* GitHub 的预览图没法走我们的 CDN 压缩，至少等滚到附近再下载 */}
           <img
             src={repo.openGraphImageUrl}
             alt={repo.name}
+            loading="lazy"
             className="w-full h-full object-cover rounded-2xl"
           />
         </div>
@@ -113,6 +115,7 @@ const StaticProjectCard = ({ index, project }: { index: number; project: StaticP
           <img
             src={project.image}
             alt={project.name}
+            loading="lazy"
             className="max-w-[70%] max-h-[70%] object-contain"
             onError={(e) => {
               e.currentTarget.style.display = "none";

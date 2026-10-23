@@ -3,6 +3,7 @@ import { PointMaterial, Points, Preload } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as random from "maath/random/dist/maath-random.esm";
 import { Suspense, useRef, useState, type ComponentRef } from "react";
+import { useOnScreen } from "./useOnScreen";
 import type { StarsProps } from "./TYPE";
 
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -49,9 +50,17 @@ const Stars = (props: StarsProps) => {
 };
 
 const StarsCanvas = () => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const onScreen = useOnScreen(wrapperRef);
+
   return (
-    <div className="w-full h-auto absolute inset-0 z-[-1]">
-      <Canvas camera={{ position: [0, 0, 1] }}>
+    <div ref={wrapperRef} className="w-full h-auto absolute inset-0 z-[-1]">
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        // 滚出屏幕就停止渲染；高分屏最多按 1.5 倍像素画，星点这么小看不出区别
+        frameloop={onScreen ? "always" : "never"}
+        dpr={[1, 1.5]}
+      >
         <Suspense fallback={null}>
           <Stars />
         </Suspense>

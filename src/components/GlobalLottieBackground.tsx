@@ -8,6 +8,19 @@ export const GlobalLottieBackground = () => {
   const lastScrollY = useRef(0);
   const currentFrame = useRef(0);
   const scrollPerFrame = 20;
+  // 背景动画不是首屏必需的（播放器的 wasm 就有 600KB），等浏览器忙完首屏再加载
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const start = () => setShouldLoad(true);
+    // Safari 没有 requestIdleCallback，退回到 1 秒后加载
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(start, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(start, 1000);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (!dotLottie) {
@@ -64,8 +77,8 @@ export const GlobalLottieBackground = () => {
     }
   };
 
-  if (error) {
-    return null; // 静默失败，不显示背景
+  if (error || !shouldLoad) {
+    return null; // 出错就静默不显示；还没轮到加载时也先不渲染
   }
 
   return (

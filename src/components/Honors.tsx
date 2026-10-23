@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
+import { cdnImage } from "../content/images";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
 const HonorCard = ({
@@ -28,8 +29,9 @@ const HonorCard = ({
     <div className="shrink-0 mt-1">
       <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
         <img
-          src={icon}
+          src={cdnImage(icon, 128)}
           alt=""
+          loading="lazy"
           className="w-8 h-8 object-contain"
           onError={(e) => { e.currentTarget.style.display = "none"; }}
         />
