@@ -45,3 +45,19 @@ export function imageUrl(key: string, opts: ImageUrlOptions = {}): string {
   parts.push("format=auto");
   return `${CDN}/cdn-cgi/image/${parts.join(",")}/${enc}`;
 }
+
+/**
+ * 把一个完整的 cdn.longsizhuo.com 图片地址换成压缩后的版本。
+ *
+ * 公司/学校 logo 的地址写在 i18n 文案里（完整 URL），原图有几十 KB，
+ * 页面上却只显示几十像素：unsw.png 原图 50KB，width=128 的 AVIF 只要几 KB。
+ * 不是我们 CDN 上的图（比如 GitHub 头像）、或者是 SVG（本来就小，也不需要转），原样返回。
+ */
+export function cdnImage(url: string, width: number): string {
+  const prefix = `${CDN}/`;
+  if (!url.startsWith(prefix) || url.endsWith(".svg")) {
+    return url;
+  }
+  const key = decodeURIComponent(url.slice(prefix.length));
+  return imageUrl(key, { width });
+}

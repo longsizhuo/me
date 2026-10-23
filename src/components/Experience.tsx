@@ -10,6 +10,7 @@ import "react-vertical-timeline-component/style.min.css";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
+import { cdnImage } from "../content/images";
 import { textVariant } from "../utils/motion.ts";
 import type { ExperienceCardProps } from "./TYPE";
 
@@ -26,8 +27,9 @@ const ExperienceCard = ({ experience }: ExperienceCardProps) => {
       icon={
         <div className='flex justify-center items-center w-full h-full'>
           <img
-            src={experience.icon}
+            src={cdnImage(experience.icon, 128)}
             alt={experience.company_name}
+            loading="lazy"
             className='w-[60%] h-[60%] object-contain'
             onError={(e) => { e.currentTarget.style.display = "none"; }}
           />

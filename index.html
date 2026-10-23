@@ -39,18 +39,34 @@
   <link rel="alternate" hreflang="x-default" href="https://longsizhuo.com/">
 
   <title>龙思卓 (Sizhuo Long) | 快手前端工程师 · 个人主页</title>
-  <link rel="icon" href="/avatar.png">
-  <link rel="apple-touch-icon" href="/avatar.png">
+  <!-- 图标用缩小过的版本：avatar.png 原图 1.1MB，只留给分享卡片（og:image）用 -->
+  <link rel="icon" href="/favicon-64.png" sizes="64x64" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#050816">
 
   <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LWL6MY0GF4"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-LWL6MY0GF4');
+
+    // 统计脚本有 178KB，但首屏用不到它：等页面加载完、浏览器空闲了再下载。
+    // 上面的 gtag(...) 调用先排在 dataLayer 里，脚本到了会补发，统计数据不会丢
+    window.addEventListener('load', function () {
+      var loadGtag = function () {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-LWL6MY0GF4';
+        document.head.appendChild(s);
+      };
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadGtag, { timeout: 3000 });
+      } else {
+        setTimeout(loadGtag, 2000);
+      }
+    });
   </script>
 
   <!-- Structured Data —— 由 scripts/geo.mjs 从 src/i18n 生成，别手写 -->

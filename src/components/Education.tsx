@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { styles } from "../styles";
 import { SectionWrapper } from "../hoc";
+import { cdnImage } from "../content/images";
 import { fadeIn, textVariant } from "../utils/motion.ts";
 
 const Education = () => {
@@ -37,8 +38,9 @@ const Education = () => {
               >
                 {edu.icon ? (
                   <img
-                    src={edu.icon}
+                    src={cdnImage(edu.icon, 128)}
                     alt={edu.university}
+                    loading="lazy"
                     className="w-[70%] h-[70%] object-contain"
                     onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
