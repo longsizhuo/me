@@ -2,15 +2,14 @@
 layer(base);
 
 @import 'tailwindcss';
+/* v4 自动检测会跳过 node_modules：char-anime 的 bg-gray-700 / bg-violet-* / file:* / lg:* 等类只能显式扫描 */
+@source "../node_modules/char-anime/dist";
 
 /*
  * Migrated by hand from tailwind.config.ts (Tailwind 3 -> 4). @source entries
  * for ./packages/video-to-ascii and ./packages/charAnime were dropped, not
  * carried forward: neither directory exists in this repo (dead globs that
- * matched nothing even under v3). node_modules/char-anime/dist was also
- * dropped — the handful of Tailwind-looking class strings inside it
- * (h-auto, text-center, text-sm, w-full) are already used elsewhere in src/,
- * so v4's automatic content detection generates them regardless.
+ * matched nothing even under v3).
  */
 @theme {
   --color-primary: #050816;

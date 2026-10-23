@@ -29,7 +29,7 @@
     "@types/node": "^24.3.0",
     "antd": "^5.27.1",
     "axios": "^1.15.2",
-    "char-anime": "latest",
+    "char-anime": "^0.2.0",
     "fra": "^0.0.4",
     "graphql": "^16.11.0",
     "i18next": "^26.0.8",

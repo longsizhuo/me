@@ -9,3 +9,7 @@ overrides:
 # esbuild 的 postinstall 只是下载对应平台的二进制，放行。
 allowBuilds:
   esbuild: true
+
+# pnpm 11 默认拒装刚发布的版本（供应链防护）。char-anime 是自己发的包，发版当天就要用，豁免这一版。
+minimumReleaseAgeExclude:
+  - char-anime@0.2.0
