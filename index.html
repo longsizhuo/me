@@ -45,8 +45,13 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#050816">
 
-  <!-- Google tag (gtag.js) -->
-  <script>
+  <!-- 能跑 JS 的浏览器标一个 js 类：#root 里给爬虫读的静态简历就藏起来、换成加载圈（样式见 scripts/geo.mjs 的 SHELL_STYLE）。
+       要在 <body> 解析前就执行，所以写在 head 里，且 data-cfasync="false"：
+       Cloudflare Rocket Loader 会把普通脚本推迟到页面渲染之后，那时简历已经闪出来了 -->
+  <script data-cfasync="false">document.documentElement.classList.add('js');</script>
+
+  <!-- Google tag (gtag.js)。data-cfasync="false"：不经 Rocket Loader，load 事件才一定监听得到 -->
+  <script data-cfasync="false">
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());

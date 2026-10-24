@@ -148,9 +148,19 @@ export function renderShell({ zh, en }) {
  * #root 里那段内容的样式。挂载后连同内容一起被 React 丢掉。
  * body 背景要在这里兜一份：index.css 是 main.jsx import 进来的，
  * JS 没跑完之前页面是白底，深色文字上去就看不清了。
+ *
+ * 能跑 JS 的浏览器（index.html 的 head 里给 <html> 加了 js 类）不显示这份简历，只显示加载圈：
+ * 不然打开页面先闪一份窄窄的简历、再跳成 3D 首页，网速慢时简历会一直挂着。
+ * 爬虫不执行 JS，拿到的 HTML 和读到的正文都不变。
  */
 export const SHELL_STYLE =
   `body{background:#050816;margin:0}` +
+  `.js .geo-shell{display:none}` +
+  `.geo-loading{display:none}` +
+  `.js .geo-loading{display:block;width:28px;height:28px;margin:45vh auto 0;border-radius:50%;` +
+  `border:3px solid rgba(145,94,255,.25);border-top-color:#915eff;animation:geo-spin .9s linear infinite}` +
+  `@keyframes geo-spin{to{transform:rotate(360deg)}}` +
+  `@media (prefers-reduced-motion:reduce){.js .geo-loading{animation:none}}` +
   `.geo-shell{max-width:760px;margin:0 auto;padding:3rem 1.5rem;color:#aaa6c3;` +
   `font-family:Inter,system-ui,sans-serif;line-height:1.8}` +
   `.geo-shell h1{color:#f7f8f8;font-size:2rem;margin:0 0 .5rem}` +
@@ -287,7 +297,7 @@ export function geo() {
           // 用替换函数而不是替换字符串：替换内容由 i18n 文案生成，其中的
             // $& / $` / $\u0027 / $$ 在字符串形式下会被当成替换模式展开。
             .replace("<!--geo-jsonld-->", () => `<script type="application/ld+json">\n${jsonLd}\n</script>`)
-          .replace("<!--geo-->", () => `<style>${SHELL_STYLE}</style>${renderShell(data)}`);
+          .replace("<!--geo-->", () => `<style>${SHELL_STYLE}</style><div class="geo-loading" aria-hidden="true"></div>${renderShell(data)}`);
       },
     },
     generateBundle() {
