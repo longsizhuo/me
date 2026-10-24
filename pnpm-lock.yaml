@@ -74,6 +74,9 @@ importers:
       i18next:
         specifier: ^26.0.8
         version: 26.0.8(typescript@6.0.3)
+      l2d-widget:
+        specifier: 0.1.2
+        version: 0.1.2
       maath:
         specifier: ^0.10.8
         version: 0.10.8(@types/three@0.177.0)(three@0.183.2)
@@ -1692,6 +1695,9 @@ packages:
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
+
+  l2d-widget@0.1.2:
+    resolution: {integrity: sha512-G96NqlH5qBIy6eNPo5eXKRFKEFJ6jHX9dKB9W9qmrZ1PXkbAkeOvoKal3a0zWxr3DkctodVMNwmXydTpfw005g==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -4512,6 +4518,8 @@ snapshots:
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
+
+  l2d-widget@0.1.2: {}
 
   levn@0.4.1:
     dependencies:

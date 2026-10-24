@@ -21,6 +21,7 @@ import Friends from "./components/Friends";
 import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTop";
 import LazyVisible from "./components/LazyVisible";
+import Live2DMascot from "./components/Live2DMascot";
 import { lazyWithReload } from "./lazyWithReload";
 
 const Tools = lazyWithReload("Tools", () => import("./pages/Tools"));
@@ -175,6 +176,8 @@ function App() {
       <HtmlLangSync />
       <CanonicalSync />
       <Analytics />
+      {/* 看板娘挂在路由外面：切换页面时不会重新加载 */}
+      <Live2DMascot />
       <AnimatePresence mode="wait">
         <Suspense fallback={<div className="bg-primary min-h-screen" />}>
           <Routes>
