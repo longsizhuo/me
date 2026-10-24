@@ -50,9 +50,25 @@ const socialLinks = [
   },
 ];
 
+// 联系区那颗地球的 3D 模型来自 Sketchfab，CC BY 4.0 协议要求写明：作品名、作者、来源、协议，以及有没有改过。
+// 写在组件里而不是 i18n 文案里：src/i18n/*.json 会被 content-sync 用后台（D1）的数据整份覆盖，写进去会被冲掉
+const MODEL_CREDIT = {
+  title: "Stylized planet",
+  url: "https://sketchfab.com/3d-models/stylized-planet-789725db86f547fc9163b00f302c3e70",
+  author: "cmzw",
+  authorUrl: "https://sketchfab.com/cmzw",
+  licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+};
+
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const year = new Date().getFullYear();
+
+  const creditLink = (href: string, text: string) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">
+      {text}
+    </a>
+  );
 
   return (
     <footer className="bg-black-100 border-t border-white/5">
@@ -85,6 +101,22 @@ const Footer = () => {
             ))}
           </div>
         </div>
+
+        <p className="mt-4 text-center text-secondary/60 text-[12px]">
+          {i18n.language === "zh" ? (
+            <>
+              地球 3D 模型 {creditLink(MODEL_CREDIT.url, MODEL_CREDIT.title)} 作者{" "}
+              {creditLink(MODEL_CREDIT.authorUrl, MODEL_CREDIT.author)}，采用{" "}
+              {creditLink(MODEL_CREDIT.licenseUrl, "CC BY 4.0")} 授权，本站压缩了贴图和顶点数据
+            </>
+          ) : (
+            <>
+              Earth 3D model {creditLink(MODEL_CREDIT.url, MODEL_CREDIT.title)} by{" "}
+              {creditLink(MODEL_CREDIT.authorUrl, MODEL_CREDIT.author)}, licensed under{" "}
+              {creditLink(MODEL_CREDIT.licenseUrl, "CC BY 4.0")}; textures and vertex data compressed for this site
+            </>
+          )}
+        </p>
       </div>
     </footer>
   );
