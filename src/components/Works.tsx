@@ -58,7 +58,8 @@ const GitHubProjectCard = ({
   }));
 
   return (
-    <motion.div onClick={onClick} variants={fadeIn("up", "", index * 0.5, 0.75)}>
+    // w-full sm:w-auto：小屏上卡片占满一行但不超出屏幕（flex 子项默认会被长内容撑宽）
+    <motion.div onClick={onClick} variants={fadeIn("up", "", index * 0.5, 0.75)} className="w-full sm:w-auto">
       <Tilt
         options={{ max: 45, scale: 0.9, speed: 450 }}
         className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full cursor-pointer"
@@ -73,7 +74,8 @@ const GitHubProjectCard = ({
           />
         </div>
         <div className="mt-5">
-          <h3 className="text-white font-bold text-[24px]">{repo.name}</h3>
+          {/* wrap-anywhere：BossZhiPin_Job_Search 这种没有空格的长名字也能断行，不然在 320px 屏上把卡片撑宽 */}
+          <h3 className="text-white font-bold text-[24px] wrap-anywhere">{repo.name}</h3>
           <p className="mt-2 text-secondary text-[14px] line-clamp-3">
             {repo.description || "No description provided."}
           </p>
@@ -105,7 +107,7 @@ interface StaticProject {
 }
 
 const StaticProjectCard = ({ index, project }: { index: number; project: StaticProject }) => (
-  <motion.div variants={fadeIn("up", "", index * 0.5, 0.75)}>
+  <motion.div variants={fadeIn("up", "", index * 0.5, 0.75)} className="w-full sm:w-auto">
     <Tilt
       options={{ max: 45, scale: 0.9, speed: 450 }}
       className="bg-tertiary p-5 rounded-2xl sm:w-[360px] w-full"
@@ -123,7 +125,7 @@ const StaticProjectCard = ({ index, project }: { index: number; project: StaticP
           />
         </div>
         <div className="mt-5">
-          <h3 className="text-white font-bold text-[24px]">{project.name}</h3>
+          <h3 className="text-white font-bold text-[24px] wrap-anywhere">{project.name}</h3>
           <p className="mt-2 text-secondary text-[14px] line-clamp-3">{project.description}</p>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">

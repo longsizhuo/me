@@ -17,13 +17,16 @@ const Hero = () => {
   const [giggle, setGiggle] = useState(false);
 
   return (
-    <section className={`relative w-full h-screen mx-auto`}>
+    // 至少一屏高、内容比屏幕高时跟着变高（原来固定 h-screen + 内容绝对定位，小屏上文字会溢出到下一屏、压住滚动提示）。
+    // svh = 手机浏览器地址栏展开时的可见高度，滚动提示不会被地址栏挡住
+    <section className="relative w-full min-h-svh mx-auto">
+      {/* pb-32：给底部的滚动提示留位置 */}
       <div
-        className={`absolute inset-0 top-[120px] max-w-7xl mx-auto ${styles.paddingX} flex flex-col xl:flex-row items-start gap-5 justify-between`}
+        className={`pt-[120px] pb-32 max-w-7xl mx-auto ${styles.paddingX} flex flex-col xl:flex-row items-start gap-5 justify-between`}
       >
         {/* Left Side - Text Section */}
         <div className="flex flex-row">
-          <div className="flex flex-col justify-center items-center mt-5">
+          <div className="flex flex-col justify-start items-center mt-5">
             <div className="w-5 h-5 rounded-full bg-[#915EFF]" />
             <div className="w-1 sm:h-80 h-40 violet-gradient" />
           </div>
@@ -99,7 +102,10 @@ const Hero = () => {
             overflow: "hidden",
             transition: "transform 0.2s",
             flexShrink: 0,
-            display: { xs: "none", md: "block" },
+            // 只在文字和照片左右并排时（Tailwind xl = 1280px，见上面的 xl:flex-row）显示照片。
+            // 原来用 MUI 的 md（900px），900–1280px 之间照片会排到文字下面、被挤出首屏
+            display: "none",
+            "@media (min-width: 1280px)": { display: "block" },
             "&:hover": {
               transform: "scale(1.05)",
               boxShadow: 12,
@@ -121,7 +127,7 @@ const Hero = () => {
         </Card>
       </div>
 
-      <div className="absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center">
+      <div className="absolute bottom-10 w-full flex justify-center items-center">
         <a href="#about">
           <div className="w-[35px] h-[64px] rounded-3xl border-4 border-secondary flex justify-center items-start p-2">
             <motion.div
