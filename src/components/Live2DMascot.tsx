@@ -15,6 +15,11 @@ const BUBBLE_DURATION = 6000; // 每句话显示多久
 
 // 模型里 "null" 这组有 7 个动作：前 6 个是普通的小动作，第 7 个（shake）是摇头
 const MOTION_GROUP = "null";
+// 画布要比她本人宽：做动作时双马尾会甩出去，原来 200 宽的画布两边都会截断。
+// l2d 按画布宽度缩放模型，所以画布放宽到 320 的同时把模型缩到 0.665，她看起来还是原来那么大。
+// （实测 7 个动作逐帧取范围：头发甩到 x 52~280，左右还留 40px 以上）
+const CANVAS = { width: 320, height: 400 };
+const MODEL_SCALE = 0.665;
 const NORMAL_MOTIONS = 6;
 const SHAKE_MOTION = 6;
 // 2 秒内连点 4 下算「戳个不停」
@@ -217,8 +222,8 @@ const Live2DMascot = () => {
       // l2d-widget 把容器直接挂在 body 上，又不对外暴露：记下创建前的 body 子元素，新出现的那个就是
       const before = new Set(Array.from(document.body.children));
       const widget = createWidget({
-        model: { path: MODEL_PATH, tips: false },
-        size: small ? { width: 100, height: 200 } : { width: 200, height: 400 },
+        model: { path: MODEL_PATH, scale: MODEL_SCALE, tips: false },
+        size: small ? { width: CANVAS.width / 2, height: CANVAS.height / 2 } : CANVAS,
         // 拖到屏幕中间以后，默认的滑动退场滑不出视口（只往下滑自身高度的 130%），淡出没这个问题
         transitionType: "fade",
         primaryColor: "rgba(145, 94, 255, 0.9)", // 站点主色 #915EFF
