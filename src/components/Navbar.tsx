@@ -53,22 +53,23 @@ const Navbar = () => {
               window.scrollTo(0, 0);
             }}
           >
-            <p className="text-white text-[18px] font-bold cursor-pointer flex">
+            <p className="text-white text-[18px] font-bold cursor-pointer flex whitespace-nowrap">
               {t("nav.brandName")} &nbsp;
               <span className="sm:block hidden"> | {t("nav.brandRole")}</span>
             </p>
           </Link>
           <button
             onClick={toggleLang}
-            className="text-secondary hover:text-white text-[13px] font-medium border border-secondary/30 hover:border-white/50 px-2 py-0.5 rounded-sm transition-colors"
+            className="shrink-0 whitespace-nowrap text-secondary hover:text-white text-[13px] font-medium border border-secondary/30 hover:border-white/50 px-2 py-0.5 rounded-sm transition-colors"
             title={i18n.language === "en" ? "切换到中文" : "Switch to English"}
           >
             {i18n.language === "en" ? "中文" : "EN"}
           </button>
         </div>
 
-        {/* Desktop nav */}
-        <ul className="list-none hidden sm:flex flex-row gap-4 lg:gap-6 items-center">
+        {/* Desktop nav：9 个链接加左边的名字一行要 ~1150px，所以 1280px（xl）起才铺开，更窄用下面的汉堡菜单。
+            原来从 640px（sm）就铺开，900–1100px 时名字被挤成两行、语言按钮被挤变形 */}
+        <ul className="list-none hidden xl:flex flex-row gap-4 lg:gap-6 items-center">
           {isHome &&
             navLinks.map((nav) => (
               <li
@@ -94,7 +95,7 @@ const Navbar = () => {
         </ul>
 
         {/* Mobile nav */}
-        <div className="sm:hidden flex flex-1 justify-end items-center">
+        <div className="xl:hidden flex flex-1 justify-end items-center">
           <button
             onClick={() => setToggle(!toggle)}
             aria-label={toggle ? "Close menu" : "Open menu"}

@@ -22,10 +22,11 @@ const Hero = () => {
     <section className="relative w-full min-h-svh mx-auto">
       {/* pb-32：给底部的滚动提示留位置 */}
       <div
-        className={`pt-[120px] pb-32 max-w-7xl mx-auto ${styles.paddingX} flex flex-col xl:flex-row items-start gap-5 justify-between`}
+        className={`pt-[120px] pb-32 max-w-7xl mx-auto ${styles.paddingX} flex flex-col min-[900px]:flex-row items-start gap-5 justify-between`}
       >
         {/* Left Side - Text Section */}
-        <div className="flex flex-row">
+        {/* min-w-0：和照片并排时文字这一栏可以收窄，不会把照片挤出去 */}
+        <div className="flex flex-row min-w-0">
           <div className="flex flex-col justify-start items-center mt-5">
             <div className="w-5 h-5 rounded-full bg-[#915EFF]" />
             <div className="w-1 sm:h-80 h-40 violet-gradient" />
@@ -95,17 +96,17 @@ const Hero = () => {
         {/* Right Side - Profile Picture */}
         <Card
           sx={{
-            width: { xs: "100%", sm: "400px", lg: "500px", xl: "640px" },
+            // 900–1200px 屏幕窄，照片缩到 340px 给文字留地方；更宽时保持原来的 500 / 640px
+            width: { xs: "100%", md: "340px", lg: "500px", xl: "640px" },
             height: "auto",
             boxShadow: 20,
             borderRadius: "20px",
             overflow: "hidden",
             transition: "transform 0.2s",
             flexShrink: 0,
-            // 只在文字和照片左右并排时（Tailwind xl = 1280px，见上面的 xl:flex-row）显示照片。
-            // 原来用 MUI 的 md（900px），900–1280px 之间照片会排到文字下面、被挤出首屏
-            display: "none",
-            "@media (min-width: 1280px)": { display: "block" },
+            // 手机上不显示照片；从 900px（MUI md）起显示，并且和文字左右并排（上面的 min-[900px]:flex-row）。
+            // 原来要到 1280px 才并排，900–1280px 之间照片排在文字下面、被挤出首屏
+            display: { xs: "none", md: "block" },
             "&:hover": {
               transform: "scale(1.05)",
               boxShadow: 12,
@@ -116,8 +117,8 @@ const Hero = () => {
           <img
             src={profileSmall}
             srcSet={`${profileSmall} 500w, ${profileLarge} 912w`}
-            // 卡片宽度：xl 640px / lg 500px / 其他 400px（和上面 Card 的 width 对应）
-            sizes="(min-width: 1536px) 640px, (min-width: 1200px) 500px, 400px"
+            // 卡片宽度：xl 640px / lg 500px / md 340px（和上面 Card 的 width 对应）
+            sizes="(min-width: 1536px) 640px, (min-width: 1200px) 500px, 340px"
             width={912}
             height={1269}
             alt="Sizhuo Long"
